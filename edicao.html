@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editar Agenda - FocusHue</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f3f6f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #57A0D3;
+      padding: 20px;
+      text-align: center;
+      color: white;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #57A0D3;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #4a8dc1;
+    }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #666;
+      text-decoration: none;
+    }
+
+    .back:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Editar Bloco da Agenda</h1>
+</header>
+
+<div class="container">
+  <h2>Configuração de Horário</h2>
+  <form id="formAgenda">
+    <label for="horario">Horário</label>
+    <input type="time" id="horario" name="horario" required>
+
+    <label for="tipo">Tipo de Bloco</label>
+    <select id="tipo" name="tipo" required>
+      <option value="Estudo">Estudo</option>
+      <option value="Foco">Foco</option>
+      <option value="Descanso">Descanso</option>
+      <option value="Alerta de Distração">Alerta de Distração</option>
+    </select>
+
+    <button type="submit">Salvar Bloco</button>
+  </form>
+
+  <a class="back" href="agenda.html">← Voltar para Agenda</a>
+</div>
+
+<script>
+  document.getElementById('formAgenda').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const horario = document.getElementById('horario').value;
+    const tipo = document.getElementById('tipo').value;
+
+    // Simulando salvamento (você pode conectar com localStorage ou backend depois)
+    alert(`Bloco salvo: ${horario} - ${tipo}`);
+
+    // Resetando formulário
+    this.reset();
+  });
+</script>
+
+</body>
+</html>

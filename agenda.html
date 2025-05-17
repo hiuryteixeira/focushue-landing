@@ -1,0 +1,83 @@
+<!-- agenda.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda Cromática - FocusHue</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eaf5f0;
+    }
+
+    header {
+      background-color: #57A0D3;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .agenda-container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .bloco {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      border-left: 10px solid;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .bloco h3, .bloco span {
+      margin: 0;
+    }
+
+    .estudo    { border-color: #4da6ff; }
+    .foco      { border-color: #7fc97f; }
+    .descanso  { border-color: #ffd700; }
+    .alerta    { border-color: #ff6b6b; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Agenda Cromática</h1>
+  <p>Veja seus blocos configurados para o dia</p>
+</header>
+
+<div class="agenda-container">
+
+  <div class="bloco estudo">
+    <h3>09:00</h3>
+    <span>Estudo</span>
+  </div>
+
+  <div class="bloco foco">
+    <h3>11:00</h3>
+    <span>Foco</span>
+  </div>
+
+  <div class="bloco descanso">
+    <h3>12:00</h3>
+    <span>Descanso</span>
+  </div>
+
+  <div class="bloco alerta">
+    <h3>13:00</h3>
+    <span>Alerta de Distração</span>
+  </div>
+
+</div>
+
+</body>
+</html>

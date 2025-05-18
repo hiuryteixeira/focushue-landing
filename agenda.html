@@ -10,134 +10,219 @@
       --foco: #81C784;
       --descanso: #F4E06D;
       --alerta: #EF9A9A;
-      --fundo: #d7e3da;
-      --texto: #2d2d2d;
+      --bg: #d7e3da;
+      --text: #2e2e2e;
+      --bg-dark: #1c1c1c;
+      --text-dark: #eeeeee;
     }
 
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: var(--fundo);
-      color: var(--texto);
+      background-color: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease-in-out;
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
     }
 
     header {
-      background: linear-gradient(to right, #81C784, #6BAED6);
+      background: linear-gradient(to right, var(--foco), var(--estudo));
       padding: 20px;
-      text-align: center;
       color: white;
-      font-size: 1.4em;
-      letter-spacing: 1px;
-      border-bottom: 4px solid white;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+      position: relative;
+    }
+
+    .menu-toggle {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      font-size: 1.4rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      font-size: 1.4rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    nav {
+      display: none;
+      flex-direction: column;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: absolute;
+      top: 70px;
+      left: 10px;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 10;
+    }
+
+    nav a {
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      background: var(--foco);
+      color: white;
     }
 
     .agenda-container {
-      max-width: 500px;
-      margin: 40px auto;
+      max-width: 600px;
+      margin: 30px auto;
       display: flex;
       flex-direction: column;
       gap: 20px;
-      padding: 0 15px;
+      padding: 0 20px;
     }
 
     .bloco {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 22px;
+      padding: 18px 24px;
       border-radius: 12px;
       color: #fff;
       font-weight: bold;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      position: relative;
+      transition: 0.3s;
     }
 
     .bloco:hover {
       transform: scale(1.02);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .bloco .edit {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: rgba(255,255,255,0.2);
+      padding: 4px 8px;
+      border-radius: 5px;
+    }
+
+    .estudo { background: var(--estudo); }
+    .foco { background: var(--foco); }
+    .descanso { background: var(--descanso); color: #5a5100; }
+    .alerta { background: var(--alerta); }
+
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      font-size: 0.9rem;
+      color: #999;
+    }
+
+    .customize {
+      text-align: center;
+      margin: 40px auto;
+    }
+
+    .customize button {
+      margin: 5px;
+      padding: 10px 18px;
+      border: none;
+      background: #333;
+      color: white;
+      border-radius: 5px;
       cursor: pointer;
     }
 
-    .bloco.estudo {
-      background: var(--estudo);
-    }
-
-    .bloco.foco {
+    .customize button:hover {
       background: var(--foco);
-    }
-
-    .bloco.descanso {
-      background: var(--descanso);
-      color: #5c5c00;
-    }
-
-    .bloco.alerta {
-      background: var(--alerta);
-    }
-
-    .hora {
-      font-size: 1.2em;
-    }
-
-    .tipo {
-      font-size: 1.1em;
-      text-align: right;
-    }
-
-    footer {
-      margin-top: 50px;
-      text-align: center;
-      font-size: 0.9em;
-      color: #777;
     }
 
     @media (max-width: 600px) {
       .bloco {
         flex-direction: column;
         align-items: flex-start;
-        gap: 10px;
       }
-      .tipo {
-        text-align: left;
+
+      .bloco .edit {
+        top: auto;
+        bottom: 10px;
       }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    Agenda Cromática 🌈
-  </header>
+<header>
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  Agenda Cromática
+  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+</header>
 
-  <div class="agenda-container">
-    <div class="bloco estudo">
-      <div class="hora">09:00</div>
-      <div class="tipo">Estudo</div>
-    </div>
+<nav id="menu">
+  <a href="#">🏠 Início</a>
+  <a href="#">📅 Agenda</a>
+  <a href="#">⚙️ Configurações</a>
+  <a href="#">📊 Estatísticas</a>
+</nav>
 
-    <div class="bloco foco">
-      <div class="hora">11:00</div>
-      <div class="tipo">Foco</div>
-    </div>
-
-    <div class="bloco descanso">
-      <div class="hora">12:00</div>
-      <div class="tipo">Descanso</div>
-    </div>
-
-    <div class="bloco alerta">
-      <div class="hora">13:00</div>
-      <div class="tipo">Alerta de Distração</div>
-    </div>
+<section class="agenda-container">
+  <div class="bloco estudo">
+    <div>09:00 - Estudo</div>
+    <span class="edit" onclick="alert('Editar Estudo')">Editar</span>
   </div>
+  <div class="bloco foco">
+    <div>11:00 - Foco</div>
+    <span class="edit" onclick="alert('Editar Foco')">Editar</span>
+  </div>
+  <div class="bloco descanso">
+    <div>12:00 - Descanso</div>
+    <span class="edit" onclick="alert('Editar Descanso')">Editar</span>
+  </div>
+  <div class="bloco alerta">
+    <div>13:00 - Alerta de Distração</div>
+    <span class="edit" onclick="alert('Editar Alerta')">Editar</span>
+  </div>
+</section>
 
-  <footer>
-    © 2025 FocusHue. Desenvolvido com 💡 e 🎨.
-  </footer>
+<div class="customize">
+  <button onclick="alert('Alterar cores em breve')">🎨 Personalizar Cores</button>
+  <button onclick="alert('Salvar horário em breve')">💾 Salvar Agenda</button>
+</div>
 
-</body>
-</html>
+<footer>
+  © 2025 FocusHue™ — Sistema Cromático de Foco.
+</footer>
 
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+  }
+</script>
 
 </body>
 </html>

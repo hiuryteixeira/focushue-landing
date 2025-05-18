@@ -1,83 +1,143 @@
-<!-- agenda.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Agenda Cromática - FocusHue</title>
   <style>
+    :root {
+      --estudo: #6BAED6;
+      --foco: #81C784;
+      --descanso: #F4E06D;
+      --alerta: #EF9A9A;
+      --fundo: #d7e3da;
+      --texto: #2d2d2d;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 0;
-      background: #eaf5f0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--fundo);
+      color: var(--texto);
     }
 
     header {
-      background-color: #57A0D3;
-      color: white;
+      background: linear-gradient(to right, #81C784, #6BAED6);
       padding: 20px;
       text-align: center;
+      color: white;
+      font-size: 1.4em;
+      letter-spacing: 1px;
+      border-bottom: 4px solid white;
     }
 
     .agenda-container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
+      max-width: 500px;
+      margin: 40px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 0 15px;
     }
 
     .bloco {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #fff;
-      border-left: 10px solid;
-      padding: 15px 20px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 18px 22px;
+      border-radius: 12px;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .bloco h3, .bloco span {
-      margin: 0;
+    .bloco:hover {
+      transform: scale(1.02);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
     }
 
-    .estudo    { border-color: #4da6ff; }
-    .foco      { border-color: #7fc97f; }
-    .descanso  { border-color: #ffd700; }
-    .alerta    { border-color: #ff6b6b; }
+    .bloco.estudo {
+      background: var(--estudo);
+    }
+
+    .bloco.foco {
+      background: var(--foco);
+    }
+
+    .bloco.descanso {
+      background: var(--descanso);
+      color: #5c5c00;
+    }
+
+    .bloco.alerta {
+      background: var(--alerta);
+    }
+
+    .hora {
+      font-size: 1.2em;
+    }
+
+    .tipo {
+      font-size: 1.1em;
+      text-align: right;
+    }
+
+    footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 0.9em;
+      color: #777;
+    }
+
+    @media (max-width: 600px) {
+      .bloco {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .tipo {
+        text-align: left;
+      }
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Agenda Cromática</h1>
-  <p>Veja seus blocos configurados para o dia</p>
-</header>
+  <header>
+    Agenda Cromática 🌈
+  </header>
 
-<div class="agenda-container">
+  <div class="agenda-container">
+    <div class="bloco estudo">
+      <div class="hora">09:00</div>
+      <div class="tipo">Estudo</div>
+    </div>
 
-  <div class="bloco estudo">
-    <h3>09:00</h3>
-    <span>Estudo</span>
+    <div class="bloco foco">
+      <div class="hora">11:00</div>
+      <div class="tipo">Foco</div>
+    </div>
+
+    <div class="bloco descanso">
+      <div class="hora">12:00</div>
+      <div class="tipo">Descanso</div>
+    </div>
+
+    <div class="bloco alerta">
+      <div class="hora">13:00</div>
+      <div class="tipo">Alerta de Distração</div>
+    </div>
   </div>
 
-  <div class="bloco foco">
-    <h3>11:00</h3>
-    <span>Foco</span>
-  </div>
+  <footer>
+    © 2025 FocusHue. Desenvolvido com 💡 e 🎨.
+  </footer>
 
-  <div class="bloco descanso">
-    <h3>12:00</h3>
-    <span>Descanso</span>
-  </div>
+</body>
+</html>
 
-  <div class="bloco alerta">
-    <h3>13:00</h3>
-    <span>Alerta de Distração</span>
-  </div>
-
-</div>
 
 </body>
 </html>

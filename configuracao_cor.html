@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Configuração de Cor | FocusHue™</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #cfe3d4;
+      --primary: #1c1c1e;
+      --verde-foco: #8bbf9f;
+      --azul-estudo: #6aa7d9;
+      --amarelo-descanso: #e7d36f;
+      --vermelho-alerta: #e28a89;
+      --cinza-card: #f5f5f5;
+      --card-shadow: rgba(0, 0, 0, 0.1);
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--primary);
+    }
+    header {
+      padding: 1rem;
+      background: #ffffff44;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+    .circle-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 2rem auto;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--azul-estudo) 0deg 90deg,
+        var(--verde-foco) 90deg 180deg,
+        var(--amarelo-descanso) 180deg 270deg,
+        var(--vermelho-alerta) 270deg 360deg
+      );
+      position: relative;
+    }
+    .circle-container span {
+      position: absolute;
+      font-weight: bold;
+      color: #fff;
+    }
+    .circle-container .estudo { top: 10%; left: 50%; transform: translateX(-50%); }
+    .circle-container .foco { left: 10%; top: 50%; transform: translateY(-50%); }
+    .circle-container .descanso { bottom: 10%; left: 50%; transform: translateX(-50%); }
+    .circle-container .alerta { right: 10%; top: 50%; transform: translateY(-50%); }
+    .color-pickers {
+      max-width: 600px;
+      margin: 2rem auto;
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    .color-card {
+      background: var(--cinza-card);
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px var(--card-shadow);
+    }
+    .color-card label {
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .color-card input[type="color"] {
+      width: 100%;
+      height: 50px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    footer {
+      margin: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <header>🎨 Configuração de Cor</header>
+
+  <section class="circle-container">
+    <span class="estudo">Estudo</span>
+    <span class="foco">Foco</span>
+    <span class="descanso">Descanso</span>
+    <span class="alerta">Alerta</span>
+  </section>
+
+  <section class="color-pickers">
+    <div class="color-card">
+      <label for="color-estudo">Cor do Estudo</label>
+      <input type="color" id="color-estudo" value="#6aa7d9" onchange="updateColor('--azul-estudo', this.value)">
+    </div>
+    <div class="color-card">
+      <label for="color-foco">Cor do Foco</label>
+      <input type="color" id="color-foco" value="#8bbf9f" onchange="updateColor('--verde-foco', this.value)">
+    </div>
+    <div class="color-card">
+      <label for="color-descanso">Cor do Descanso</label>
+      <input type="color" id="color-descanso" value="#e7d36f" onchange="updateColor('--amarelo-descanso', this.value)">
+    </div>
+    <div class="color-card">
+      <label for="color-alerta">Cor do Alerta</label>
+      <input type="color" id="color-alerta" value="#e28a89" onchange="updateColor('--vermelho-alerta', this.value)">
+    </div>
+  </section>
+
+  <footer>FocusHue™ – Personalize seu ritmo. Viva sua cor.</footer>
+
+  <script>
+    function updateColor(variable, color) {
+      document.documentElement.style.setProperty(variable, color);
+    }
+  </script>
+</body>
+</html>

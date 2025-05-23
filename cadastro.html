@@ -214,6 +214,8 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script> <!-- SDK do Firestore adicionado -->
+
   <script>
     const firebaseConfig = {
       // Mantenha sua configuração original aqui
@@ -224,8 +226,10 @@
       messagingSenderId: "485935414293",
       appId: "1:485935414293:web:c7ead918246319e0d6a21c"
     };
+    // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore(); // Inicializa Firestore
 
     const cadastroBox = document.getElementById("cadastroBox");
     const body = document.body;
@@ -278,28 +282,47 @@
 
       auth.createUserWithEmailAndPassword(email, senha)
         .then((userCredential) => {
-          // Cadastro bem-sucedido
-          console.log("Cadastro bem-sucedido:", userCredential.user);
-          // Opcional: Atualizar perfil com o nome
-          return userCredential.user.updateProfile({
+          const user = userCredential.user;
+          console.log("Cadastro Auth bem-sucedido:", user);
+
+          // Atualizar perfil Auth com o nome
+          return user.updateProfile({
               displayName: nome
           }).then(() => {
+              console.log("Perfil Auth atualizado com nome.");
+
+              // Salvar dados no Firestore
+              // Usamos o UID do usuário como ID do documento na coleção 'users'
+              return db.collection("users").doc(user.uid).set({
+                  uid: user.uid,
+                  nome: nome,
+                  email: email,
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp() // Data/Hora de criação
+              });
+          }).then(() => {
+              console.log("Dados salvos no Firestore.");
               showMessage("Cadastro realizado com sucesso! Redirecionando...", false);
-              // Redireciona para a página principal ou de login após um breve delay
+              // Redireciona para a página de login após um breve delay
               setTimeout(() => { window.location.href = "login_v2.html"; }, 2000);
           });
         })
         .catch(error => {
-          console.error("Erro no cadastro:", error);
-          let friendlyMessage = "Ocorreu um erro ao tentar cadastrar.";
-          if (error.code === 'auth/email-already-in-use') {
-              friendlyMessage = "Este e-mail já está cadastrado.";
-          } else if (error.code === 'auth/invalid-email') {
-              friendlyMessage = "Formato de e-mail inválido.";
-          } else if (error.code === 'auth/weak-password') {
-              friendlyMessage = "A senha é muito fraca. Use pelo menos 6 caracteres.";
+          console.error("Erro no cadastro ou Firestore:", error);
+          // Verifica se é erro do Firestore ou do Auth
+          if (error.code && error.code.startsWith('firestore/')) {
+              showMessage("Erro ao salvar dados adicionais. Tente novamente.");
+          } else {
+              // Trata erros do Auth
+              let friendlyMessage = "Ocorreu um erro ao tentar cadastrar.";
+              if (error.code === 'auth/email-already-in-use') {
+                  friendlyMessage = "Este e-mail já está cadastrado.";
+              } else if (error.code === 'auth/invalid-email') {
+                  friendlyMessage = "Formato de e-mail inválido.";
+              } else if (error.code === 'auth/weak-password') {
+                  friendlyMessage = "A senha é muito fraca. Use pelo menos 6 caracteres.";
+              }
+              showMessage(friendlyMessage);
           }
-          showMessage(friendlyMessage);
         });
     }
 
@@ -309,23 +332,48 @@
 
       auth.signInWithPopup(provider)
         .then((result) => {
-          // Cadastro/Login com Google bem-sucedido
-          console.log("Login/Cadastro com Google bem-sucedido:", result.user);
-          showMessage("Login com Google realizado com sucesso! Redirecionando...", false);
-          // Redireciona para a página principal após um breve delay
-          setTimeout(() => { window.location.href = "index.html"; }, 2000);
+          const user = result.user;
+          const isNewUser = result.additionalUserInfo.isNewUser;
+          console.log("Login/Cadastro com Google bem-sucedido:", user);
+
+          // Se for um novo usuário via Google, salva no Firestore.
+          // Se for um usuário existente, apenas loga.
+          if (isNewUser) {
+              console.log("Novo usuário via Google, salvando no Firestore...");
+              return db.collection("users").doc(user.uid).set({
+                  uid: user.uid,
+                  nome: user.displayName, // Nome da conta Google
+                  email: user.email,     // Email da conta Google
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              }).then(() => {
+                  console.log("Dados do novo usuário Google salvos no Firestore.");
+                  showMessage("Cadastro com Google realizado com sucesso! Redirecionando...", false);
+                  // Redireciona para a página principal após cadastro com Google
+                  setTimeout(() => { window.location.href = "index.html"; }, 2000);
+              });
+          } else {
+              // Usuário existente logando com Google
+              console.log("Usuário existente logando com Google.");
+              showMessage("Login com Google realizado com sucesso! Redirecionando...", false);
+              // Redireciona para a página principal após login com Google
+              setTimeout(() => { window.location.href = "index.html"; }, 2000);
+              return Promise.resolve(); // Mantém a cadeia da promessa
+          }
         })
         .catch(error => {
-          console.error("Erro no login/cadastro com Google:", error);
-          let friendlyMessage = "Erro ao cadastrar/entrar com Google.";
-          if (error.code === 'auth/account-exists-with-different-credential') {
-              friendlyMessage = "Já existe uma conta com este e-mail usando um método de login diferente.";
-          } else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-             showMessage(friendlyMessage);
-          }
-          // O erro auth/unauthorized-domain deve ser resolvido no console do Firebase
-          if (error.code === 'auth/unauthorized-domain') {
-              showMessage("Erro: Domínio não autorizado para login. Verifique a configuração do Firebase.");
+          console.error("Erro no login/cadastro com Google ou Firestore:", error);
+          if (error.code && error.code.startsWith('firestore/')) {
+              showMessage("Erro ao salvar dados após login com Google.");
+          } else {
+              let friendlyMessage = "Erro ao cadastrar/entrar com Google.";
+              if (error.code === 'auth/account-exists-with-different-credential') {
+                  friendlyMessage = "Já existe uma conta com este e-mail usando um método de login diferente.";
+              } else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+                 showMessage(friendlyMessage);
+              }
+              if (error.code === 'auth/unauthorized-domain') {
+                  showMessage("Erro: Domínio não autorizado para login. Verifique a configuração do Firebase.");
+              }
           }
         });
     }

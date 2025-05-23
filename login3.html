@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - FocusHue</title>
+  <style>
+    :root {
+      --estudo: #6BAED6;
+      --foco: #81C784;
+      --descanso: #F4E06D;
+      --alerta: #EF9A9A;
+      --bg: #d7e3da;
+      --text: #2e2e2e;
+      --bg-dark: #1c1c1c;
+      --text-dark: #eeeeee;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      transition: 0.3s;
+    }
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    .login-container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+    .login-container.dark {
+      background: #2e2e2e;
+    }
+    .login-container img {
+      width: 80px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .login-btn {
+      background: var(--foco);
+      color: white;
+    }
+    .login-btn:hover {
+      background: var(--estudo);
+    }
+    .google-btn {
+      background: white;
+      color: #444;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .google-btn img {
+      width: 20px;
+    }
+    .dark .google-btn {
+      background: #444;
+      color: white;
+    }
+    .toggle-theme {
+      margin-top: 20px;
+      cursor: pointer;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container" id="loginBox">
+    <img src="logo-focushue.png" alt="FocusHue Logo" />
+    <h1>Entrar no FocusHue™</h1>
+    
+    <input type="email" placeholder="E-mail" />
+    <input type="password" placeholder="Senha" />
+    <button class="login-btn">Entrar</button>
+
+    <button class="google-btn">
+      <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google icon" />
+      Entrar com Google
+    </button>
+
+    <p class="toggle-theme" onclick="toggleTheme()">🌙 Alternar Tema Escuro</p>
+  </div>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+ <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
+      authDomain: "focushue-16683.firebaseapp.com",
+      projectId: "focushue-16683",
+      storageBucket: "focushue-16683.appspot.com",
+      messagingSenderId: "485935414293",
+      appId: "1:485935414293:web:c7ead918246319e0d6a21c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      document.getElementById("loginBox").classList.toggle("dark");
+    }
+
+    function loginEmail() {
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+      auth.signInWithEmailAndPassword(email, senha)
+        .then(() => {
+          window.location.href = "index.html";
+        })
+        .catch(error => {
+          document.getElementById("mensagemErro").innerText = "Erro: " + error.message;
+        });
+    }
+
+    function loginGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(() => {
+          window.location.href = "index.html";
+        })
+        .catch(error => {
+          document.getElementById("mensagemErro").innerText = "Erro: " + error.message;
+        });
+    }
+  </script>
+</body>
+</html>

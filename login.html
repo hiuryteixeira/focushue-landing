@@ -202,7 +202,7 @@
     </button>
 
     <div class="links">
-        <a href="cadastro.html">Não tem uma conta? Cadastre-se</a>
+        <a href="cadastro_v3.html">Não tem uma conta? Cadastre-se</a> <!-- Atualizado para apontar para cadastro_v3 -->
         <span class="toggle-theme" onclick="toggleTheme()" role="button" aria-label="Alternar tema claro/escuro">🌙 Alternar Tema</span>
     </div>
 
@@ -271,7 +271,7 @@
         .then((userCredential) => {
           // Login bem-sucedido
           console.log("Login bem-sucedido:", userCredential.user);
-          window.location.href = "index.html"; // Redireciona para a página principal
+          window.location.href = "home.html"; // Redireciona para a página principal (home.html)
         })
         .catch(error => {
           console.error("Erro no login:", error);
@@ -293,7 +293,7 @@
         .then((result) => {
           // Login com Google bem-sucedido
           console.log("Login com Google bem-sucedido:", result.user);
-          window.location.href = "index.html"; // Redireciona para a página principal
+          window.location.href = "home.html"; // Redireciona para a página principal (home.html)
         })
         .catch(error => {
           console.error("Erro no login com Google:", error);
@@ -327,4 +327,3 @@
   </script>
 </body>
 </html>
-

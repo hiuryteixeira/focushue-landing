@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - FocusHue</title>
+  <title>Cadastro - FocusHue</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --estudo: #6BAED6;
       --foco: #81C784; /* Verde principal */
-      --foco-hover: #618264; /* Verde mais escuro para hover, como em cadastro.html */
+      --foco-hover: #618264; /* Verde mais escuro para hover */
       --descanso: #F4E06D;
       --alerta: #EF9A9A;
       --bg: #d7e3da; /* Fundo claro */
@@ -39,7 +39,7 @@
 
     body {
       margin: 0;
-      font-family: 'Inter', 'Segoe UI', sans-serif; /* Usando Inter como principal */
+      font-family: 'Inter', 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text);
       display: flex;
@@ -48,7 +48,7 @@
       justify-content: center;
       min-height: 100vh;
       transition: background-color 0.3s, color 0.3s;
-      padding: 20px; /* Adiciona padding para evitar que o container cole nas bordas em telas menores */
+      padding: 20px;
     }
 
     body.dark {
@@ -56,9 +56,9 @@
       color: var(--text-dark);
     }
 
-    .login-container {
+    .container {
       background: var(--container-bg);
-      padding: 35px 45px; /* Aumentando padding */
+      padding: 35px 45px;
       border-radius: 10px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       text-align: center;
@@ -67,27 +67,28 @@
       transition: background-color 0.3s;
     }
 
-    .login-container.dark {
+    .container.dark {
       background: var(--container-bg-dark);
       box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
 
     .logo {
-        width: 50px; /* Tamanho similar ao cadastro */
+        width: 50px;
         margin-bottom: 1rem;
     }
 
-    h1 {
-      margin-bottom: 25px; /* Mais espaço abaixo do título */
+    h2 {
+      margin-bottom: 25px;
       font-size: 1.8rem;
       font-weight: 600;
     }
 
+    input[type="text"],
     input[type="email"],
     input[type="password"] {
       width: 100%;
       padding: 12px;
-      margin-bottom: 15px; /* Espaçamento entre inputs */
+      margin-bottom: 15px;
       border-radius: 6px;
       border: 1px solid var(--input-border);
       font-size: 1rem;
@@ -96,6 +97,7 @@
       transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     }
 
+    .dark input[type="text"],
     .dark input[type="email"],
     .dark input[type="password"] {
         background-color: var(--container-bg-dark);
@@ -106,22 +108,22 @@
     button {
       width: 100%;
       padding: 12px;
-      margin-top: 10px; /* Espaçamento padrão acima dos botões */
+      margin-top: 10px;
       font-size: 1rem;
-      font-weight: 600; /* Deixa o texto do botão mais forte */
+      font-weight: 600;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     }
 
-    .login-btn {
+    .cadastro-btn {
       background: var(--foco);
       color: var(--button-text);
-      margin-top: 20px; /* Mais espaço acima do botão principal */
+      margin-top: 20px;
     }
 
-    .login-btn:hover {
+    .cadastro-btn:hover {
       background: var(--foco-hover);
     }
 
@@ -133,7 +135,7 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-top: 15px; /* Espaçamento ajustado */
+      margin-top: 15px;
     }
 
     .google-btn img {
@@ -152,11 +154,11 @@
     }
 
     .links {
-        margin-top: 25px; /* Mais espaço antes dos links */
+        margin-top: 25px;
         font-size: 0.9rem;
         display: flex;
-        flex-direction: column; /* Empilha os links */
-        gap: 10px; /* Espaço entre os links */
+        flex-direction: column;
+        gap: 10px;
         align-items: center;
     }
 
@@ -179,31 +181,32 @@
         color: var(--alerta);
         margin-top: 15px;
         min-height: 1.2em; /* Reserva espaço para a mensagem */
+        text-align: center;
     }
 
   </style>
 </head>
 <body>
-  <div class="login-container" id="loginBox">
-    <!-- Opcional: Adicionar logo -->
+  <div class="container" id="cadastroBox">
     <!-- <img src="logo-focushue.png" alt="FocusHue Logo" class="logo" /> -->
-    <h1>Entrar no FocusHue™</h1>
+    <h2>Criar Conta</h2>
 
+    <input type="text" id="nome" placeholder="Nome completo" aria-label="Nome completo" />
     <input type="email" id="email" placeholder="E-mail" aria-label="E-mail" />
-    <input type="password" id="senha" placeholder="Senha" aria-label="Senha" />
+    <input type="password" id="senha" placeholder="Senha (mínimo 6 caracteres)" aria-label="Senha" />
 
-    <div class="msg" id="mensagemErro"></div>
+    <div class="msg" id="mensagemStatus"></div>
 
-    <button class="login-btn" onclick="loginEmail()">Entrar</button>
+    <button class="cadastro-btn" onclick="cadastrarEmail()">Cadastrar</button>
 
     <button class="google-btn" onclick="loginGoogle()">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon" /> <!-- Icone oficial do Firebase UI -->
-      Entrar com Google
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon" />
+      Cadastrar com Google
     </button>
 
     <div class="links">
-        <a href="cadastro.html">Não tem uma conta? Cadastre-se</a>
-        <span class="toggle-theme" onclick="toggleTheme()" role="button" aria-label="Alternar tema claro/escuro">🌙 Alternar Tema</span>
+      <a href="login_v2.html">Já tem uma conta? Entrar</a>
+      <span class="toggle-theme" onclick="toggleTheme()" role="button" aria-label="Alternar tema claro/escuro">🌙 Alternar Tema</span>
     </div>
 
   </div>
@@ -224,14 +227,14 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    const loginBox = document.getElementById("loginBox");
+    const cadastroBox = document.getElementById("cadastroBox");
     const body = document.body;
     const themeToggle = document.querySelector('.toggle-theme');
 
     // Verifica preferência de tema no localStorage
     if (localStorage.getItem('theme') === 'dark') {
         body.classList.add('dark');
-        loginBox.classList.add('dark');
+        cadastroBox.classList.add('dark');
         themeToggle.textContent = '☀️ Alternar Tema Claro';
     } else {
         themeToggle.textContent = '🌙 Alternar Tema Escuro';
@@ -239,7 +242,7 @@
 
     function toggleTheme() {
       body.classList.toggle("dark");
-      loginBox.classList.toggle("dark");
+      cadastroBox.classList.toggle("dark");
 
       // Salva preferência e atualiza texto do botão
       if (body.classList.contains('dark')) {
@@ -252,34 +255,49 @@
     }
 
     function showMessage(message, isError = true) {
-        const msgElement = document.getElementById("mensagemErro");
+        const msgElement = document.getElementById("mensagemStatus");
         msgElement.innerText = message;
         msgElement.style.color = isError ? 'var(--alerta)' : 'var(--foco)';
     }
 
-    function loginEmail() {
+    function cadastrarEmail() {
+      const nome = document.getElementById("nome").value;
       const email = document.getElementById("email").value;
       const senha = document.getElementById("senha").value;
-      showMessage(''); // Limpa mensagens anteriores
+      showMessage(""); // Limpa mensagens anteriores
 
-      if (!email || !senha) {
-          showMessage("Por favor, preencha e-mail e senha.");
+      if (!nome || !email || !senha) {
+          showMessage("Por favor, preencha todos os campos.");
           return;
       }
 
-      auth.signInWithEmailAndPassword(email, senha)
+      if (senha.length < 6) {
+          showMessage("A senha deve ter pelo menos 6 caracteres.");
+          return;
+      }
+
+      auth.createUserWithEmailAndPassword(email, senha)
         .then((userCredential) => {
-          // Login bem-sucedido
-          console.log("Login bem-sucedido:", userCredential.user);
-          window.location.href = "index.html"; // Redireciona para a página principal
+          // Cadastro bem-sucedido
+          console.log("Cadastro bem-sucedido:", userCredential.user);
+          // Opcional: Atualizar perfil com o nome
+          return userCredential.user.updateProfile({
+              displayName: nome
+          }).then(() => {
+              showMessage("Cadastro realizado com sucesso! Redirecionando...", false);
+              // Redireciona para a página principal ou de login após um breve delay
+              setTimeout(() => { window.location.href = "login_v2.html"; }, 2000);
+          });
         })
         .catch(error => {
-          console.error("Erro no login:", error);
-          let friendlyMessage = "Ocorreu um erro ao tentar fazer login.";
-          if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-              friendlyMessage = "E-mail ou senha inválidos.";
+          console.error("Erro no cadastro:", error);
+          let friendlyMessage = "Ocorreu um erro ao tentar cadastrar.";
+          if (error.code === 'auth/email-already-in-use') {
+              friendlyMessage = "Este e-mail já está cadastrado.";
           } else if (error.code === 'auth/invalid-email') {
               friendlyMessage = "Formato de e-mail inválido.";
+          } else if (error.code === 'auth/weak-password') {
+              friendlyMessage = "A senha é muito fraca. Use pelo menos 6 caracteres.";
           }
           showMessage(friendlyMessage);
         });
@@ -287,22 +305,22 @@
 
     function loginGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      showMessage(''); // Limpa mensagens anteriores
+      showMessage(""); // Limpa mensagens anteriores
 
       auth.signInWithPopup(provider)
         .then((result) => {
-          // Login com Google bem-sucedido
-          console.log("Login com Google bem-sucedido:", result.user);
-          window.location.href = "index.html"; // Redireciona para a página principal
+          // Cadastro/Login com Google bem-sucedido
+          console.log("Login/Cadastro com Google bem-sucedido:", result.user);
+          showMessage("Login com Google realizado com sucesso! Redirecionando...", false);
+          // Redireciona para a página principal após um breve delay
+          setTimeout(() => { window.location.href = "index.html"; }, 2000);
         })
         .catch(error => {
-          console.error("Erro no login com Google:", error);
-          let friendlyMessage = "Erro ao fazer login com Google.";
-          // Códigos de erro comuns do Popup: auth/popup-closed-by-user, auth/cancelled-popup-request
+          console.error("Erro no login/cadastro com Google:", error);
+          let friendlyMessage = "Erro ao cadastrar/entrar com Google.";
           if (error.code === 'auth/account-exists-with-different-credential') {
               friendlyMessage = "Já existe uma conta com este e-mail usando um método de login diferente.";
           } else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-             // Não mostra mensagem se o usuário simplesmente fechou o popup
              showMessage(friendlyMessage);
           }
           // O erro auth/unauthorized-domain deve ser resolvido no console do Firebase
@@ -313,14 +331,19 @@
     }
 
     // Adiciona listener para tecla Enter nos campos
+    document.getElementById('nome').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            cadastrarEmail();
+        }
+    });
     document.getElementById('email').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            loginEmail();
+            cadastrarEmail();
         }
     });
     document.getElementById('senha').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            loginEmail();
+            cadastrarEmail();
         }
     });
 

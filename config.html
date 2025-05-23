@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Configurações - FocusHue</title>
+  <style>
+    :root {
+      --foco: #81C784;
+      --estudo: #6BAED6;
+      --descanso: #F4E06D;
+      --alerta: #EF9A9A;
+      --bg: #d7e3da;
+      --text: #2e2e2e;
+      --bg-dark: #1c1c1c;
+      --text-dark: #eeeeee;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: 0.3s;
+    }
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    header {
+      background: linear-gradient(to right, var(--foco), var(--estudo));
+      padding: 20px;
+      color: white;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+      position: relative;
+    }
+    .menu-toggle, .theme-toggle {
+      position: absolute;
+      top: 20px;
+      font-size: 1.4rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .menu-toggle { left: 20px; }
+    .theme-toggle { right: 20px; }
+    nav {
+      display: none;
+      flex-direction: column;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: absolute;
+      top: 70px;
+      left: 10px;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 10;
+    }
+    nav a {
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      background: var(--foco);
+      color: white;
+    }
+    main {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h2 {
+      margin-top: 20px;
+    }
+    .config-section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .config-section label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    .config-section input,
+    .config-section select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      font-size: 0.9rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    Configurações
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+  </header>
+
+  <nav id="menu">
+    <a href="index.html">🏠 Início</a>
+    <a href="agenda.html">📅 Agenda</a>
+    <a href="tarefas.html">✅ Tarefas</a>
+    <a href="config.html">⚙️ Configurações</a>
+    <a href="estatisticas.html">📊 Estatísticas</a>
+    <a href="notificacoes.html">🔔 Notificações</a>
+    <a href="login.html">🔐 Login</a>
+  </nav>
+
+  <main>
+    <div class="config-section">
+      <h2>Preferências do Usuário</h2>
+      <label for="tema">Tema do App:</label>
+      <select id="tema">
+        <option>Claro</option>
+        <option>Escuro</option>
+      </select>
+
+      <label for="idioma">Idioma:</label>
+      <select id="idioma">
+        <option>Português</option>
+        <option>Inglês</option>
+        <option>Espanhol</option>
+      </select>
+    </div>
+
+    <div class="config-section">
+      <h2>Notificações</h2>
+      <label><input type="checkbox" checked /> Notificar início de blocos</label>
+      <label><input type="checkbox" /> Notificar término de foco</label>
+      <label><input type="checkbox" /> Lembrete para descanso</label>
+    </div>
+
+    <div class="config-section">
+      <h2>Outras Opções</h2>
+      <button onclick="alert('Preferências salvas!')">Salvar Alterações</button>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 FocusHue™ — Sistema Cromático de Foco.
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hora de Produzir - FocusHue</title>
+  <style>
+    :root {
+      --estudo: #6BAED6;
+      --foco: #81C784;
+      --descanso: #F4E06D;
+      --alerta: #EF9A9A;
+      --bg: #d7e3da;
+      --text: #2e2e2e;
+      --bg-dark: #1c1c1c;
+      --text-dark: #eeeeee;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease-in-out;
+    }
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    header {
+      background: linear-gradient(to right, var(--foco), var(--estudo));
+      padding: 20px;
+      color: white;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+      position: relative;
+    }
+    .menu-toggle, .theme-toggle {
+      position: absolute;
+      top: 20px;
+      font-size: 1.4rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .menu-toggle { left: 20px; }
+    .theme-toggle { right: 20px; }
+    nav {
+      display: none;
+      flex-direction: column;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: absolute;
+      top: 70px;
+      left: 10px;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 10;
+    }
+    nav a {
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      background: var(--foco);
+      color: white;
+    }
+    main {
+      max-width: 700px;
+      margin: 60px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    .hora {
+      font-size: 4rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .titulo {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 1rem;
+      color: white;
+    }
+    .notificacao {
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      font-size: 0.9rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  Hora de Produzir
+  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+</header>
+
+<nav id="menu">
+  <a href="index.html">🏠 Início</a>
+  <a href="agenda.html">📅 Agenda</a>
+  <a href="tarefas.html">✅ Tarefas</a>
+  <a href="config.html">⚙️ Configurações</a>
+  <a href="estatisticas.html">📊 Estatísticas</a>
+  <a href="notificacoes.html">🔔 Notificações</a>
+  <a href="login.html">🔐 Login</a>
+</nav>
+
+<main>
+  <div class="hora" id="horarioAtual">--:--</div>
+  <div class="titulo">Hora de Produzir</div>
+  <div class="tag" id="modoAtual">Carregando...</div>
+  <div class="notificacao" id="mensagemNotificacao"></div>
+</main>
+
+<footer>
+  © 2025 FocusHue™ — Sistema Cromático de Foco.
+</footer>
+
+<audio id="alarme" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_9ca1f7b5c2.mp3?filename=alarm-103046.mp3" preload="auto"></audio>
+
+<script>
+  let ultimoModo = "";
+
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+  }
+
+  function atualizarHora() {
+    const agora = new Date();
+    const horas = agora.getHours().toString().padStart(2, '0');
+    const minutos = agora.getMinutes().toString().padStart(2, '0');
+    const horaAtual = `${horas}:${minutos}`;
+    document.getElementById("horarioAtual").textContent = horaAtual;
+    definirModoAtual(horaAtual);
+  }
+
+  function definirModoAtual(horaAtual) {
+    const agenda = JSON.parse(localStorage.getItem("agenda-dia") || "[]");
+
+    let modoAtual = "produtividade";
+    for (let bloco of agenda) {
+      if (horaAtual >= bloco.inicio && horaAtual < bloco.fim) {
+        modoAtual = bloco.tipo;
+        break;
+      }
+    }
+
+    if (modoAtual !== ultimoModo) {
+      tocarAlarme();
+      mostrarNotificacao(modoAtual);
+      localStorage.setItem("led-status", modoAtual);
+      ultimoModo = modoAtual;
+    }
+
+    const nomeExibido = modoAtual.charAt(0).toUpperCase() + modoAtual.slice(1);
+    document.getElementById("modoAtual").textContent = nomeExibido;
+    document.getElementById("modoAtual").style.backgroundColor =
+      getComputedStyle(document.documentElement).getPropertyValue(`--${modoAtual}`);
+    document.getElementById("mensagemNotificacao").textContent = `Agora é hora de ${modoAtual}!`;
+  }
+
+  function tocarAlarme() {
+    document.getElementById("alarme").play();
+  }
+
+  function mostrarNotificacao(modo) {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("FocusHue", { body: `Hora de ${modo}!` });
+    }
+  }
+
+  function solicitarPermissaoNotificacao() {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }
+
+  function carregarPreferencias() {
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") document.body.classList.add("dark");
+
+    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    carregarPreferencias();
+    solicitarPermissaoNotificacao();
+    atualizarHora();
+    setInterval(atualizarHora, 60000);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!-- Arquivo base contendo as principais páginas do sistema FocusHue com suporte a cores salvas via localStorage -->
+
+<!-- ===================== index.html ===================== -->
+<!-- Reutiliza o mesmo estilo, layout e script de carregamento de cores -->
+
+<!-- ===================== tarefas.html ===================== -->
+<!-- Substitua o conteúdo conforme a funcionalidade de tarefas -->
+
+<!-- ===================== config.html ===================== -->
+<!-- Pode mostrar preferências gerais e botão para acessar a paleta -->
+
+<!-- ===================== estatisticas.html ===================== -->
+<!-- Pode incluir gráficos com cores de foco, estudo etc. utilizando as variáveis -->
+
+<!-- ===================== notificacoes.html ===================== -->
+<!-- Alerta de cor vermelha para notificações urgentes -->
+
+<!-- ===================== login.html ===================== -->
+<!-- Tela de login estilizada com as variáveis cromáticas -->
+
+<!-- Cada página deve incluir no final o seguinte script: -->
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+  }
+
+  function carregarCoresSalvas() {
+    const variaveis = ['--estudo', '--foco', '--descanso', '--alerta'];
+    variaveis.forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) {
+        document.documentElement.style.setProperty(variable, corSalva);
+      }
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', carregarCoresSalvas);
+</script>
+
+<!-- Basta copiar o modelo da agenda.html e adaptar o conteúdo principal -->

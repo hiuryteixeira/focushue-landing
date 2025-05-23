@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Agenda Cromática - FocusHue</title>
+  <title>Agenda Diária - FocusHue</title>
   <style>
     :root {
       --estudo: #6BAED6;
@@ -21,7 +21,6 @@
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      transition: all 0.3s ease-in-out;
     }
 
     body.dark {
@@ -39,9 +38,8 @@
       position: relative;
     }
 
-    .menu-toggle {
+    .menu-toggle, .theme-toggle {
       position: absolute;
-      left: 20px;
       top: 20px;
       font-size: 1.4rem;
       background: none;
@@ -50,28 +48,19 @@
       cursor: pointer;
     }
 
-    .theme-toggle {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      font-size: 1.4rem;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
+    .menu-toggle { left: 20px; }
+    .theme-toggle { right: 20px; }
 
     nav {
       display: none;
       flex-direction: column;
       background: rgba(255,255,255,0.95);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       position: absolute;
       top: 70px;
       left: 10px;
       border-radius: 8px;
       padding: 10px;
-      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     nav a {
@@ -80,7 +69,6 @@
       color: #333;
       font-weight: 500;
       border-radius: 5px;
-      transition: 0.3s;
     }
 
     nav a:hover {
@@ -89,47 +77,44 @@
     }
 
     .agenda-container {
-      max-width: 600px;
+      max-width: 700px;
       margin: 30px auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
       padding: 0 20px;
     }
 
     .bloco {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 18px 24px;
-      border-radius: 12px;
-      color: #fff;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      color: white;
       font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      position: relative;
-      transition: 0.3s;
     }
 
-    .bloco:hover {
-      transform: scale(1.02);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-    }
-
-    .bloco .edit {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      background: rgba(255,255,255,0.2);
-      padding: 4px 8px;
+    select, input[type="time"] {
+      padding: 5px;
       border-radius: 5px;
+      border: none;
+      font-weight: bold;
     }
 
-    .estudo { background: var(--estudo); }
-    .foco { background: var(--foco); }
-    .descanso { background: var(--descanso); color: #5a5100; }
-    .alerta { background: var(--alerta); }
+    .estudo { background-color: var(--estudo); }
+    .foco { background-color: var(--foco); }
+    .descanso { background-color: var(--descanso); color: #333; }
+    .alerta { background-color: var(--alerta); }
+
+    .add-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: var(--foco);
+      color: white;
+    }
 
     footer {
       text-align: center;
@@ -137,8 +122,7 @@
       font-size: 0.9rem;
       color: #999;
     }
-
-    .customize {
+	.customize {
       text-align: center;
       margin: 40px auto;
     }
@@ -156,59 +140,33 @@
     .customize button:hover {
       background: var(--foco);
     }
-
-    @media (max-width: 600px) {
-      .bloco {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .bloco .edit {
-        top: auto;
-        bottom: 10px;
-      }
-    }
   </style>
 </head>
 <body>
 
 <header>
   <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-  Agenda Cromática
+  Agenda Diária
   <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
 </header>
 
 <nav id="menu">
-  <a href="#">🏠 Início</a>
-  <a href="#">📅 Agenda</a>
-  <a href="#">⚙️ Configurações</a>
-  <a href="#">📊 Estatísticas</a>
+  <a href="index.html">🏠 Início</a>
+  <a href="agenda.html">📅 Agenda</a>
+  <a href="tarefas.html">✅ Tarefas</a>
+  <a href="config.html">⚙️ Configurações</a>
+  <a href="estatisticas.html">📊 Estatísticas</a>
+  <a href="notificacoes.html">🔔 Notificações</a>
+  <a href="login.html">🔐 Login</a>
 </nav>
 
 <section class="agenda-container">
-  <div class="bloco estudo">
-    <div>09:00 - Estudo</div>
-    <span class="edit" onclick="alert('Editar Estudo')">Editar</span>
-  </div>
-  <div class="bloco foco">
-    <div>11:00 - Foco</div>
-    <span class="edit" onclick="alert('Editar Foco')">Editar</span>
-  </div>
-  <div class="bloco descanso">
-    <div>12:00 - Descanso</div>
-    <span class="edit" onclick="alert('Editar Descanso')">Editar</span>
-  </div>
-  <div class="bloco alerta">
-    <div>13:00 - Alerta de Distração</div>
-    <span class="edit" onclick="alert('Editar Alerta')">Editar</span>
-  </div>
+  <div id="blocosDia"></div>
+  <button class="add-btn" onclick="adicionarBloco()">+ Adicionar Bloco</button>
 </section>
-
 <div class="customize">
-  <button onclick="alert('Alterar cores em breve')">🎨 Personalizar Cores</button>
-  <button onclick="alert('Salvar horário em breve')">💾 Salvar Agenda</button>
+  <button onclick="window.location.href='paleta.html'">🎨 Personalizar Cores</button>
 </div>
-
 <footer>
   © 2025 FocusHue™ — Sistema Cromático de Foco.
 </footer>
@@ -222,7 +180,56 @@
   function toggleTheme() {
     document.body.classList.toggle("dark");
   }
+
+  function salvarAgenda() {
+    const blocos = [...document.querySelectorAll(".bloco")].map(bloco => {
+      return {
+        tipo: bloco.querySelector("select").value,
+        inicio: bloco.querySelector(".inicio").value,
+        fim: bloco.querySelector(".fim").value
+      };
+    });
+    localStorage.setItem("agenda-dia", JSON.stringify(blocos));
+  }
+
+  function carregarAgenda() {
+    const data = JSON.parse(localStorage.getItem("agenda-dia") || "[]");
+    data.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim));
+  }
+
+  function adicionarBloco(tipo = "foco", inicio = "08:00", fim = "09:00") {
+    const container = document.getElementById("blocosDia");
+    const div = document.createElement("div");
+    div.className = `bloco ${tipo}`;
+
+    div.innerHTML = `
+      <select onchange="this.parentElement.className='bloco ' + this.value; salvarAgenda();">
+        <option value="foco" ${tipo === "foco" ? "selected" : ""}>Foco</option>
+        <option value="estudo" ${tipo === "estudo" ? "selected" : ""}>Estudo</option>
+        <option value="descanso" ${tipo === "descanso" ? "selected" : ""}>Descanso</option>
+        <option value="alerta" ${tipo === "alerta" ? "selected" : ""}>Alerta</option>
+      </select>
+      <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()" />
+      <span>às</span>
+      <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()" />
+      <button onclick="this.parentElement.remove(); salvarAgenda()">❌</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function carregarCoresSalvas() {
+    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    carregarCoresSalvas();
+    carregarAgenda();
+  });
 </script>
 
 </body>
 </html>
+

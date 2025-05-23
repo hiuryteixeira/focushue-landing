@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minhas Tarefas - FocusHue</title>
+  <style>
+    :root {
+      --estudo: #6BAED6;
+      --foco: #81C784;
+      --descanso: #F4E06D;
+      --alerta: #EF9A9A;
+      --bg: #d7e3da;
+      --text: #2e2e2e;
+      --bg-dark: #1c1c1c;
+      --text-dark: #eeeeee;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease-in-out;
+    }
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    header {
+      background: linear-gradient(to right, var(--foco), var(--estudo));
+      padding: 20px;
+      color: white;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+      position: relative;
+    }
+    .menu-toggle, .theme-toggle {
+      position: absolute;
+      top: 20px;
+      font-size: 1.4rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .menu-toggle { left: 20px; }
+    .theme-toggle { right: 20px; }
+    nav {
+      display: none;
+      flex-direction: column;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: absolute;
+      top: 70px;
+      left: 10px;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 10;
+    }
+    nav a {
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      background: var(--foco);
+      color: white;
+    }
+    .tarefas-container {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .tarefa {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-radius: 10px;
+      color: white;
+      font-weight: 500;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .tarefa .tipo { font-size: 0.85rem; opacity: 0.8; }
+    .tarefa .botoes {
+      display: flex;
+      gap: 8px;
+    }
+    .tarefa button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+    .estudo { background: var(--estudo); }
+    .foco { background: var(--foco); }
+    .descanso { background: var(--descanso); color: #5a5100; }
+    .alerta { background: var(--alerta); }
+    .add-tarefa {
+      text-align: center;
+      margin: 30px auto 10px;
+    }
+    .add-tarefa button {
+      background: var(--foco);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .add-tarefa button:hover { background: var(--estudo); }
+    
+	footer {
+      text-align: center;
+      padding: 30px 0;
+      font-size: 0.9rem;
+      color: #999;
+    }
+	 .customize {
+      text-align: center;
+      margin: 40px auto;
+    }
+
+    .customize button {
+      margin: 5px;
+      padding: 10px 18px;
+      border: none;
+      background: #333;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .customize button:hover {
+      background: var(--foco);
+    }
+    @media (max-width: 600px) {
+      .tarefa {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .botoes { margin-top: 10px; }
+	  .bloco .edit {
+        top: auto;
+        bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  Minhas Tarefas
+  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+</header>
+  <nav id="menu">
+    <a href="index.html">🏠 Início</a>
+    <a href="agenda.html">📅 Agenda</a>
+    <a href="tarefas.html">✅ Tarefas</a>
+    <a href="config.html">⚙️ Configurações</a>
+    <a href="estatisticas.html">📊 Estatísticas</a>
+    <a href="notificacoes.html">🔔 Notificações</a>
+    <a href="login.html">🔐 Login</a>
+  </nav>
+<section class="tarefas-container" id="listaTarefas">
+</section>
+<div class="add-tarefa">
+  <button onclick="adicionarTarefa()">➕ Adicionar Tarefa</button>
+</div>
+<footer>
+  © 2025 FocusHue™ — Sistema Cromático de Foco.
+</footer>
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+  }
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+  }
+  const tarefas = [
+    { titulo: "Estudar para prova", tipo: "Estudo" },
+    { titulo: "Finalizar relatório", tipo: "Foco" },
+    { titulo: "Caminhada leve", tipo: "Descanso" },
+    { titulo: "Redes Sociais", tipo: "Alerta" },
+  ];
+  function renderTarefas() {
+    const lista = document.getElementById("listaTarefas");
+    lista.innerHTML = "";
+    tarefas.forEach((t, i) => {
+      const div = document.createElement("div");
+      const tipoClass = t.tipo.toLowerCase();
+      div.className = `tarefa ${tipoClass}`;
+      div.innerHTML = `
+        <div><div>${t.titulo}</div><div class="tipo">${t.tipo}</div></div>
+        <div class="botoes">
+          <button onclick="editarTarefa(${i})">✏️</button>
+          <button onclick="excluirTarefa(${i})">🗑️</button>
+        </div>
+      `;
+      lista.appendChild(div);
+    });
+  }
+  function adicionarTarefa() {
+    const titulo = prompt("Digite o título da tarefa:");
+    const tipo = prompt("Tipo: Estudo, Foco, Descanso ou Alerta").trim();
+    if (titulo && tipo) {
+      tarefas.push({ titulo, tipo });
+      renderTarefas();
+    }
+  }
+  function editarTarefa(i) {
+    const novoTitulo = prompt("Novo título:", tarefas[i].titulo);
+    const novoTipo = prompt("Novo tipo:", tarefas[i].tipo);
+    if (novoTitulo && novoTipo) {
+      tarefas[i] = { titulo: novoTitulo, tipo: novoTipo };
+      renderTarefas();
+    }
+  }
+  function excluirTarefa(i) {
+    if (confirm("Tem certeza que deseja excluir esta tarefa?")) {
+      tarefas.splice(i, 1);
+      renderTarefas();
+    }
+  }
+  renderTarefas();
+  function carregarCoresSalvas() {
+    const variaveis = ['--estudo', '--foco', '--descanso', '--alerta'];
+    variaveis.forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) {
+        document.documentElement.style.setProperty(variable, corSalva);
+      }
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', carregarCoresSalvas);
+</script>
+</body>
+</html>

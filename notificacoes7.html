@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <!-- Firebase SDK CORRETO para HTML puro -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+  // SEU CÓDIGO COPIADO DO FIREBASE
+  const firebaseConfig = {
+    apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
+    authDomain: "focushue-16683.firebaseapp.com",
+    projectId: "focushue-16683",
+    storageBucket: "focushue-16683.firebasestorage.app",
+    messagingSenderId: "485935414293",
+    appId: "1:485935414293:web:c7ead918246319e0d6a21c"
+  };
+
+  // Inicializa Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notificações - FocusHue</title>
+  <style>
+    :root {
+      --estudo: #6BAED6;
+      --foco: #81C784;
+      --descanso: #F4E06D;
+      --alerta: #EF9A9A;
+      --bg: #d7e3da;
+      --text: #2e2e2e;
+      --bg-dark: #1c1c1c;
+      --text-dark: #eeeeee;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease-in-out;
+    }
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+	  
+    }
+		button {
+	transition: background 0.3s, color 0.3s, border 0.3s;
+	}
+	.dark button {
+	background: #333;
+	color: white;
+	border: 1px solid #666;
+	}
+	
+    header {
+      background: linear-gradient(to right, var(--alerta), var(--estudo));
+      padding: 20px;
+      color: white;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+      position: relative;
+    }
+	.container {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .form input, .form select {
+      padding: 10px;
+      font-size: 1rem;
+      flex: 1;
+      min-width: 100px;
+    }
+    .form button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: var(--foco);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+	
+	
+	
+    .menu-toggle, .theme-toggle {
+      position: absolute;
+      top: 20px;
+      font-size: 1.4rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .menu-toggle { left: 20px; }
+    .theme-toggle { right: 20px; }
+    nav {
+      display: none;
+      flex-direction: column;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: absolute;
+      top: 70px;
+      left: 10px;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 10;
+    }
+    nav a {
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      background: var(--foco);
+      color: white;
+    }
+	.notificacoes {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .notificacoes-container {
+      max-width: 600px;
+      margin: 30px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 0 20px;
+    }
+    .notificacao {
+      background-color: white;
+      border-left: 6px solid var(--alerta);
+      border-radius: 8px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .notificacao .hora {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .notificacao .mensagem {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .notificacao .edit {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 0.85rem;
+      background: rgba(0,0,0,0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      font-size: 0.9rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  Notificações
+  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+</header>
+
+<nav id="menu">
+  <a href="index.html">🏠 Início</a>
+  <a href="agenda.html">📅 Agenda</a>
+  <a href="tarefas.html">✅ Tarefas</a>
+  <a href="config.html">⚙️ Configurações</a>
+  <a href="estatisticas.html">📊 Estatísticas</a>
+  <a href="notificacoes.html">🔔 Notificações</a>
+  <a href="login.html">🔐 Login</a>
+</nav>
+
+<section class="notificacoes-container" id="listaNotificacoes"></section>
+
+<div style="text-align:center; margin: 30px;">
+  <input type="time" id="hora" required style="padding: 8px; font-size: 1rem;" />
+  <input type="text" id="mensagem" placeholder="Mensagem da notificação" style="padding: 8px; width: 200px; font-size: 1rem;" />
+  <select id="modo" style="padding: 8px; font-size: 1rem;">
+    <option value="estudo">Estudo</option>
+    <option value="foco">Foco</option>
+    <option value="descanso">Descanso</option>
+    <option value="alerta">Alerta</option>
+  </select>
+  <button onclick="salvarNotificacao()" style="padding: 10px 20px; font-size: 1rem; background: var(--foco); color: white; border: none; border-radius: 6px; cursor: pointer;">
+    ➕ Salvar
+  </button>
+
+</div>
+
+
+<footer>
+  © 2025 FocusHue™ — Sistema Cromático de Foco.
+</footer>
+
+<script>
+let notificacaoEditandoId = null;
+function carregarCoresSalvas() {
+    const variaveis = ['--estudo', '--foco', '--descanso', '--alerta'];
+    variaveis.forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) {
+        document.documentElement.style.setProperty(variable, corSalva);
+      }
+    });
+  }
+  
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+  }
+
+
+    window.salvarNotificacao = async function() {
+      const hora = document.getElementById("hora").value;
+      const mensagem = document.getElementById("mensagem").value;
+      const modo = document.getElementById("modo").value;
+
+      if (!hora || !mensagem || !modo) {
+        alert("Preencha todos os campos!");
+        return;
+      }
+
+      if (notificacaoEditandoId) {
+        await db.collection("notificacoes").doc(notificacaoEditandoId).update({ hora, mensagem, modo });
+        notificacaoEditandoId = null;
+      } else {
+        await db.collection("notificacoes").add({ hora, mensagem, modo });
+      }
+
+      listarNotificacoes();
+      document.getElementById("hora").value = "";
+      document.getElementById("mensagem").value = "";
+    }
+
+    window.excluirNotificacao = async function(id) {
+      if (confirm("Deseja realmente excluir esta notificação?")) {
+        await db.collection("notificacoes").doc(id).delete();
+        listarNotificacoes();
+      }
+    }
+
+    window.prepararEdicao = function(id, hora, mensagem, modo) {
+      document.getElementById("hora").value = hora;
+      document.getElementById("mensagem").value = mensagem;
+      document.getElementById("modo").value = modo;
+      notificacaoEditandoId = id;
+    }
+
+    async function listarNotificacoes() {
+      const container = document.getElementById("listaNotificacoes");
+      container.innerHTML = "";
+      const snapshot = await db.collection("notificacoes").orderBy("hora").get();
+      snapshot.forEach(doc => {
+        const dados = doc.data();
+        const div = document.createElement("div");
+        div.className = "notificacao";
+
+        let cor = "var(--alerta)";
+        if (dados.modo === "foco") cor = "var(--foco)";
+        else if (dados.modo === "estudo") cor = "var(--estudo)";
+        else if (dados.modo === "descanso") cor = "var(--descanso)";
+        div.style.borderLeft = `6px solid ${cor}`;
+
+        div.innerHTML = `
+          <div class="hora">${dados.hora}</div>
+          <div class="mensagem">${dados.mensagem}</div>
+          <button onclick="excluirNotificacao('${doc.id}')">🗑️ Excluir</button>
+          <button class="edit" onclick="prepararEdicao('${doc.id}', '${dados.hora}', '${dados.mensagem}', '${dados.modo}')">✏️ Editar</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+
+	
+</script>
+
+</body>
+</html>

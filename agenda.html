@@ -205,6 +205,38 @@
         color: var(--foco);
     }
 
+    /* Estilo para mensagens de erro */
+    #mensagemErro {
+        text-align: center;
+        margin: 15px auto;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: rgba(239, 154, 154, 0.2);
+        color: #d32f2f;
+        font-size: 0.9rem;
+        max-width: 90%;
+        display: none;
+    }
+    .dark #mensagemErro {
+        background-color: rgba(239, 154, 154, 0.1);
+    }
+
+    /* Estilo para o botão de tentar novamente */
+    #btnTentarNovamente {
+        display: block;
+        margin: 10px auto;
+        padding: 8px 16px;
+        background-color: var(--foco);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    #btnTentarNovamente:hover {
+        background-color: var(--estudo);
+    }
+
   </style>
 </head>
 <body>
@@ -226,6 +258,12 @@
 </nav>
 
 <section class="agenda-container" id="agendaContainer">
+  <!-- Mensagem de erro -->
+  <div id="mensagemErro">
+    Erro ao carregar ou salvar sua agenda. 
+    <button id="btnTentarNovamente" onclick="carregarAgenda()">Tentar Novamente</button>
+  </div>
+  
   <div id="blocosDia"></div>
   <button class="add-btn" onclick="adicionarBloco()">+ Adicionar Bloco</button>
   <div id="statusSalvo">Agenda salva!</div> <!-- Feedback de salvamento -->
@@ -250,7 +288,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
-  // Configuração Firebase (Mantenha a sua)
+  // Configuração Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
     authDomain: "focushue-16683.firebaseapp.com",
@@ -259,12 +297,28 @@
     messagingSenderId: "485935414293",
     appId: "1:485935414293:web:c7ead918246319e0d6a21c"
   };
-  firebase.initializeApp(firebaseConfig);
+  
+  // Inicialização do Firebase
+  try {
+    firebase.initializeApp(firebaseConfig);
+    console.log("Firebase inicializado com sucesso");
+  } catch (error) {
+    console.error("Erro ao inicializar Firebase:", error);
+    mostrarErro("Erro ao inicializar o Firebase. Verifique sua conexão com a internet.");
+  }
+  
   const auth = firebase.auth();
   const db = firebase.firestore();
 
   let currentUser = null;
   let debounceTimer; // Para evitar salvamentos excessivos
+
+  // Elementos da UI
+  const mensagemErro = document.getElementById('mensagemErro');
+  const blocosDia = document.getElementById('blocosDia');
+  const statusSalvo = document.getElementById('statusSalvo');
+  const agendaContainer = document.getElementById('agendaContainer');
+  const mensagemLogin = document.getElementById('mensagemLogin');
 
   function toggleMenu() {
     const menu = document.getElementById("menu");
@@ -287,128 +341,236 @@
   }
 
   function mostrarStatusSalvo() {
-      const status = document.getElementById('statusSalvo');
-      status.style.opacity = 1;
-      setTimeout(() => { status.style.opacity = 0; }, 1500); // Esconde após 1.5s
+      statusSalvo.style.opacity = 1;
+      setTimeout(() => { statusSalvo.style.opacity = 0; }, 1500); // Esconde após 1.5s
+  }
+
+  function mostrarErro(mensagem) {
+      console.error("ERRO:", mensagem);
+      mensagemErro.textContent = mensagem;
+      mensagemErro.style.display = 'block';
+      
+      // Adiciona o botão de tentar novamente
+      const btnTentarNovamente = document.getElementById('btnTentarNovamente');
+      if (!btnTentarNovamente) {
+          const btn = document.createElement('button');
+          btn.id = 'btnTentarNovamente';
+          btn.textContent = 'Tentar Novamente';
+          btn.onclick = carregarAgenda;
+          mensagemErro.appendChild(btn);
+      }
+  }
+
+  function esconderErro() {
+      mensagemErro.style.display = 'none';
   }
 
   // --- Funções da Agenda com Firestore --- 
   function salvarAgenda() {
     if (!currentUser) return;
+    esconderErro(); // Esconde mensagens de erro anteriores
 
     // Debounce para evitar salvamentos múltiplos rápidos
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
         console.log("Salvando agenda no Firestore para:", currentUser.uid);
-        const blocos = [...document.querySelectorAll(".bloco")].map(bloco => {
-          return {
-            tipo: bloco.querySelector("select").value,
-            inicio: bloco.querySelector(".inicio").value,
-            fim: bloco.querySelector(".fim").value
-          };
-        });
+        
+        try {
+            // Coleta os dados dos blocos
+            const blocos = [...document.querySelectorAll(".bloco")].map(bloco => {
+              return {
+                tipo: bloco.querySelector("select").value,
+                inicio: bloco.querySelector(".inicio").value,
+                fim: bloco.querySelector(".fim").value
+              };
+            });
 
-        // Salva a agenda na subcoleção 'agenda' do usuário, documento 'dia'
-        db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia")
-          .set({ blocos: blocos })
-          .then(() => {
-            console.log("Agenda salva com sucesso no Firestore!");
-            mostrarStatusSalvo();
-          })
-          .catch((error) => {
-            console.error("Erro ao salvar agenda no Firestore:", error);
-            alert("Erro ao salvar a agenda. Verifique sua conexão ou tente novamente.");
-          });
+            // Verifica se há dados para salvar
+            if (!blocos || blocos.length === 0) {
+                console.log("Nenhum bloco para salvar, adicionando bloco padrão");
+                adicionarBloco("foco", "09:00", "10:00", false);
+                return; // Sai da função, o adicionarBloco vai chamar salvarAgenda novamente
+            }
+
+            // Prepara o objeto de dados
+            const agendaData = { 
+                blocos: blocos,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Salva no Firestore
+            db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia")
+              .set(agendaData)
+              .then(() => {
+                console.log("Agenda salva com sucesso no Firestore!");
+                mostrarStatusSalvo();
+              })
+              .catch((error) => {
+                console.error("Erro ao salvar agenda no Firestore:", error);
+                mostrarErro("Erro ao salvar a agenda: " + error.message);
+                
+                // Salva localmente como backup
+                localStorage.setItem(`agenda-backup-${currentUser.uid}`, JSON.stringify(blocos));
+                console.log("Backup da agenda salvo no localStorage");
+              });
+        } catch (error) {
+            console.error("Erro ao processar dados da agenda:", error);
+            mostrarErro("Erro ao processar dados da agenda: " + error.message);
+        }
     }, 1000); // Aguarda 1 segundo após a última alteração para salvar
   }
 
   async function carregarAgenda() {
     if (!currentUser) return;
+    esconderErro(); // Esconde mensagens de erro anteriores
+    
     console.log("Carregando agenda do Firestore para:", currentUser.uid);
-    document.getElementById("blocosDia").innerHTML = ''; // Limpa blocos existentes
+    blocosDia.innerHTML = ''; // Limpa blocos existentes
 
     try {
+      // Tenta carregar do Firestore
       const docRef = db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia");
       const docSnap = await docRef.get();
 
-      if (docSnap.exists()) {
+      console.log("Documento obtido do Firestore:", docSnap.exists ? "Existe" : "Não existe");
+
+      if (docSnap.exists) {
         const data = docSnap.data();
         console.log("Dados da agenda carregados:", data);
-        if (data.blocos && data.blocos.length > 0) {
-            data.blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false));
+        
+        if (data && data.blocos && Array.isArray(data.blocos) && data.blocos.length > 0) {
+            // Renderiza os blocos da agenda
+            data.blocos.forEach(b => {
+                // Verifica se os dados do bloco são válidos
+                if (b && b.tipo && b.inicio && b.fim) {
+                    adicionarBloco(b.tipo, b.inicio, b.fim, false);
+                } else {
+                    console.warn("Bloco com dados inválidos ignorado:", b);
+                }
+            });
+            console.log("Agenda carregada com sucesso!");
         } else {
-            // Se o documento existe mas não tem blocos, adiciona um padrão
-            adicionarBloco("foco", "09:00", "10:00", true); // Salva o bloco padrão
+            console.log("Documento existe mas não tem blocos válidos, criando bloco padrão");
+            adicionarBloco("foco", "09:00", "10:00", true);
         }
       } else {
-        // Documento não existe, cria um bloco padrão e salva
-        console.log("Nenhuma agenda encontrada, criando bloco padrão.");
-        adicionarBloco("foco", "09:00", "10:00", true); // Salva o bloco padrão
+        // Documento não existe, verifica se há backup local
+        const backupData = localStorage.getItem(`agenda-backup-${currentUser.uid}`);
+        if (backupData) {
+            console.log("Usando backup local da agenda");
+            try {
+                const blocos = JSON.parse(backupData);
+                if (Array.isArray(blocos) && blocos.length > 0) {
+                    blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false));
+                    // Tenta salvar o backup no Firestore
+                    salvarAgenda();
+                    return;
+                }
+            } catch (e) {
+                console.error("Erro ao processar backup local:", e);
+            }
+        }
+        
+        // Sem documento e sem backup válido, cria um bloco padrão
+        console.log("Nenhuma agenda encontrada, criando bloco padrão");
+        adicionarBloco("foco", "09:00", "10:00", true);
       }
     } catch (error) {
       console.error("Erro ao carregar agenda do Firestore:", error);
-      alert("Erro ao carregar sua agenda. Tente recarregar a página.");
+      mostrarErro("Erro ao carregar sua agenda: " + error.message);
+      
+      // Tenta usar backup local em caso de erro
+      try {
+          const backupData = localStorage.getItem(`agenda-backup-${currentUser.uid}`);
+          if (backupData) {
+              console.log("Usando backup local da agenda após erro");
+              const blocos = JSON.parse(backupData);
+              if (Array.isArray(blocos) && blocos.length > 0) {
+                  blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false));
+              }
+          } else {
+              // Sem backup, cria um bloco padrão
+              adicionarBloco("foco", "09:00", "10:00", false);
+          }
+      } catch (e) {
+          console.error("Erro ao processar backup local:", e);
+          adicionarBloco("foco", "09:00", "10:00", false);
+      }
     }
   }
 
   function adicionarBloco(tipo = "foco", inicio = "09:00", fim = "10:00", salvar = true) {
     if (!currentUser) return;
-    const container = document.getElementById("blocosDia");
-    const div = document.createElement("div");
-    div.className = `bloco ${tipo}`;
-    div.dataset.id = Date.now(); // Adiciona um ID único para referência, se necessário
+    
+    try {
+        const div = document.createElement("div");
+        div.className = `bloco ${tipo}`;
+        div.dataset.id = Date.now(); // Adiciona um ID único para referência
 
-    div.innerHTML = `
-      <select onchange="this.parentElement.className='bloco ' + this.value; salvarAgenda();">
-        <option value="foco" ${tipo === "foco" ? "selected" : ""}>Foco</option>
-        <option value="estudo" ${tipo === "estudo" ? "selected" : ""}>Estudo</option>
-        <option value="descanso" ${tipo === "descanso" ? "selected" : ""}>Descanso</option>
-        <option value="alerta" ${tipo === "alerta" ? "selected" : ""}>Alerta</option>
-      </select>
-      <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()" />
-      <span>às</span>
-      <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()" />
-      <button onclick="this.parentElement.remove(); salvarAgenda()">❌</button>
-    `;
-    container.appendChild(div);
-    if (salvar) {
-        salvarAgenda();
+        div.innerHTML = `
+          <select onchange="this.parentElement.className='bloco ' + this.value; salvarAgenda();">
+            <option value="foco" ${tipo === "foco" ? "selected" : ""}>Foco</option>
+            <option value="estudo" ${tipo === "estudo" ? "selected" : ""}>Estudo</option>
+            <option value="descanso" ${tipo === "descanso" ? "selected" : ""}>Descanso</option>
+            <option value="alerta" ${tipo === "alerta" ? "selected" : ""}>Alerta</option>
+          </select>
+          <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()" />
+          <span>às</span>
+          <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()" />
+          <button onclick="this.parentElement.remove(); salvarAgenda()">❌</button>
+        `;
+        blocosDia.appendChild(div);
+        
+        if (salvar) {
+            salvarAgenda();
+        }
+    } catch (error) {
+        console.error("Erro ao adicionar bloco:", error);
+        mostrarErro("Erro ao adicionar bloco: " + error.message);
     }
   }
 
   function logout() {
       auth.signOut().then(() => {
           console.log("Usuário deslogado");
-          window.location.href = "login_v2.html";
+          window.location.href = "login.html";
       }).catch((error) => {
           console.error("Erro ao fazer logout:", error);
+          alert("Erro ao fazer logout: " + error.message);
       });
   }
 
   // --- Listener de Autenticação ---
   auth.onAuthStateChanged(user => {
-    const agendaContainer = document.getElementById('agendaContainer');
-    const mensagemLogin = document.getElementById('mensagemLogin');
-
-    if (user) {
-      currentUser = user;
-      console.log("Usuário logado:", currentUser.uid);
-      agendaContainer.style.display = 'block';
-      mensagemLogin.style.display = 'none';
-      carregarAgenda(); // Carrega a agenda do Firestore
-    } else {
-      currentUser = null;
-      console.log("Nenhum usuário logado.");
-      agendaContainer.style.display = 'none';
-      mensagemLogin.style.display = 'block';
-      document.getElementById("blocosDia").innerHTML = '';
+    try {
+        if (user) {
+          currentUser = user;
+          console.log("Usuário logado:", currentUser.uid);
+          agendaContainer.style.display = 'block';
+          mensagemLogin.style.display = 'none';
+          carregarAgenda(); // Carrega a agenda do Firestore
+        } else {
+          currentUser = null;
+          console.log("Nenhum usuário logado.");
+          agendaContainer.style.display = 'none';
+          mensagemLogin.style.display = 'block';
+          blocosDia.innerHTML = '';
+        }
+    } catch (error) {
+        console.error("Erro no gerenciamento de autenticação:", error);
+        mostrarErro("Erro ao verificar login: " + error.message);
     }
   });
 
   // --- Inicialização da Página ---
   window.addEventListener("DOMContentLoaded", () => {
-    carregarCoresSalvas();
-    // carregarAgenda() é chamado pelo onAuthStateChanged
+    try {
+        carregarCoresSalvas();
+        // carregarAgenda() é chamado pelo onAuthStateChanged
+    } catch (error) {
+        console.error("Erro na inicialização da página:", error);
+        mostrarErro("Erro ao inicializar a página: " + error.message);
+    }
   });
 
 </script>

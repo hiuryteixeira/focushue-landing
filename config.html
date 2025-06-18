@@ -1,10 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Configurações - FocusHue</title>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  
   <style>
     :root {
       --foco: #81C784;
@@ -86,6 +91,10 @@
       margin-bottom: 20px;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
+    .dark .config-section {
+      background: #333;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
     .config-section label {
       display: block;
       margin: 10px 0 5px;
@@ -97,12 +106,89 @@
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      background-color: #fff;
+      color: #333;
+    }
+    .dark .config-section input,
+    .dark .config-section select {
+      background-color: #444;
+      color: #eee;
+      border-color: #555;
+    }
+    .config-section button {
+      padding: 12px 24px;
+      background-color: var(--foco);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 15px;
+      transition: background-color 0.3s;
+    }
+    .config-section button:hover {
+      background-color: var(--estudo);
     }
     footer {
       text-align: center;
       padding: 30px 0;
       font-size: 0.9rem;
       color: #999;
+    }
+    .checkbox-container {
+      margin: 10px 0;
+    }
+    .checkbox-container input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+    
+    /* Mensagem de usuário não logado */
+    #mensagemLogin {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 1.1rem;
+      color: var(--text);
+      display: none;
+    }
+    #mensagemLogin a {
+      color: var(--estudo);
+      font-weight: bold;
+      text-decoration: none;
+    }
+    #mensagemLogin a:hover {
+      text-decoration: underline;
+    }
+    .dark #mensagemLogin {
+      color: var(--text-dark);
+    }
+    .dark #mensagemLogin a {
+      color: var(--foco);
+    }
+    
+    /* Mensagem de status */
+    #statusMessage {
+      text-align: center;
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    .success {
+      background-color: rgba(129, 199, 132, 0.2);
+      color: #2e7d32;
+    }
+    .dark .success {
+      background-color: rgba(129, 199, 132, 0.1);
+      color: #81c784;
+    }
+    .error {
+      background-color: rgba(239, 154, 154, 0.2);
+      color: #c62828;
+    }
+    .dark .error {
+      background-color: rgba(239, 154, 154, 0.1);
+      color: #ef9a9a;
     }
   </style>
 </head>
@@ -120,44 +206,96 @@
     <a href="config.html">⚙️ Configurações</a>
     <a href="estatisticas.html">📊 Estatísticas</a>
     <a href="notificacoes.html">🔔 Notificações</a>
-    <a href="login.html">🔐 Login</a>
+    <a href="#" onclick="logout()">🚪 Sair</a>
   </nav>
 
-  <main>
+  <main id="configContainer">
+    <div id="statusMessage"></div>
+    
     <div class="config-section">
       <h2>Preferências do Usuário</h2>
       <label for="tema">Tema do App:</label>
       <select id="tema">
-        <option>Claro</option>
-        <option>Escuro</option>
+        <option value="claro">Claro</option>
+        <option value="escuro">Escuro</option>
       </select>
 
       <label for="idioma">Idioma:</label>
       <select id="idioma">
-        <option>Português</option>
-        <option>Inglês</option>
-        <option>Espanhol</option>
+        <option value="portugues">Português</option>
+        <option value="ingles">Inglês</option>
+        <option value="espanhol">Espanhol</option>
       </select>
     </div>
 
     <div class="config-section">
       <h2>Notificações</h2>
-      <label><input type="checkbox" checked /> Notificar início de blocos</label>
-      <label><input type="checkbox" /> Notificar término de foco</label>
-      <label><input type="checkbox" /> Lembrete para descanso</label>
+      <div class="checkbox-container">
+        <input type="checkbox" id="notifInicioBloco" />
+        <label for="notifInicioBloco">Notificar início de blocos</label>
+      </div>
+      <div class="checkbox-container">
+        <input type="checkbox" id="notifTerminoFoco" />
+        <label for="notifTerminoFoco">Notificar término de foco</label>
+      </div>
+      <div class="checkbox-container">
+        <input type="checkbox" id="notifLembreteDescanso" />
+        <label for="notifLembreteDescanso">Lembrete para descanso</label>
+      </div>
     </div>
 
     <div class="config-section">
       <h2>Outras Opções</h2>
-      <button onclick="alert('Preferências salvas!')">Salvar Alterações</button>
+      <button onclick="salvarConfiguracoes()">Salvar Alterações</button>
     </div>
   </main>
+
+  <div id="mensagemLogin">
+    <p>Você precisa estar logado para ver e editar suas configurações.</p>
+    <p><a href="login.html">Fazer Login</a> ou <a href="cadastro.html">Criar Conta</a></p>
+  </div>
 
   <footer>
     © 2025 FocusHue™ — Sistema Cromático de Foco.
   </footer>
 
   <script>
+    // Configuração Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
+      authDomain: "focushue-16683.firebaseapp.com",
+      projectId: "focushue-16683",
+      storageBucket: "focushue-16683.appspot.com",
+      messagingSenderId: "485935414293",
+      appId: "1:485935414293:web:c7ead918246319e0d6a21c"
+    };
+    
+    // Inicialização do Firebase
+    try {
+      firebase.initializeApp(firebaseConfig);
+      console.log("Firebase inicializado com sucesso");
+    } catch (error) {
+      console.error("Erro ao inicializar Firebase:", error);
+      mostrarMensagem("Erro ao inicializar o Firebase. Verifique sua conexão com a internet.", "error");
+    }
+    
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    let currentUser = null;
+    
+    // Elementos da UI
+    const configContainer = document.getElementById('configContainer');
+    const mensagemLogin = document.getElementById('mensagemLogin');
+    const statusMessage = document.getElementById('statusMessage');
+    
+    // Elementos de configuração
+    const temaSelect = document.getElementById('tema');
+    const idiomaSelect = document.getElementById('idioma');
+    const notifInicioBloco = document.getElementById('notifInicioBloco');
+    const notifTerminoFoco = document.getElementById('notifTerminoFoco');
+    const notifLembreteDescanso = document.getElementById('notifLembreteDescanso');
+
     function toggleMenu() {
       const menu = document.getElementById("menu");
       menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
@@ -165,7 +303,155 @@
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
+      
+      // Salva a preferência no localStorage para uso imediato
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "escuro" : "claro");
+      
+      // Se o usuário estiver logado, atualiza a preferência no Firestore
+      if (currentUser) {
+        const tema = document.body.classList.contains("dark") ? "escuro" : "claro";
+        db.collection("users").doc(currentUser.uid).collection("config").doc("preferencias")
+          .set({ tema: tema }, { merge: true })
+          .catch(error => {
+            console.error("Erro ao salvar tema:", error);
+          });
+      }
     }
+    
+    function carregarCoresSalvas() {
+      ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
+        const corSalva = localStorage.getItem(variable);
+        if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
+      });
+    }
+    
+    function mostrarMensagem(mensagem, tipo) {
+      statusMessage.textContent = mensagem;
+      statusMessage.className = tipo; // 'success' ou 'error'
+      statusMessage.style.display = 'block';
+      
+      // Esconde a mensagem após 3 segundos
+      setTimeout(() => {
+        statusMessage.style.display = 'none';
+      }, 3000);
+    }
+    
+    async function carregarConfiguracoes() {
+      if (!currentUser) return;
+      
+      try {
+        const docRef = db.collection("users").doc(currentUser.uid).collection("config").doc("preferencias");
+        const doc = await docRef.get();
+        
+        if (doc.exists) {
+          const data = doc.data();
+          console.log("Configurações carregadas:", data);
+          
+          // Aplica as configurações aos elementos da UI
+          if (data.tema) {
+            temaSelect.value = data.tema;
+            if (data.tema === "escuro") {
+              document.body.classList.add("dark");
+            } else {
+              document.body.classList.remove("dark");
+            }
+          }
+          
+          if (data.idioma) {
+            idiomaSelect.value = data.idioma;
+          }
+          
+          if (data.notificacoes) {
+            notifInicioBloco.checked = data.notificacoes.inicioBloco || false;
+            notifTerminoFoco.checked = data.notificacoes.terminoFoco || false;
+            notifLembreteDescanso.checked = data.notificacoes.lembreteDescanso || false;
+          }
+        } else {
+          console.log("Nenhuma configuração encontrada, usando padrões");
+          // Usa as configurações padrão
+          const tema = localStorage.getItem("theme") || "claro";
+          if (tema === "escuro" || tema === "dark") {
+            document.body.classList.add("dark");
+            temaSelect.value = "escuro";
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar configurações:", error);
+        mostrarMensagem("Erro ao carregar suas configurações.", "error");
+      }
+    }
+    
+    async function salvarConfiguracoes() {
+      if (!currentUser) {
+        mostrarMensagem("Você precisa estar logado para salvar configurações.", "error");
+        return;
+      }
+      
+      try {
+        const configData = {
+          tema: temaSelect.value,
+          idioma: idiomaSelect.value,
+          notificacoes: {
+            inicioBloco: notifInicioBloco.checked,
+            terminoFoco: notifTerminoFoco.checked,
+            lembreteDescanso: notifLembreteDescanso.checked
+          },
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        await db.collection("users").doc(currentUser.uid).collection("config").doc("preferencias")
+          .set(configData);
+        
+        console.log("Configurações salvas com sucesso!");
+        mostrarMensagem("Configurações salvas com sucesso!", "success");
+        
+        // Atualiza o tema no localStorage para uso em outras páginas
+        localStorage.setItem("theme", configData.tema);
+        
+        // Aplica o tema imediatamente
+        if (configData.tema === "escuro") {
+          document.body.classList.add("dark");
+        } else {
+          document.body.classList.remove("dark");
+        }
+        
+      } catch (error) {
+        console.error("Erro ao salvar configurações:", error);
+        mostrarMensagem("Erro ao salvar configurações: " + error.message, "error");
+      }
+    }
+    
+    function logout() {
+      auth.signOut().then(() => {
+        console.log("Usuário deslogado");
+        window.location.href = "login.html";
+      }).catch((error) => {
+        console.error("Erro ao fazer logout:", error);
+        alert("Erro ao fazer logout: " + error.message);
+      });
+    }
+    
+    // Listener de autenticação
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        console.log("Usuário logado:", currentUser.uid);
+        configContainer.style.display = 'block';
+        mensagemLogin.style.display = 'none';
+        carregarConfiguracoes();
+      } else {
+        currentUser = null;
+        console.log("Nenhum usuário logado");
+        configContainer.style.display = 'none';
+        mensagemLogin.style.display = 'block';
+      }
+    });
+    
+    // Inicialização da página
+    window.addEventListener("DOMContentLoaded", () => {
+      carregarCoresSalvas();
+      // carregarConfiguracoes é chamado pelo onAuthStateChanged
+    });
   </script>
 </body>
 </html>

@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Minhas Tarefas - FocusHue</title>
+  <title>Notificações - FocusHue</title>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  
   <style>
     :root {
       --estudo: #6BAED6;
@@ -20,14 +26,23 @@
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      transition: background-color 0.3s, color 0.3s;
+      transition: all 0.3s ease-in-out;
     }
     body.dark {
       background-color: var(--bg-dark);
       color: var(--text-dark);
     }
+    button {
+      transition: background 0.3s, color 0.3s, border 0.3s;
+    }
+    .dark button {
+      background: #333;
+      color: white;
+      border: 1px solid #666;
+    }
+    
     header {
-      background: linear-gradient(to right, var(--foco), var(--estudo));
+      background: linear-gradient(to right, var(--alerta), var(--estudo));
       padding: 20px;
       color: white;
       text-align: center;
@@ -35,6 +50,33 @@
       font-weight: bold;
       position: relative;
     }
+    .container {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .form input, .form select {
+      padding: 10px;
+      font-size: 1rem;
+      flex: 1;
+      min-width: 100px;
+    }
+    .form button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: var(--foco);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
     .menu-toggle, .theme-toggle {
       position: absolute;
       top: 20px;
@@ -64,299 +106,258 @@
       color: #333;
       font-weight: 500;
       border-radius: 5px;
-      transition: background-color 0.3s, color 0.3s;
+      transition: 0.3s;
     }
     nav a:hover {
       background: var(--foco);
       color: white;
     }
-    .tarefas-section {
-        max-width: 700px;
-        margin: 30px auto;
-        padding: 0 20px;
-    }
-    .tarefas-container {
+    .notificacoes {
       display: flex;
       flex-direction: column;
-      gap: 15px; /* Espaçamento ajustado */
+      gap: 12px;
     }
-    .tarefa {
+    .notificacoes-container {
+      max-width: 600px;
+      margin: 30px auto;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px; /* Padding ajustado */
-      border-radius: 8px; /* Raio ajustado */
-      color: white;
-      font-weight: 500;
-      position: relative;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1); /* Sombra ajustada */
-      transition: background-color 0.3s;
+      flex-direction: column;
+      gap: 20px;
+      padding: 0 20px;
     }
-    .tarefa .info {
-        flex-grow: 1;
-    }
-    .tarefa .titulo {
-        font-size: 1.05rem; /* Tamanho ajustado */
-        margin-bottom: 3px;
-    }
-    .tarefa .tipo { 
-        font-size: 0.8rem; /* Tamanho ajustado */
-        opacity: 0.85; 
-    }
-    .tarefa .botoes {
-      display: flex;
-      gap: 8px;
-      margin-left: 15px; /* Espaço entre info e botões */
-    }
-    .tarefa button {
-      padding: 5px 8px; /* Padding ajustado */
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      background: rgba(255,255,255,0.2);
-      color: white;
-      transition: background-color 0.3s;
-    }
-    .tarefa button:hover {
-        background: rgba(255,255,255,0.4);
-    }
-
-    /* Cores das tarefas */
-    .estudo { background: var(--estudo); }
-    .foco { background: var(--foco); }
-    .descanso { background: var(--descanso); color: #5a5100; }
-    .descanso button { color: #5a5100; background: rgba(0,0,0,0.1); }
-    .descanso button:hover { background: rgba(0,0,0,0.2); }
-    .alerta { background: var(--alerta); }
-
-    .add-tarefa-container {
-      text-align: center;
-      margin: 30px auto 10px;
-    }
-    .add-tarefa-container button {
-      background: var(--foco);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1rem;
+    .notificacao {
+      background-color: white;
+      border-left: 6px solid var(--alerta);
       border-radius: 8px;
-      cursor: pointer;
+      padding: 16px 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .dark .notificacao {
+      background-color: #333;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .notificacao .hora {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .dark .notificacao .hora {
+      color: #aaa;
+    }
+    .notificacao .mensagem {
+      font-size: 1.1rem;
       font-weight: bold;
-      transition: background-color 0.3s;
+      margin-top: 5px;
     }
-    .add-tarefa-container button:hover { 
-        background: var(--estudo); 
+    .notificacao .edit {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 0.85rem;
+      background: rgba(0,0,0,0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
     }
-    
-	footer {
+    .dark .notificacao .edit {
+      background: rgba(255,255,255,0.1);
+    }
+    footer {
       text-align: center;
       padding: 30px 0;
       font-size: 0.9rem;
       color: #999;
     }
-
-    /* Modal de Adicionar/Editar Tarefa */
-    .modal {
-        display: none; 
-        position: fixed; 
-        z-index: 100; 
-        left: 0;
-        top: 0;
-        width: 100%; 
-        height: 100%; 
-        overflow: auto; 
-        background-color: rgba(0,0,0,0.5); 
+    
+    /* Formulário de notificação */
+    .notificacao-form {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 30px auto;
+      max-width: 600px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
     }
-    .modal-content {
-        background-color: var(--bg);
-        margin: 15% auto; 
-        padding: 25px 35px;
-        border: 1px solid #888;
-        width: 80%; 
-        max-width: 450px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        color: var(--text);
+    .dark .notificacao-form {
+      background-color: #333;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-    .dark .modal-content {
-        background-color: var(--bg-dark);
-        color: var(--text-dark);
-        border-color: #555;
+    .notificacao-form input,
+    .notificacao-form select {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
     }
-    .modal-content h3 {
-        margin-top: 0;
-        margin-bottom: 20px;
-        text-align: center;
+    .dark .notificacao-form input,
+    .dark .notificacao-form select {
+      background-color: #444;
+      border-color: #555;
+      color: #eee;
     }
-    .modal-content label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
+    .notificacao-form input[type="time"] {
+      width: 100px;
     }
-    .modal-content input[type="text"], .modal-content select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-sizing: border-box;
-        font-size: 1rem;
+    .notificacao-form input[type="text"] {
+      flex-grow: 1;
+      min-width: 200px;
     }
-    .dark .modal-content input[type="text"], .dark .modal-content select {
-        background-color: #444;
-        border-color: #666;
-        color: var(--text-dark);
+    .notificacao-form select {
+      width: 120px;
     }
-    .modal-buttons {
-        text-align: right;
-        margin-top: 20px;
+    .notificacao-form button {
+      padding: 10px 20px;
+      background-color: var(--foco);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
     }
-    .modal-buttons button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-left: 10px;
-        font-weight: bold;
+    .notificacao-form button:hover {
+      background-color: var(--estudo);
     }
-    .modal-buttons .save-btn {
-        background-color: var(--foco);
-        color: white;
+    
+    /* Botões de ação nas notificações */
+    .notificacao-acoes {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
     }
-    .modal-buttons .cancel-btn {
-        background-color: #ccc;
-        color: #333;
+    .notificacao-acoes button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      background-color: rgba(0,0,0,0.05);
+      color: var(--text);
     }
-    .dark .modal-buttons .cancel-btn {
-        background-color: #555;
-        color: var(--text-dark);
+    .dark .notificacao-acoes button {
+      background-color: rgba(255,255,255,0.1);
+      color: var(--text-dark);
     }
-    .close-btn {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-        line-height: 1;
+    .notificacao-acoes button:hover {
+      background-color: rgba(0,0,0,0.1);
     }
-    .close-btn:hover, .close-btn:focus {
-        color: black;
-        text-decoration: none;
+    .dark .notificacao-acoes button:hover {
+      background-color: rgba(255,255,255,0.2);
     }
-    .dark .close-btn {
-        color: #777;
-    }
-    .dark .close-btn:hover, .dark .close-btn:focus {
-        color: #ccc;
-    }
-
+    
     /* Mensagem de usuário não logado */
     #mensagemLogin {
-        text-align: center;
-        margin-top: 50px;
-        font-size: 1.1rem;
-        color: var(--text);
+      text-align: center;
+      margin-top: 50px;
+      font-size: 1.1rem;
+      color: var(--text);
+      display: none;
     }
     #mensagemLogin a {
-        color: var(--estudo);
-        font-weight: bold;
-        text-decoration: none;
+      color: var(--estudo);
+      font-weight: bold;
+      text-decoration: none;
     }
     #mensagemLogin a:hover {
-        text-decoration: underline;
+      text-decoration: underline;
     }
     .dark #mensagemLogin {
-        color: var(--text-dark);
+      color: var(--text-dark);
     }
     .dark #mensagemLogin a {
-        color: var(--foco);
+      color: var(--foco);
     }
-
-    @media (max-width: 600px) {
-      .tarefa {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px; /* Adiciona espaço entre info e botões */
-      }
-      .tarefa .botoes { 
-          margin-left: 0; /* Remove margem esquerda */
-          align-self: flex-end; /* Alinha botões à direita */
-      }
-      .modal-content {
-          margin: 10% auto;
-          width: 90%;
-      }
+    
+    /* Mensagem de status */
+    #statusMessage {
+      text-align: center;
+      margin: 15px auto;
+      padding: 10px;
+      border-radius: 5px;
+      max-width: 600px;
+      display: none;
+    }
+    .success {
+      background-color: rgba(129, 199, 132, 0.2);
+      color: #2e7d32;
+    }
+    .dark .success {
+      background-color: rgba(129, 199, 132, 0.1);
+      color: #81c784;
+    }
+    .error {
+      background-color: rgba(239, 154, 154, 0.2);
+      color: #c62828;
+    }
+    .dark .error {
+      background-color: rgba(239, 154, 154, 0.1);
+      color: #ef9a9a;
+    }
+    
+    /* Mensagem quando não há notificações */
+    .no-notificacoes {
+      text-align: center;
+      padding: 30px;
+      color: #888;
+      font-style: italic;
+    }
+    .dark .no-notificacoes {
+      color: #aaa;
     }
   </style>
 </head>
 <body>
+
 <header>
   <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-  Minhas Tarefas
+  Notificações
   <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
 </header>
-  <nav id="menu">
-    <a href="index.html">🏠 Início</a>
-    <a href="agenda.html">📅 Agenda</a>
-    <a href="tarefas.html">✅ Tarefas</a>
-    <a href="config.html">⚙️ Configurações</a>
-    <a href="estatisticas.html">📊 Estatísticas</a>
-    <a href="notificacoes.html">🔔 Notificações</a>
-    <a href="#" onclick="logout()">🚪 Sair</a> <!-- Botão Sair adicionado -->
-  </nav>
 
-<section class="tarefas-section" id="tarefasSection">
-    <div class="tarefas-container" id="listaTarefas">
-        <!-- Tarefas serão carregadas aqui -->
-    </div>
-    <div class="add-tarefa-container">
-      <button onclick="abrirModalTarefa()">➕ Adicionar Tarefa</button>
-    </div>
-</section>
+<nav id="menu">
+  <a href="index.html">🏠 Início</a>
+  <a href="agenda.html">📅 Agenda</a>
+  <a href="tarefas.html">✅ Tarefas</a>
+  <a href="config.html">⚙️ Configurações</a>
+  <a href="estatisticas.html">📊 Estatísticas</a>
+  <a href="notificacoes.html">🔔 Notificações</a>
+  <a href="#" onclick="logout()">🚪 Sair</a>
+</nav>
 
-<div id="mensagemLogin" style="display: none;">
-  <p>Você precisa estar logado para ver e gerenciar suas tarefas.</p>
-  <p><a href="login_v2.html">Fazer Login</a> ou <a href="cadastro_v3.html">Criar Conta</a></p>
+<div id="statusMessage"></div>
+
+<div id="notificacoesContainer">
+  <section class="notificacoes-container" id="listaNotificacoes">
+    <!-- Notificações serão carregadas aqui -->
+  </section>
+
+  <div class="notificacao-form">
+    <input type="time" id="hora" required />
+    <input type="text" id="mensagem" placeholder="Mensagem da notificação" />
+    <select id="modo">
+      <option value="estudo">Estudo</option>
+      <option value="foco">Foco</option>
+      <option value="descanso">Descanso</option>
+      <option value="alerta">Alerta</option>
+    </select>
+    <button onclick="salvarNotificacao()">➕ Salvar</button>
+  </div>
+</div>
+
+<div id="mensagemLogin">
+  <p>Você precisa estar logado para ver e gerenciar suas notificações.</p>
+  <p><a href="login.html">Fazer Login</a> ou <a href="cadastro.html">Criar Conta</a></p>
 </div>
 
 <footer>
   © 2025 FocusHue™ — Sistema Cromático de Foco.
 </footer>
 
-<!-- Modal para Adicionar/Editar Tarefa -->
-<div id="modalTarefa" class="modal">
-  <div class="modal-content">
-    <span class="close-btn" onclick="fecharModalTarefa()">&times;</span>
-    <h3 id="modalTitulo">Adicionar Nova Tarefa</h3>
-    <input type="hidden" id="tarefaId"> <!-- Campo oculto para ID da tarefa (para edição) -->
-    <div>
-      <label for="tarefaTitulo">Título:</label>
-      <input type="text" id="tarefaTitulo" placeholder="Ex: Preparar apresentação">
-    </div>
-    <div>
-      <label for="tarefaTipo">Tipo:</label>
-      <select id="tarefaTipo">
-        <option value="foco">Foco</option>
-        <option value="estudo">Estudo</option>
-        <option value="descanso">Descanso</option>
-        <option value="alerta">Alerta</option>
-      </select>
-    </div>
-    <div class="modal-buttons">
-      <button class="cancel-btn" onclick="fecharModalTarefa()">Cancelar</button>
-      <button class="save-btn" onclick="salvarTarefa()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script> <!-- SDK do Firestore adicionado -->
-
 <script>
-  // Configuração Firebase (Mantenha a sua)
+  // Configuração Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
     authDomain: "focushue-16683.firebaseapp.com",
@@ -365,13 +366,43 @@
     messagingSenderId: "485935414293",
     appId: "1:485935414293:web:c7ead918246319e0d6a21c"
   };
-  firebase.initializeApp(firebaseConfig);
+  
+  // Inicialização do Firebase
+  try {
+    firebase.initializeApp(firebaseConfig);
+    console.log("Firebase inicializado com sucesso");
+  } catch (error) {
+    console.error("Erro ao inicializar Firebase:", error);
+    mostrarMensagem("Erro ao inicializar o Firebase. Verifique sua conexão com a internet.", "error");
+  }
+  
   const auth = firebase.auth();
-  const db = firebase.firestore(); // Firestore inicializado
-
+  const db = firebase.firestore();
+  
   let currentUser = null;
-  let tarefasCache = []; // Cache local das tarefas para renderização
-
+  let notificacaoEditandoId = null;
+  
+  // Elementos da UI
+  const notificacoesContainer = document.getElementById('notificacoesContainer');
+  const mensagemLogin = document.getElementById('mensagemLogin');
+  const statusMessage = document.getElementById('statusMessage');
+  const listaNotificacoes = document.getElementById('listaNotificacoes');
+  
+  function carregarCoresSalvas() {
+    const variaveis = ['--estudo', '--foco', '--descanso', '--alerta'];
+    variaveis.forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) {
+        document.documentElement.style.setProperty(variable, corSalva);
+      }
+    });
+    
+    // Carrega tema claro/escuro
+    if (localStorage.getItem("theme") === "escuro" || localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+  }
+  
   function toggleMenu() {
     const menu = document.getElementById("menu");
     menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
@@ -379,228 +410,174 @@
 
   function toggleTheme() {
     document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-    // Aplica tema ao modal se estiver aberto
-    const modalContent = document.querySelector("#modalTarefa .modal-content");
-    if (modalContent) {
-        if (document.body.classList.contains("dark")) {
-            modalContent.classList.add("dark");
-        } else {
-            modalContent.classList.remove("dark");
-        }
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "escuro" : "claro");
+  }
+  
+  function mostrarMensagem(mensagem, tipo) {
+    statusMessage.textContent = mensagem;
+    statusMessage.className = tipo; // 'success' ou 'error'
+    statusMessage.style.display = 'block';
+    
+    // Esconde a mensagem após 3 segundos
+    setTimeout(() => {
+      statusMessage.style.display = 'none';
+    }, 3000);
+  }
+
+  async function salvarNotificacao() {
+    if (!currentUser) {
+      mostrarMensagem("Você precisa estar logado para salvar notificações.", "error");
+      return;
     }
-  }
+    
+    const hora = document.getElementById("hora").value;
+    const mensagem = document.getElementById("mensagem").value;
+    const modo = document.getElementById("modo").value;
 
-  function carregarCoresSalvas() {
-    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
-      const corSalva = localStorage.getItem(variable);
-      if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
-    });
-    // Carrega tema claro/escuro
-    if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark");
+    if (!hora || !mensagem) {
+      mostrarMensagem("Preencha a hora e a mensagem da notificação.", "error");
+      return;
     }
-  }
 
-  // --- Funções de Renderização e Manipulação de Tarefas com Firestore ---
-  function renderTarefas() {
-    const lista = document.getElementById("listaTarefas");
-    lista.innerHTML = ""; // Limpa a lista
-    if (!currentUser) return; // Não renderiza se não estiver logado
-
-    console.log("Renderizando tarefas do cache:", tarefasCache);
-    // Ordena as tarefas por data de criação (mais recentes primeiro)
-    const tarefasOrdenadas = tarefasCache.sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0));
-
-    tarefasOrdenadas.forEach((tarefa) => {
-      const div = document.createElement("div");
-      div.dataset.id = tarefa.id; // Usa o ID do documento Firestore
-      const tipoClass = tarefa.tipo ? tarefa.tipo.toLowerCase() : 'foco';
-      div.className = `tarefa ${tipoClass}`;
-      
-      div.innerHTML = `
-        <div class="info">
-            <div class="titulo">${tarefa.titulo || 'Tarefa sem título'}</div>
-            <div class="tipo">${tarefa.tipo || 'Foco'}</div>
-        </div>
-        <div class="botoes">
-          <button onclick="abrirModalTarefa('${tarefa.id}')">✏️ Editar</button>
-          <button onclick="excluirTarefa('${tarefa.id}')">🗑️ Excluir</button>
-        </div>
-      `;
-      lista.appendChild(div);
-    });
-  }
-
-  async function carregarTarefas() {
-      if (!currentUser) return;
-      console.log("Carregando tarefas do Firestore para:", currentUser.uid);
-      try {
-          const tarefasRef = db.collection("users").doc(currentUser.uid).collection("tarefas");
-          const snapshot = await tarefasRef.orderBy("createdAt", "desc").get(); // Ordena por data de criação
-          
-          tarefasCache = []; // Limpa o cache antes de carregar
-          snapshot.forEach(doc => {
-              tarefasCache.push({ id: doc.id, ...doc.data() });
-          });
-          console.log("Tarefas carregadas:", tarefasCache);
-          renderTarefas(); // Renderiza as tarefas carregadas
-      } catch (error) {
-          console.error("Erro ao carregar tarefas:", error);
-          alert("Erro ao carregar suas tarefas. Tente recarregar a página.");
-      }
-  }
-
-  // --- Funções do Modal --- 
-  const modal = document.getElementById("modalTarefa");
-  const modalTitulo = document.getElementById("modalTitulo");
-  const tarefaIdInput = document.getElementById("tarefaId");
-  const tarefaTituloInput = document.getElementById("tarefaTitulo");
-  const tarefaTipoSelect = document.getElementById("tarefaTipo");
-
-  function abrirModalTarefa(id = null) {
-      const modalContent = document.querySelector("#modalTarefa .modal-content");
-      if (document.body.classList.contains("dark")) {
-          modalContent.classList.add("dark");
-      } else {
-          modalContent.classList.remove("dark");
-      }
-
-      if (id) {
-          // Editando tarefa existente
-          const tarefa = tarefasCache.find(t => t.id === id);
-          if (tarefa) {
-              modalTitulo.textContent = "Editar Tarefa";
-              tarefaIdInput.value = id;
-              tarefaTituloInput.value = tarefa.titulo;
-              tarefaTipoSelect.value = tarefa.tipo.toLowerCase();
-          } else {
-              console.error("Tarefa não encontrada para edição com ID:", id);
-              return;
-          }
-      } else {
-          // Adicionando nova tarefa
-          modalTitulo.textContent = "Adicionar Nova Tarefa";
-          tarefaIdInput.value = "";
-          tarefaTituloInput.value = "";
-          tarefaTipoSelect.value = "foco";
-      }
-      modal.style.display = "block";
-  }
-
-  function fecharModalTarefa() {
-      modal.style.display = "none";
-  }
-
-  async function salvarTarefa() {
-      if (!currentUser) return;
-
-      const id = tarefaIdInput.value;
-      const titulo = tarefaTituloInput.value.trim();
-      const tipoSelecionado = tarefaTipoSelect.value;
-      // Capitaliza o tipo para salvar no Firestore e exibir
-      const tipoCapitalizado = tipoSelecionado.charAt(0).toUpperCase() + tipoSelecionado.slice(1);
-
-      if (!titulo) {
-          alert("Por favor, digite um título para a tarefa.");
-          return;
-      }
-
-      const tarefaData = {
-          titulo: titulo,
-          tipo: tipoCapitalizado, // Salva capitalizado
-          // Adiciona ou atualiza timestamp apenas ao criar
-          // Se for editar, não sobrescreve o createdAt original
+    try {
+      const notificacaoData = {
+        hora: hora,
+        mensagem: mensagem,
+        modo: modo,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
+      
+      const notificacoesRef = db.collection("users").doc(currentUser.uid).collection("notificacoes");
+      
+      if (notificacaoEditandoId) {
+        // Atualiza notificação existente
+        await notificacoesRef.doc(notificacaoEditandoId).update(notificacaoData);
+        mostrarMensagem("Notificação atualizada com sucesso!", "success");
+        notificacaoEditandoId = null;
+      } else {
+        // Adiciona nova notificação
+        await notificacoesRef.add(notificacaoData);
+        mostrarMensagem("Notificação adicionada com sucesso!", "success");
+      }
 
+      // Limpa o formulário
+      document.getElementById("hora").value = "";
+      document.getElementById("mensagem").value = "";
+      document.getElementById("modo").value = "estudo";
+      
+      // Recarrega a lista de notificações
+      listarNotificacoes();
+      
+    } catch (error) {
+      console.error("Erro ao salvar notificação:", error);
+      mostrarMensagem("Erro ao salvar notificação: " + error.message, "error");
+    }
+  }
+
+  async function excluirNotificacao(id) {
+    if (!currentUser) return;
+    
+    if (confirm("Deseja realmente excluir esta notificação?")) {
       try {
-          const tarefasRef = db.collection("users").doc(currentUser.uid).collection("tarefas");
-          if (id) {
-              // Editar tarefa existente
-              console.log("Atualizando tarefa no Firestore:", id);
-              await tarefasRef.doc(id).update(tarefaData);
-              // Atualiza o cache local
-              const index = tarefasCache.findIndex(t => t.id === id);
-              if (index > -1) {
-                  tarefasCache[index] = { ...tarefasCache[index], ...tarefaData };
-              }
-          } else {
-              // Adicionar nova tarefa
-              console.log("Adicionando nova tarefa no Firestore");
-              tarefaData.createdAt = firebase.firestore.FieldValue.serverTimestamp(); // Adiciona timestamp na criação
-              const docRef = await tarefasRef.add(tarefaData);
-              // Adiciona ao cache local com o ID retornado
-              tarefasCache.push({ id: docRef.id, ...tarefaData }); 
-          }
-          renderTarefas(); // Re-renderiza a lista
-          fecharModalTarefa();
+        await db.collection("users").doc(currentUser.uid).collection("notificacoes").doc(id).delete();
+        mostrarMensagem("Notificação excluída com sucesso!", "success");
+        listarNotificacoes();
       } catch (error) {
-          console.error("Erro ao salvar tarefa:", error);
-          alert("Erro ao salvar a tarefa. Tente novamente.");
+        console.error("Erro ao excluir notificação:", error);
+        mostrarMensagem("Erro ao excluir notificação: " + error.message, "error");
       }
+    }
   }
 
-  async function excluirTarefa(id) {
-      if (!currentUser) return;
-      if (confirm("Tem certeza que deseja excluir esta tarefa?")) {
-          console.log("Excluindo tarefa do Firestore:", id);
-          try {
-              await db.collection("users").doc(currentUser.uid).collection("tarefas").doc(id).delete();
-              // Remove do cache local
-              tarefasCache = tarefasCache.filter(t => t.id !== id);
-              renderTarefas(); // Re-renderiza a lista
-          } catch (error) {
-              console.error("Erro ao excluir tarefa:", error);
-              alert("Erro ao excluir a tarefa. Tente novamente.");
-          }
-      }
+  function prepararEdicao(id, hora, mensagem, modo) {
+    document.getElementById("hora").value = hora;
+    document.getElementById("mensagem").value = mensagem;
+    document.getElementById("modo").value = modo;
+    notificacaoEditandoId = id;
+    
+    // Rola a página até o formulário
+    document.querySelector('.notificacao-form').scrollIntoView({ behavior: 'smooth' });
+    
+    // Destaca o formulário brevemente
+    document.querySelector('.notificacao-form').style.boxShadow = '0 0 15px var(--foco)';
+    setTimeout(() => {
+      document.querySelector('.notificacao-form').style.boxShadow = '';
+    }, 1000);
   }
 
-  function logout() {
-      auth.signOut().then(() => {
-          console.log("Usuário deslogado");
-          window.location.href = "login_v2.html";
-      }).catch((error) => {
-          console.error("Erro ao fazer logout:", error);
+  async function listarNotificacoes() {
+    if (!currentUser) return;
+    
+    listaNotificacoes.innerHTML = "";
+    
+    try {
+      const notificacoesRef = db.collection("users").doc(currentUser.uid).collection("notificacoes");
+      const snapshot = await notificacoesRef.orderBy("hora").get();
+      
+      if (snapshot.empty) {
+        listaNotificacoes.innerHTML = '<div class="no-notificacoes">Você ainda não tem notificações. Adicione uma acima!</div>';
+        return;
+      }
+      
+      snapshot.forEach(doc => {
+        const dados = doc.data();
+        const div = document.createElement("div");
+        div.className = "notificacao";
+
+        let cor = "var(--alerta)";
+        if (dados.modo === "foco") cor = "var(--foco)";
+        else if (dados.modo === "estudo") cor = "var(--estudo)";
+        else if (dados.modo === "descanso") cor = "var(--descanso)";
+        div.style.borderLeft = `6px solid ${cor}`;
+
+        div.innerHTML = `
+          <div class="hora">${dados.hora}</div>
+          <div class="mensagem">${dados.mensagem}</div>
+          <div class="notificacao-acoes">
+            <button onclick="prepararEdicao('${doc.id}', '${dados.hora}', '${dados.mensagem}', '${dados.modo}')">✏️ Editar</button>
+            <button onclick="excluirNotificacao('${doc.id}')">🗑️ Excluir</button>
+          </div>
+        `;
+        listaNotificacoes.appendChild(div);
       });
+    } catch (error) {
+      console.error("Erro ao listar notificações:", error);
+      mostrarMensagem("Erro ao carregar notificações: " + error.message, "error");
+    }
   }
-
-  // --- Listener de Autenticação --- 
+  
+  function logout() {
+    auth.signOut().then(() => {
+      console.log("Usuário deslogado");
+      window.location.href = "login.html";
+    }).catch((error) => {
+      console.error("Erro ao fazer logout:", error);
+      alert("Erro ao fazer logout: " + error.message);
+    });
+  }
+  
+  // Listener de autenticação
   auth.onAuthStateChanged(user => {
-    const tarefasSection = document.getElementById('tarefasSection');
-    const mensagemLogin = document.getElementById('mensagemLogin');
-
     if (user) {
-      // Usuário está logado
       currentUser = user;
       console.log("Usuário logado:", currentUser.uid);
-      tarefasSection.style.display = 'block';
+      notificacoesContainer.style.display = 'block';
       mensagemLogin.style.display = 'none';
-      carregarTarefas(); // Carrega tarefas do Firestore
+      listarNotificacoes();
     } else {
-      // Usuário não está logado
       currentUser = null;
-      tarefasCache = []; // Limpa o cache local
-      console.log("Nenhum usuário logado.");
-      tarefasSection.style.display = 'none';
+      console.log("Nenhum usuário logado");
+      notificacoesContainer.style.display = 'none';
       mensagemLogin.style.display = 'block';
-      document.getElementById("listaTarefas").innerHTML = ''; // Limpa a lista visualmente
     }
   });
-
-  // --- Inicialização da Página ---
+  
+  // Inicialização da página
   window.addEventListener("DOMContentLoaded", () => {
     carregarCoresSalvas();
-    // carregarTarefas() é chamado pelo onAuthStateChanged
+    // listarNotificacoes é chamado pelo onAuthStateChanged
   });
-
-  // Fecha o modal se clicar fora dele
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      fecharModalTarefa();
-    }
-  }
-
 </script>
+
 </body>
 </html>

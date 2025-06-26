@@ -58,6 +58,9 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       z-index: 100;
     }
+    body.dark nav {
+      background: rgba(40,40,40,0.95);
+    }
     nav a {
       padding: 10px;
       text-decoration: none;
@@ -65,6 +68,9 @@
       font-weight: 500;
       border-radius: 5px;
       transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark nav a {
+      color: #eee;
     }
     nav a:hover {
       background: var(--foco);
@@ -105,6 +111,11 @@
       border: 1px solid rgba(0,0,0,0.1);
       font-weight: bold;
       font-size: 0.9rem;
+    }
+    body.dark select, body.dark input[type="time"] {
+      background-color: #333;
+      color: #eee;
+      border-color: #555;
     }
     .bloco button {
         background: rgba(255,255,255,0.2);
@@ -148,6 +159,7 @@
         font-size: 1.1rem;
     }
     #mensagemLogin a { color: var(--estudo); font-weight: bold; }
+    body.dark #mensagemLogin a { color: var(--foco); }
     /* Modal */
     .modal {
         display: none; 
@@ -189,6 +201,24 @@
     .dark .cancel-btn { background-color: #555; color: var(--text-dark); }
     #listaTarefasModal .tarefa-item { display: block; margin-bottom: 10px; }
     #listaTarefasModal label { margin-left: 8px; }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 600px) {
+      .bloco-header {
+        flex-wrap: wrap;
+      }
+      .bloco .main-controls {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .modal-content {
+        width: 95%;
+        padding: 15px;
+        margin: 15% auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -270,6 +300,49 @@
   let currentUser = null;
   let agendaIntervalo;
 
+  // --- Funções de UI e Tema ---
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    
+    // Atualiza o ícone do botão
+    const themeToggle = document.querySelector(".theme-toggle");
+    themeToggle.textContent = isDark ? "☀️" : "🌙";
+    
+    // Atualiza modais se estiverem abertos
+    const modais = document.querySelectorAll(".modal-content");
+    modais.forEach(modal => {
+      if (isDark) {
+        modal.classList.add("dark");
+      } else {
+        modal.classList.remove("dark");
+      }
+    });
+  }
+
+  function carregarCoresSalvas() {
+    // Carrega cores personalizadas
+    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
+    });
+    
+    // Carrega tema claro/escuro
+    const tema = localStorage.getItem("theme");
+    if (tema === "dark") {
+      document.body.classList.add("dark");
+      document.querySelector(".theme-toggle").textContent = "☀️";
+    } else {
+      document.querySelector(".theme-toggle").textContent = "🌙";
+    }
+  }
+
   // --- Funções da Agenda ---
   function adicionarBloco(tipo = "foco", inicio = "09:00", fim = "10:00", tarefaIds = [], id = null) {
     const blocoId = id || `bloco_${Date.now()}`;
@@ -345,6 +418,15 @@
         </span>
       `;
     });
+    
+    // Aplica tema escuro ao modal se necessário
+    const modalContent = document.querySelector("#modalAssociarTarefa .modal-content");
+    if (document.body.classList.contains("dark")) {
+      modalContent.classList.add("dark");
+    } else {
+      modalContent.classList.remove("dark");
+    }
+    
     document.getElementById('modalAssociarTarefa').style.display = 'block';
   }
 
@@ -416,6 +498,14 @@
         tarefasContainer.innerHTML = '';
     }
 
+    // Aplica tema escuro ao modal se necessário
+    const modalContent = document.querySelector("#modalNotificacao .modal-content");
+    if (document.body.classList.contains("dark")) {
+      modalContent.classList.add("dark");
+    } else {
+      modalContent.classList.remove("dark");
+    }
+
     document.getElementById('btnConfirmarBloco').onclick = () => confirmarInicioBloco(blocoId, tipo);
     modal.style.display = 'block';
   }
@@ -431,6 +521,16 @@
     document.querySelectorAll('.bloco').forEach(b => b.classList.remove('active'));
     document.querySelector(`.bloco[data-id='${blocoId}']`).classList.add('active');
     fecharNotificacao();
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      console.log("Usuário deslogado");
+      window.location.href = "login.html";
+    }).catch((error) => {
+      console.error("Erro ao fazer logout:", error);
+      alert("Erro ao fazer logout: " + error.message);
+    });
   }
 
   // --- Autenticação e Inicialização ---
@@ -451,10 +551,20 @@
     }
   });
 
+  // Inicialização da página
   window.addEventListener('DOMContentLoaded', () => {
-    // Funções de inicialização como carregarCoresSalvas, etc.
+    carregarCoresSalvas();
+    // Fecha o menu ao clicar fora dele
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('menu');
+      const menuToggle = document.querySelector('.menu-toggle');
+      if (menu.style.display === 'flex' && 
+          !menu.contains(event.target) && 
+          event.target !== menuToggle) {
+        menu.style.display = 'none';
+      }
+    });
   });
-
 </script>
 </body>
 </html>

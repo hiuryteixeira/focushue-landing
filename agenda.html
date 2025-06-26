@@ -312,6 +312,7 @@
 
   let currentUser = null;
   let debounceTimer; // Para evitar salvamentos excessivos
+  let blocosAnteriores = {}; // Para rastrear alterações nos blocos
 
   // Elementos da UI
   const mensagemErro = document.getElementById('mensagemErro');
@@ -379,6 +380,7 @@
             // Coleta os dados dos blocos
             const blocos = [...document.querySelectorAll(".bloco")].map(bloco => {
               return {
+                id: bloco.dataset.id,
                 tipo: bloco.querySelector("select").value,
                 inicio: bloco.querySelector(".inicio").value,
                 fim: bloco.querySelector(".fim").value
@@ -392,6 +394,9 @@
                 return; // Sai da função, o adicionarBloco vai chamar salvarAgenda novamente
             }
 
+            // Atualiza estatísticas com base nas alterações
+            atualizarEstatisticasComBlocos(blocos);
+
             // Prepara o objeto de dados
             const agendaData = { 
                 blocos: blocos,
@@ -404,6 +409,12 @@
               .then(() => {
                 console.log("Agenda salva com sucesso no Firestore!");
                 mostrarStatusSalvo();
+                
+                // Atualiza o rastreamento de blocos
+                blocosAnteriores = {};
+                blocos.forEach(bloco => {
+                  blocosAnteriores[bloco.id] = { ...bloco };
+                });
               })
               .catch((error) => {
                 console.error("Erro ao salvar agenda no Firestore:", error);
@@ -426,6 +437,7 @@
     
     console.log("Carregando agenda do Firestore para:", currentUser.uid);
     blocosDia.innerHTML = ''; // Limpa blocos existentes
+    blocosAnteriores = {}; // Limpa o rastreamento de blocos
 
     try {
       // Tenta carregar do Firestore
@@ -443,7 +455,9 @@
             data.blocos.forEach(b => {
                 // Verifica se os dados do bloco são válidos
                 if (b && b.tipo && b.inicio && b.fim) {
-                    adicionarBloco(b.tipo, b.inicio, b.fim, false);
+                    adicionarBloco(b.tipo, b.inicio, b.fim, false, b.id);
+                    // Rastreia o bloco
+                    blocosAnteriores[b.id] = { ...b };
                 } else {
                     console.warn("Bloco com dados inválidos ignorado:", b);
                 }
@@ -461,7 +475,7 @@
             try {
                 const blocos = JSON.parse(backupData);
                 if (Array.isArray(blocos) && blocos.length > 0) {
-                    blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false));
+                    blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false, b.id));
                     // Tenta salvar o backup no Firestore
                     salvarAgenda();
                     return;
@@ -486,7 +500,7 @@
               console.log("Usando backup local da agenda após erro");
               const blocos = JSON.parse(backupData);
               if (Array.isArray(blocos) && blocos.length > 0) {
-                  blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false));
+                  blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false, b.id));
               }
           } else {
               // Sem backup, cria um bloco padrão
@@ -499,13 +513,14 @@
     }
   }
 
-  function adicionarBloco(tipo = "foco", inicio = "09:00", fim = "10:00", salvar = true) {
+  function adicionarBloco(tipo = "foco", inicio = "09:00", fim = "10:00", salvar = true, id = null) {
     if (!currentUser) return;
     
     try {
+        const blocoId = id || `bloco_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const div = document.createElement("div");
         div.className = `bloco ${tipo}`;
-        div.dataset.id = Date.now(); // Adiciona um ID único para referência
+        div.dataset.id = blocoId;
 
         div.innerHTML = `
           <select onchange="this.parentElement.className='bloco ' + this.value; salvarAgenda();">
@@ -514,66 +529,260 @@
             <option value="descanso" ${tipo === "descanso" ? "selected" : ""}>Descanso</option>
             <option value="alerta" ${tipo === "alerta" ? "selected" : ""}>Alerta</option>
           </select>
-          <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()" />
-          <span>às</span>
-          <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()" />
-          <button onclick="this.parentElement.remove(); salvarAgenda()">❌</button>
+          <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()">
+          <span>até</span>
+          <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()">
+          <button onclick="removerBloco(this.parentElement)">🗑️</button>
         `;
+        
         blocosDia.appendChild(div);
         
-        if (salvar) {
-            salvarAgenda();
+        // Registra o novo bloco nas estatísticas se for um bloco novo (não carregado do Firestore)
+        if (salvar && !id) {
+            registrarAtividade(tipo, calcularDuracaoEmMinutos(inicio, fim), blocoId);
         }
+        
+        if (salvar) salvarAgenda();
     } catch (error) {
         console.error("Erro ao adicionar bloco:", error);
         mostrarErro("Erro ao adicionar bloco: " + error.message);
     }
   }
 
-  function logout() {
-      auth.signOut().then(() => {
-          console.log("Usuário deslogado");
-          window.location.href = "login.html";
-      }).catch((error) => {
-          console.error("Erro ao fazer logout:", error);
-          alert("Erro ao fazer logout: " + error.message);
-      });
+  function removerBloco(elemento) {
+    if (!currentUser) return;
+    
+    try {
+        const blocoId = elemento.dataset.id;
+        const tipo = elemento.querySelector("select").value;
+        
+        // Registra a remoção nas estatísticas
+        removerAtividadeEstatisticas(tipo, blocoId);
+        
+        // Remove o elemento da DOM
+        elemento.remove();
+        
+        // Salva a agenda atualizada
+        salvarAgenda();
+    } catch (error) {
+        console.error("Erro ao remover bloco:", error);
+        mostrarErro("Erro ao remover bloco: " + error.message);
+    }
   }
 
-  // --- Listener de Autenticação ---
-  auth.onAuthStateChanged(user => {
+  // --- Funções para integração com estatísticas ---
+  
+  // Calcula a duração em minutos entre dois horários
+  function calcularDuracaoEmMinutos(inicio, fim) {
+    const [horaInicio, minInicio] = inicio.split(':').map(Number);
+    const [horaFim, minFim] = fim.split(':').map(Number);
+    
+    let duracaoMinutos = (horaFim * 60 + minFim) - (horaInicio * 60 + minInicio);
+    
+    // Se a duração for negativa (ex: das 23:00 às 01:00), assume que passa para o dia seguinte
+    if (duracaoMinutos < 0) {
+        duracaoMinutos += 24 * 60; // Adiciona 24 horas em minutos
+    }
+    
+    return duracaoMinutos;
+  }
+  
+  // Registra uma nova atividade nas estatísticas
+  async function registrarAtividade(tipo, duracao, blocoId) {
+    if (!currentUser) return;
+    
     try {
-        if (user) {
-          currentUser = user;
-          console.log("Usuário logado:", currentUser.uid);
-          agendaContainer.style.display = 'block';
-          mensagemLogin.style.display = 'none';
-          carregarAgenda(); // Carrega a agenda do Firestore
-        } else {
-          currentUser = null;
-          console.log("Nenhum usuário logado.");
-          agendaContainer.style.display = 'none';
-          mensagemLogin.style.display = 'block';
-          blocosDia.innerHTML = '';
+        // Cria timestamps para início e fim
+        const agora = new Date();
+        const inicio = firebase.firestore.Timestamp.fromDate(agora);
+        const fimDate = new Date(agora.getTime() + duracao * 60000); // Adiciona a duração em milissegundos
+        const fim = firebase.firestore.Timestamp.fromDate(fimDate);
+        
+        // Formata a data para YYYY-MM-DD
+        const data = agora.toISOString().split('T')[0];
+        
+        // Cria o registro com referência ao bloco da agenda
+        const registro = {
+            tipo: tipo,
+            duracao: duracao, // em minutos
+            inicio: inicio,
+            fim: fim,
+            data: data,
+            blocoId: blocoId,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Salva no Firestore
+        await db.collection("users").doc(currentUser.uid)
+                .collection("estatisticas")
+                .collection("registros")
+                .doc(blocoId) // Usa o ID do bloco como ID do documento
+                .set(registro);
+        
+        console.log("Atividade registrada com sucesso:", registro);
+        
+        // Atualiza as estatísticas resumidas
+        await atualizarEstatisticasResumidas(tipo, 1);
+        
+    } catch (error) {
+        console.error("Erro ao registrar atividade:", error);
+    }
+  }
+  
+  // Remove uma atividade das estatísticas
+  async function removerAtividadeEstatisticas(tipo, blocoId) {
+    if (!currentUser) return;
+    
+    try {
+        // Remove o registro individual
+        await db.collection("users").doc(currentUser.uid)
+                .collection("estatisticas")
+                .collection("registros")
+                .doc(blocoId)
+                .delete();
+        
+        console.log("Registro de atividade removido:", blocoId);
+        
+        // Atualiza as estatísticas resumidas (decrementa)
+        await atualizarEstatisticasResumidas(tipo, -1);
+        
+    } catch (error) {
+        console.error("Erro ao remover atividade das estatísticas:", error);
+    }
+  }
+  
+  // Atualiza as estatísticas resumidas
+  async function atualizarEstatisticasResumidas(tipo, incremento) {
+    if (!currentUser) return;
+    
+    try {
+        const docRef = db.collection("users").doc(currentUser.uid)
+                        .collection("estatisticas")
+                        .doc("resumo");
+        
+        // Obtém o documento atual ou cria um novo
+        const doc = await docRef.get();
+        const dados = doc.exists ? doc.data() : {};
+        
+        // Garante que os períodos existam
+        if (!dados.hoje) dados.hoje = { estudo: 0, foco: 0, descanso: 0, alerta: 0 };
+        if (!dados.semana) dados.semana = { estudo: 0, foco: 0, descanso: 0, alerta: 0 };
+        if (!dados.mes) dados.mes = { estudo: 0, foco: 0, descanso: 0, alerta: 0 };
+        
+        // Incrementa ou decrementa os contadores para cada período
+        dados.hoje[tipo] = Math.max(0, (dados.hoje[tipo] || 0) + incremento);
+        dados.semana[tipo] = Math.max(0, (dados.semana[tipo] || 0) + incremento);
+        dados.mes[tipo] = Math.max(0, (dados.mes[tipo] || 0) + incremento);
+        
+        // Adiciona timestamp de atualização
+        dados.hoje.ultimaAtualizacao = firebase.firestore.FieldValue.serverTimestamp();
+        dados.semana.ultimaAtualizacao = firebase.firestore.FieldValue.serverTimestamp();
+        dados.mes.ultimaAtualizacao = firebase.firestore.FieldValue.serverTimestamp();
+        
+        // Salva as estatísticas atualizadas
+        await docRef.set(dados);
+        
+        console.log(`Estatísticas resumidas atualizadas: ${tipo} ${incremento > 0 ? '+' : ''}${incremento}`);
+        
+    } catch (error) {
+        console.error("Erro ao atualizar estatísticas resumidas:", error);
+    }
+  }
+  
+  // Atualiza estatísticas com base nas alterações nos blocos
+  async function atualizarEstatisticasComBlocos(blocos) {
+    if (!currentUser) return;
+    
+    try {
+        // Para cada bloco atual
+        for (const bloco of blocos) {
+            // Se é um bloco novo (não estava no rastreamento anterior)
+            if (!blocosAnteriores[bloco.id]) {
+                console.log("Novo bloco detectado:", bloco);
+                const duracao = calcularDuracaoEmMinutos(bloco.inicio, bloco.fim);
+                await registrarAtividade(bloco.tipo, duracao, bloco.id);
+            } 
+            // Se é um bloco existente que foi modificado
+            else if (
+                blocosAnteriores[bloco.id].tipo !== bloco.tipo ||
+                blocosAnteriores[bloco.id].inicio !== bloco.inicio ||
+                blocosAnteriores[bloco.id].fim !== bloco.fim
+            ) {
+                console.log("Bloco modificado:", bloco);
+                
+                // Se o tipo mudou, atualiza as estatísticas
+                if (blocosAnteriores[bloco.id].tipo !== bloco.tipo) {
+                    // Decrementa o tipo antigo
+                    await atualizarEstatisticasResumidas(blocosAnteriores[bloco.id].tipo, -1);
+                    // Incrementa o novo tipo
+                    await atualizarEstatisticasResumidas(bloco.tipo, 1);
+                }
+                
+                // Atualiza o registro individual
+                const duracao = calcularDuracaoEmMinutos(bloco.inicio, bloco.fim);
+                const agora = new Date();
+                const inicio = firebase.firestore.Timestamp.fromDate(agora);
+                const fimDate = new Date(agora.getTime() + duracao * 60000);
+                const fim = firebase.firestore.Timestamp.fromDate(fimDate);
+                
+                await db.collection("users").doc(currentUser.uid)
+                        .collection("estatisticas")
+                        .collection("registros")
+                        .doc(bloco.id)
+                        .update({
+                            tipo: bloco.tipo,
+                            duracao: duracao,
+                            inicio: inicio,
+                            fim: fim,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+            }
         }
+        
+        // Verifica blocos que foram removidos
+        for (const id in blocosAnteriores) {
+            if (!blocos.find(b => b.id === id)) {
+                console.log("Bloco removido:", blocosAnteriores[id]);
+                await removerAtividadeEstatisticas(blocosAnteriores[id].tipo, id);
+            }
+        }
+        
     } catch (error) {
-        console.error("Erro no gerenciamento de autenticação:", error);
-        mostrarErro("Erro ao verificar login: " + error.message);
+        console.error("Erro ao atualizar estatísticas com blocos:", error);
+    }
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      console.log("Usuário deslogado");
+      window.location.href = "login.html";
+    }).catch((error) => {
+      console.error("Erro ao fazer logout:", error);
+      alert("Erro ao fazer logout: " + error.message);
+    });
+  }
+
+  // Listener de autenticação
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      currentUser = user;
+      console.log("Usuário logado:", currentUser.uid);
+      agendaContainer.style.display = 'block';
+      mensagemLogin.style.display = 'none';
+      carregarAgenda();
+    } else {
+      currentUser = null;
+      console.log("Nenhum usuário logado");
+      agendaContainer.style.display = 'none';
+      mensagemLogin.style.display = 'block';
     }
   });
 
-  // --- Inicialização da Página ---
+  // Inicialização da página
   window.addEventListener("DOMContentLoaded", () => {
-    try {
-        carregarCoresSalvas();
-        // carregarAgenda() é chamado pelo onAuthStateChanged
-    } catch (error) {
-        console.error("Erro na inicialização da página:", error);
-        mostrarErro("Erro ao inicializar a página: " + error.message);
-    }
+    carregarCoresSalvas();
+    // carregarAgenda é chamado pelo onAuthStateChanged
   });
-
 </script>
-
 </body>
 </html>

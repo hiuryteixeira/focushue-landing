@@ -4,7 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Estatísticas da Sessão - FocusHue</title>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  
+  <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
     :root {
       --estudo: #6BAED6;
@@ -89,11 +97,147 @@
       border: 1px solid #aaa;
       font-size: 1rem;
     }
+    .dark select {
+      background-color: #444;
+      color: #eee;
+      border-color: #555;
+    }
     footer {
       text-align: center;
       padding: 30px 0;
       font-size: 0.9rem;
       color: #999;
+    }
+    
+    /* Estatísticas resumidas */
+    .stats-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .stat-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 15px;
+      min-width: 120px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .dark .stat-card {
+      background-color: #333;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .stat-card h3 {
+      margin: 0 0 5px 0;
+      font-size: 1rem;
+    }
+    .stat-card .value {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    .stat-card.estudo { border-top: 4px solid var(--estudo); }
+    .stat-card.foco { border-top: 4px solid var(--foco); }
+    .stat-card.descanso { border-top: 4px solid var(--descanso); }
+    .stat-card.alerta { border-top: 4px solid var(--alerta); }
+    
+    /* Mensagem de usuário não logado */
+    #mensagemLogin {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 1.1rem;
+      color: var(--text);
+      display: none;
+    }
+    #mensagemLogin a {
+      color: var(--estudo);
+      font-weight: bold;
+      text-decoration: none;
+    }
+    #mensagemLogin a:hover {
+      text-decoration: underline;
+    }
+    .dark #mensagemLogin {
+      color: var(--text-dark);
+    }
+    .dark #mensagemLogin a {
+      color: var(--foco);
+    }
+    
+    /* Mensagem de status */
+    #statusMessage {
+      text-align: center;
+      margin: 15px auto;
+      padding: 10px;
+      border-radius: 5px;
+      max-width: 600px;
+      display: none;
+    }
+    .success {
+      background-color: rgba(129, 199, 132, 0.2);
+      color: #2e7d32;
+    }
+    .dark .success {
+      background-color: rgba(129, 199, 132, 0.1);
+      color: #81c784;
+    }
+    .error {
+      background-color: rgba(239, 154, 154, 0.2);
+      color: #c62828;
+    }
+    .dark .error {
+      background-color: rgba(239, 154, 154, 0.1);
+      color: #ef9a9a;
+    }
+    
+    /* Loader */
+    .loader {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--foco);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+    .dark .loader {
+      border-color: #333;
+      border-top-color: var(--foco);
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Botão para simular dados */
+    .simulate-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: var(--foco);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .simulate-btn:hover {
+      background-color: var(--estudo);
+    }
+    
+    /* Mensagem quando não há dados */
+    .no-data {
+      margin: 30px 0;
+      padding: 20px;
+      background-color: rgba(0,0,0,0.05);
+      border-radius: 8px;
+      font-style: italic;
+      color: #666;
+    }
+    .dark .no-data {
+      background-color: rgba(255,255,255,0.05);
+      color: #aaa;
     }
   </style>
 </head>
@@ -110,9 +254,13 @@
     <a href="tarefas.html">✅ Tarefas</a>
     <a href="config.html">⚙️ Configurações</a>
     <a href="estatisticas.html">📊 Estatísticas</a>
+    <a href="notificacoes.html">🔔 Notificações</a>
+    <a href="#" onclick="logout()">🚪 Sair</a>
   </nav>
 
-  <main>
+  <div id="statusMessage"></div>
+
+  <main id="estatisticasContainer">
     <div class="filtro">
       <label for="periodo">Filtrar por:</label>
       <select id="periodo" onchange="filtrarDados()">
@@ -121,34 +269,143 @@
         <option value="mes">Este Mês</option>
       </select>
     </div>
+    
+    <div class="loader" id="loader"></div>
+    
+    <div class="stats-cards" id="statsCards">
+      <!-- Cards de estatísticas serão inseridos aqui -->
+    </div>
+    
     <canvas id="graficoPizza" width="400" height="400"></canvas>
+    
+    <div id="noDataMessage" style="display: none;" class="no-data">
+      Não há dados de estatísticas para este período.
+      <div>
+        <button class="simulate-btn" onclick="simularDados()">Gerar Dados de Exemplo</button>
+      </div>
+    </div>
   </main>
+
+  <div id="mensagemLogin">
+    <p>Você precisa estar logado para ver suas estatísticas.</p>
+    <p><a href="login.html">Fazer Login</a> ou <a href="cadastro.html">Criar Conta</a></p>
+  </div>
 
   <footer>
     © 2025 FocusHue™ — Sistema Cromático de Foco.
   </footer>
 
   <script>
-    const ctx = document.getElementById('graficoPizza').getContext('2d');
-    let grafico;
-
-    const dadosBase = {
-      hoje: [3, 2, 1, 2],
-      semana: [10, 6, 5, 8],
-      mes: [40, 25, 20, 15]
+    // Configuração Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
+      authDomain: "focushue-16683.firebaseapp.com",
+      projectId: "focushue-16683",
+      storageBucket: "focushue-16683.appspot.com",
+      messagingSenderId: "485935414293",
+      appId: "1:485935414293:web:c7ead918246319e0d6a21c"
     };
-
+    
+    // Inicialização do Firebase
+    try {
+      firebase.initializeApp(firebaseConfig);
+      console.log("Firebase inicializado com sucesso");
+    } catch (error) {
+      console.error("Erro ao inicializar Firebase:", error);
+      mostrarMensagem("Erro ao inicializar o Firebase. Verifique sua conexão com a internet.", "error");
+    }
+    
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    let currentUser = null;
+    let grafico = null;
+    
+    // Elementos da UI
+    const estatisticasContainer = document.getElementById('estatisticasContainer');
+    const mensagemLogin = document.getElementById('mensagemLogin');
+    const statusMessage = document.getElementById('statusMessage');
+    const loader = document.getElementById('loader');
+    const noDataMessage = document.getElementById('noDataMessage');
+    const statsCards = document.getElementById('statsCards');
+    const ctx = document.getElementById('graficoPizza').getContext('2d');
+    
+    // Constantes
     const labels = ["Estudo", "Foco", "Descanso", "Alerta"];
     const cores = ["#6BAED6", "#81C784", "#F4E06D", "#EF9A9A"];
+    const tipos = ["estudo", "foco", "descanso", "alerta"];
+    
+    // Dados padrão para simulação
+    const dadosPadrao = {
+      hoje: {
+        estudo: 3,
+        foco: 2,
+        descanso: 1,
+        alerta: 2
+      },
+      semana: {
+        estudo: 10,
+        foco: 6,
+        descanso: 5,
+        alerta: 8
+      },
+      mes: {
+        estudo: 40,
+        foco: 25,
+        descanso: 20,
+        alerta: 15
+      }
+    };
+    
+    function carregarCoresSalvas() {
+      ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
+        const corSalva = localStorage.getItem(variable);
+        if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
+      });
+      
+      // Carrega tema claro/escuro
+      if (localStorage.getItem("theme") === "escuro" || localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+      }
+    }
+    
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    }
 
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "escuro" : "claro");
+    }
+    
+    function mostrarMensagem(mensagem, tipo) {
+      statusMessage.textContent = mensagem;
+      statusMessage.className = tipo; // 'success' ou 'error'
+      statusMessage.style.display = 'block';
+      
+      // Esconde a mensagem após 3 segundos
+      setTimeout(() => {
+        statusMessage.style.display = 'none';
+      }, 3000);
+    }
+    
+    function mostrarLoader(mostrar = true) {
+      loader.style.display = mostrar ? 'block' : 'none';
+    }
+    
     function renderGrafico(dados) {
       if (grafico) grafico.destroy();
+      
+      // Extrai os valores dos dados para o formato esperado pelo Chart.js
+      const valores = tipos.map(tipo => dados[tipo] || 0);
+      
       grafico = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: labels,
           datasets: [{
-            data: dados,
+            data: valores,
             backgroundColor: cores
           }]
         },
@@ -156,7 +413,10 @@
           responsive: true,
           plugins: {
             legend: {
-              position: 'bottom'
+              position: 'bottom',
+              labels: {
+                color: document.body.classList.contains('dark') ? '#eeeeee' : '#2e2e2e'
+              }
             },
             tooltip: {
               callbacks: {
@@ -169,23 +429,203 @@
         }
       });
     }
-
+    
+    function renderizarCardsEstatisticas(dados) {
+      statsCards.innerHTML = '';
+      
+      tipos.forEach((tipo, index) => {
+        const valor = dados[tipo] || 0;
+        const card = document.createElement('div');
+        card.className = `stat-card ${tipo}`;
+        card.innerHTML = `
+          <h3>${labels[index]}</h3>
+          <div class="value">${valor}</div>
+          <div>blocos</div>
+        `;
+        statsCards.appendChild(card);
+      });
+    }
+    
+    async function carregarEstatisticas(periodo) {
+      if (!currentUser) return;
+      
+      mostrarLoader(true);
+      noDataMessage.style.display = 'none';
+      
+      try {
+        const docRef = db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo");
+        const doc = await docRef.get();
+        
+        if (doc.exists && doc.data()[periodo]) {
+          const dados = doc.data()[periodo];
+          console.log(`Estatísticas de ${periodo} carregadas:`, dados);
+          
+          renderGrafico(dados);
+          renderizarCardsEstatisticas(dados);
+        } else {
+          console.log(`Nenhuma estatística encontrada para ${periodo}`);
+          noDataMessage.style.display = 'block';
+          document.getElementById('graficoPizza').style.display = 'none';
+          statsCards.innerHTML = '';
+        }
+      } catch (error) {
+        console.error("Erro ao carregar estatísticas:", error);
+        mostrarMensagem("Erro ao carregar estatísticas: " + error.message, "error");
+      } finally {
+        mostrarLoader(false);
+      }
+    }
+    
     function filtrarDados() {
       const periodo = document.getElementById("periodo").value;
-      renderGrafico(dadosBase[periodo]);
+      carregarEstatisticas(periodo);
     }
-
-    function toggleMenu() {
-      const menu = document.getElementById("menu");
-      menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    
+    async function simularDados() {
+      if (!currentUser) return;
+      
+      mostrarLoader(true);
+      
+      try {
+        const periodo = document.getElementById("periodo").value;
+        const dados = dadosPadrao[periodo];
+        
+        // Adiciona timestamp
+        const dadosComTimestamp = {
+          ...dados,
+          ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Salva no Firestore
+        const docRef = db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo");
+        
+        // Verifica se o documento já existe
+        const doc = await docRef.get();
+        if (doc.exists) {
+          // Atualiza apenas o período específico
+          await docRef.update({
+            [periodo]: dadosComTimestamp
+          });
+        } else {
+          // Cria o documento com o período específico
+          await docRef.set({
+            [periodo]: dadosComTimestamp
+          });
+        }
+        
+        console.log(`Dados simulados para ${periodo} salvos com sucesso!`);
+        mostrarMensagem("Dados de exemplo gerados com sucesso!", "success");
+        
+        // Recarrega os dados
+        carregarEstatisticas(periodo);
+        
+      } catch (error) {
+        console.error("Erro ao simular dados:", error);
+        mostrarMensagem("Erro ao gerar dados de exemplo: " + error.message, "error");
+      } finally {
+        mostrarLoader(false);
+      }
     }
-
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
+    
+    // Função para registrar uma nova atividade
+    async function registrarAtividade(tipo, duracao, inicio, fim) {
+      if (!currentUser) return;
+      
+      try {
+        // Formata a data para YYYY-MM-DD
+        const data = new Date(inicio).toISOString().split('T')[0];
+        
+        // Cria o registro
+        const registro = {
+          tipo: tipo,
+          duracao: duracao, // em minutos
+          inicio: inicio,
+          fim: fim,
+          data: data
+        };
+        
+        // Salva no Firestore
+        await db.collection("users").doc(currentUser.uid).collection("estatisticas").collection("registros").add(registro);
+        
+        console.log("Atividade registrada com sucesso:", registro);
+        
+        // Atualiza as estatísticas resumidas
+        await atualizarEstatisticasResumidas(tipo);
+        
+      } catch (error) {
+        console.error("Erro ao registrar atividade:", error);
+      }
     }
-
-    // Inicia com dados de hoje
-    renderGrafico(dadosBase.hoje);
+    
+    // Função para atualizar as estatísticas resumidas
+    async function atualizarEstatisticasResumidas(tipoAtualizado) {
+      if (!currentUser) return;
+      
+      try {
+        const docRef = db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo");
+        const doc = await docRef.get();
+        
+        // Obtém os dados atuais ou cria um objeto vazio
+        const dados = doc.exists ? doc.data() : {};
+        
+        // Atualiza as estatísticas para cada período
+        ['hoje', 'semana', 'mes'].forEach(periodo => {
+          if (!dados[periodo]) {
+            dados[periodo] = {
+              estudo: 0,
+              foco: 0,
+              descanso: 0,
+              alerta: 0,
+              ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
+            };
+          }
+          
+          // Incrementa o contador para o tipo atualizado
+          dados[periodo][tipoAtualizado] = (dados[periodo][tipoAtualizado] || 0) + 1;
+          dados[periodo].ultimaAtualizacao = firebase.firestore.FieldValue.serverTimestamp();
+        });
+        
+        // Salva as estatísticas atualizadas
+        await docRef.set(dados);
+        
+        console.log("Estatísticas resumidas atualizadas com sucesso!");
+        
+      } catch (error) {
+        console.error("Erro ao atualizar estatísticas resumidas:", error);
+      }
+    }
+    
+    function logout() {
+      auth.signOut().then(() => {
+        console.log("Usuário deslogado");
+        window.location.href = "login.html";
+      }).catch((error) => {
+        console.error("Erro ao fazer logout:", error);
+        alert("Erro ao fazer logout: " + error.message);
+      });
+    }
+    
+    // Listener de autenticação
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        console.log("Usuário logado:", currentUser.uid);
+        estatisticasContainer.style.display = 'block';
+        mensagemLogin.style.display = 'none';
+        filtrarDados(); // Carrega as estatísticas do período selecionado
+      } else {
+        currentUser = null;
+        console.log("Nenhum usuário logado");
+        estatisticasContainer.style.display = 'none';
+        mensagemLogin.style.display = 'block';
+      }
+    });
+    
+    // Inicialização da página
+    window.addEventListener("DOMContentLoaded", () => {
+      carregarCoresSalvas();
+      // filtrarDados é chamado pelo onAuthStateChanged
+    });
   </script>
 </body>
 </html>

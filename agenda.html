@@ -153,6 +153,25 @@
       font-size: 0.9rem;
       color: #999;
     }
+	    .customize {
+      text-align: center;
+      margin: 40px auto;
+    }
+
+    .customize button {
+      margin: 5px;
+      padding: 10px 18px;
+      border: none;
+      background: #555;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .customize button:hover {
+      background: var(--foco);
+    }
     #mensagemLogin {
         text-align: center;
         margin-top: 50px;
@@ -247,6 +266,10 @@
 <div id="mensagemLogin" style="display: none;">
   <p>Você precisa estar logado para ver e editar sua agenda.</p>
   <p><a href="login.html">Fazer Login</a> ou <a href="cadastro.html">Criar Conta</a></p>
+</div>
+
+<div class="customize">
+  <button onclick="window.location.href='paleta.html'">🎨 Personalizar Cores</button>
 </div>
 
 <!-- Modal para associar tarefas -->

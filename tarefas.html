@@ -58,6 +58,9 @@
       padding: 10px;
       z-index: 10;
     }
+    body.dark nav {
+      background: rgba(40,40,40,0.95);
+    }
     nav a {
       padding: 10px;
       text-decoration: none;
@@ -65,6 +68,9 @@
       font-weight: 500;
       border-radius: 5px;
       transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark nav a {
+      color: #eee;
     }
     nav a:hover {
       background: var(--foco);
@@ -379,11 +385,17 @@
 
   function toggleTheme() {
     document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    
+    // Atualiza o ícone do botão
+    const themeToggle = document.querySelector(".theme-toggle");
+    themeToggle.textContent = isDark ? "☀️" : "🌙";
+    
     // Aplica tema ao modal se estiver aberto
     const modalContent = document.querySelector("#modalTarefa .modal-content");
     if (modalContent) {
-        if (document.body.classList.contains("dark")) {
+        if (isDark) {
             modalContent.classList.add("dark");
         } else {
             modalContent.classList.remove("dark");
@@ -392,13 +404,19 @@
   }
 
   function carregarCoresSalvas() {
+    // Carrega cores personalizadas
     ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
       const corSalva = localStorage.getItem(variable);
       if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
     });
+    
     // Carrega tema claro/escuro
-    if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark");
+    const tema = localStorage.getItem("theme");
+    if (tema === "dark") {
+      document.body.classList.add("dark");
+      document.querySelector(".theme-toggle").textContent = "☀️";
+    } else {
+      document.querySelector(".theme-toggle").textContent = "🌙";
     }
   }
 
@@ -518,5 +536,92 @@
           if (id) {
               // Editar tarefa existente
               console.log("Atualizando tarefa no Firestore:", id);
-              await tare
-(Content truncated due to size limit. Use line ranges to read in chunks)
+              await tarefasRef.doc(id).update({
+                  ...tarefaData,
+                  updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+          } else {
+              // Adicionar nova tarefa
+              console.log("Adicionando nova tarefa ao Firestore");
+              tarefaData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+              await tarefasRef.add(tarefaData);
+          }
+          
+          fecharModalTarefa();
+          await carregarTarefas(); // Recarrega as tarefas para atualizar a lista
+      } catch (error) {
+          console.error("Erro ao salvar tarefa:", error);
+          alert("Erro ao salvar tarefa: " + error.message);
+      }
+  }
+
+  async function excluirTarefa(id) {
+      if (!currentUser) return;
+      if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+
+      try {
+          console.log("Excluindo tarefa do Firestore:", id);
+          await db.collection("users").doc(currentUser.uid).collection("tarefas").doc(id).delete();
+          // Atualiza o cache local e renderiza
+          tarefasCache = tarefasCache.filter(t => t.id !== id);
+          renderTarefas();
+      } catch (error) {
+          console.error("Erro ao excluir tarefa:", error);
+          alert("Erro ao excluir tarefa: " + error.message);
+      }
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      console.log("Usuário deslogado");
+      window.location.href = "login.html";
+    }).catch((error) => {
+      console.error("Erro ao fazer logout:", error);
+      alert("Erro ao fazer logout: " + error.message);
+    });
+  }
+
+  // --- Autenticação e Inicialização ---
+  auth.onAuthStateChanged(user => {
+      const tarefasSection = document.getElementById('tarefasSection');
+      const mensagemLogin = document.getElementById('mensagemLogin');
+      
+      if (user) {
+          currentUser = user;
+          tarefasSection.style.display = 'block';
+          mensagemLogin.style.display = 'none';
+          carregarTarefas();
+      } else {
+          currentUser = null;
+          tarefasSection.style.display = 'none';
+          mensagemLogin.style.display = 'block';
+          tarefasCache = [];
+          renderTarefas();
+      }
+  });
+
+  // Inicialização da página
+  window.addEventListener('DOMContentLoaded', () => {
+    carregarCoresSalvas();
+    
+    // Fecha o menu ao clicar fora dele
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('menu');
+      const menuToggle = document.querySelector('.menu-toggle');
+      if (menu.style.display === 'flex' && 
+          !menu.contains(event.target) && 
+          event.target !== menuToggle) {
+        menu.style.display = 'none';
+      }
+    });
+    
+    // Fecha o modal ao clicar fora dele
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        fecharModalTarefa();
+      }
+    };
+  });
+</script>
+</body>
+</html>

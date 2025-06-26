@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Agenda Diária - FocusHue</title>
+  <title>Agenda Integrada - FocusHue</title>
   <style>
     :root {
       --estudo: #6BAED6;
@@ -15,7 +15,6 @@
       --bg-dark: #1c1c1c;
       --text-dark: #eeeeee;
     }
-
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -23,12 +22,10 @@
       color: var(--text);
       transition: background-color 0.3s, color 0.3s;
     }
-
     body.dark {
       background-color: var(--bg-dark);
       color: var(--text-dark);
     }
-
     header {
       background: linear-gradient(to right, var(--foco), var(--estudo));
       padding: 20px;
@@ -38,7 +35,6 @@
       font-weight: bold;
       position: relative;
     }
-
     .menu-toggle, .theme-toggle {
       position: absolute;
       top: 20px;
@@ -48,10 +44,8 @@
       color: white;
       cursor: pointer;
     }
-
     .menu-toggle { left: 20px; }
     .theme-toggle { right: 20px; }
-
     nav {
       display: none;
       flex-direction: column;
@@ -62,9 +56,8 @@
       border-radius: 8px;
       padding: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      z-index: 10;
+      z-index: 100;
     }
-
     nav a {
       padding: 10px;
       text-decoration: none;
@@ -73,31 +66,39 @@
       border-radius: 5px;
       transition: background-color 0.3s, color 0.3s;
     }
-
     nav a:hover {
       background: var(--foco);
       color: white;
     }
-
     .agenda-container {
       max-width: 700px;
       margin: 30px auto;
       padding: 0 20px;
     }
-
     .bloco {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 15px;
-      border-radius: 8px;
-      margin-bottom: 12px;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
       color: white;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: background-color 0.3s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s;
     }
-
+    .bloco.active {
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    .bloco-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .bloco-body {
+        padding-top: 10px;
+        margin-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.3);
+    }
+    .bloco-body h4 { margin: 0 0 8px 0; font-size: 0.9rem; }
+    .bloco-body ul { margin: 0; padding-left: 20px; font-size: 0.9rem; }
     select, input[type="time"] {
       padding: 6px 8px;
       border-radius: 5px;
@@ -105,29 +106,23 @@
       font-weight: bold;
       font-size: 0.9rem;
     }
-
     .bloco button {
         background: rgba(255,255,255,0.2);
         border: none;
         color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
+        padding: 5px 9px;
+        border-radius: 5px;
         cursor: pointer;
-        margin-left: auto;
         transition: background-color 0.3s;
     }
-    .bloco button:hover {
-        background: rgba(255,255,255,0.4);
-    }
-
-    /* Cores dos blocos */
+    .bloco .main-controls { margin-left: auto; display: flex; gap: 8px; }
+    .bloco button:hover { background: rgba(255,255,255,0.4); }
     .estudo { background-color: var(--estudo); }
     .foco { background-color: var(--foco); }
     .descanso { background-color: var(--descanso); color: #333; }
     .descanso button { color: #333; background: rgba(0,0,0,0.1); }
     .descanso button:hover { background: rgba(0,0,0,0.2); }
     .alerta { background-color: var(--alerta); }
-
     .add-btn {
       margin-top: 20px;
       padding: 12px 24px;
@@ -140,110 +135,67 @@
       font-weight: bold;
       transition: background-color 0.3s;
     }
-    .add-btn:hover {
-        background-color: var(--estudo);
-    }
-
+    .add-btn:hover { background-color: var(--estudo); }
     footer {
       text-align: center;
       padding: 30px 0;
       font-size: 0.9rem;
       color: #999;
     }
-
-    .customize {
-      text-align: center;
-      margin: 40px auto;
-    }
-
-    .customize button {
-      margin: 5px;
-      padding: 10px 18px;
-      border: none;
-      background: #555;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .customize button:hover {
-      background: var(--foco);
-    }
-
     #mensagemLogin {
         text-align: center;
         margin-top: 50px;
         font-size: 1.1rem;
+    }
+    #mensagemLogin a { color: var(--estudo); font-weight: bold; }
+    /* Modal */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 200; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%; 
+        overflow: auto; 
+        background-color: rgba(0,0,0,0.6); 
+    }
+    .modal-content {
+        background-color: var(--bg);
+        margin: 10% auto; 
+        padding: 25px 35px;
+        border: 1px solid #888;
+        width: 90%; 
+        max-width: 500px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         color: var(--text);
     }
-    #mensagemLogin a {
-        color: var(--estudo);
-        font-weight: bold;
-        text-decoration: none;
+    .dark .modal-content { background-color: #2c2c2c; color: var(--text-dark); border-color: #555; }
+    .modal-buttons {
+        text-align: right;
+        margin-top: 20px;
     }
-    #mensagemLogin a:hover {
-        text-decoration: underline;
-    }
-    .dark #mensagemLogin {
-        color: var(--text-dark);
-    }
-    .dark #mensagemLogin a {
-        color: var(--foco);
-    }
-
-    /* Estilo para feedback de salvamento */
-    #statusSalvo {
-        text-align: center;
-        margin-top: 15px;
-        font-size: 0.9rem;
-        color: var(--foco);
-        opacity: 0;
-        transition: opacity 0.5s;
-    }
-    .dark #statusSalvo {
-        color: var(--foco);
-    }
-
-    /* Estilo para mensagens de erro */
-    #mensagemErro {
-        text-align: center;
-        margin: 15px auto;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: rgba(239, 154, 154, 0.2);
-        color: #d32f2f;
-        font-size: 0.9rem;
-        max-width: 90%;
-        display: none;
-    }
-    .dark #mensagemErro {
-        background-color: rgba(239, 154, 154, 0.1);
-    }
-
-    /* Estilo para o botão de tentar novamente */
-    #btnTentarNovamente {
-        display: block;
-        margin: 10px auto;
-        padding: 8px 16px;
-        background-color: var(--foco);
-        color: white;
+    .modal-buttons button {
+        padding: 10px 20px;
         border: none;
-        border-radius: 4px;
+        border-radius: 5px;
         cursor: pointer;
-        font-size: 0.9rem;
+        margin-left: 10px;
+        font-weight: bold;
     }
-    #btnTentarNovamente:hover {
-        background-color: var(--estudo);
-    }
-
+    .save-btn { background-color: var(--foco); color: white; }
+    .cancel-btn { background-color: #ccc; color: #333; }
+    .dark .cancel-btn { background-color: #555; color: var(--text-dark); }
+    #listaTarefasModal .tarefa-item { display: block; margin-bottom: 10px; }
+    #listaTarefasModal label { margin-left: 8px; }
   </style>
 </head>
 <body>
 
 <header>
   <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-  Agenda Diária
+  Agenda Integrada
   <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
 </header>
 
@@ -258,15 +210,8 @@
 </nav>
 
 <section class="agenda-container" id="agendaContainer">
-  <!-- Mensagem de erro -->
-  <div id="mensagemErro">
-    Erro ao carregar ou salvar sua agenda. 
-    <button id="btnTentarNovamente" onclick="carregarAgenda()">Tentar Novamente</button>
-  </div>
-  
   <div id="blocosDia"></div>
   <button class="add-btn" onclick="adicionarBloco()">+ Adicionar Bloco</button>
-  <div id="statusSalvo">Agenda salva!</div> <!-- Feedback de salvamento -->
 </section>
 
 <div id="mensagemLogin" style="display: none;">
@@ -274,13 +219,34 @@
   <p><a href="login.html">Fazer Login</a> ou <a href="cadastro.html">Criar Conta</a></p>
 </div>
 
-<div class="customize">
-  <button onclick="window.location.href='paleta.html'">🎨 Personalizar Cores</button>
+<!-- Modal para associar tarefas -->
+<div id="modalAssociarTarefa" class="modal">
+  <div class="modal-content">
+    <h3>Associar Tarefas ao Bloco</h3>
+    <input type="hidden" id="blocoIdParaAssociar">
+    <div id="listaTarefasModal" style="max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+      <!-- Lista de tarefas do usuário será carregada aqui -->
+    </div>
+    <div class="modal-buttons">
+      <button class="cancel-btn" onclick="fecharModalAssociar()">Cancelar</button>
+      <button class="save-btn" onclick="salvarAssociacaoTarefas()">Salvar</button>
+    </div>
+  </div>
 </div>
 
-<footer>
-  © 2025 FocusHue™ — Sistema Cromático de Foco.
-</footer>
+<!-- Modal de notificação interativa -->
+<div id="modalNotificacao" class="modal">
+  <div class="modal-content">
+    <h3 id="notificacaoTitulo"></h3>
+    <p id="notificacaoMensagem"></p>
+    <div id="notificacaoTarefas"></div>
+    <div class="modal-buttons">
+      <button class="cancel-btn" onclick="fecharNotificacao()">Agora não</button>
+      <button class="save-btn" id="btnConfirmarBloco">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -297,492 +263,198 @@
     messagingSenderId: "485935414293",
     appId: "1:485935414293:web:c7ead918246319e0d6a21c"
   };
-  
-  // Inicialização do Firebase
-  try {
-    firebase.initializeApp(firebaseConfig);
-    console.log("Firebase inicializado com sucesso");
-  } catch (error) {
-    console.error("Erro ao inicializar Firebase:", error);
-    mostrarErro("Erro ao inicializar o Firebase. Verifique sua conexão com a internet.");
-  }
-  
+  firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
   let currentUser = null;
-  let debounceTimer; // Para evitar salvamentos excessivos
-  let blocosAnteriores = {}; // Para rastrear alterações nos blocos
+  let agendaIntervalo;
 
-  // Elementos da UI
-  const mensagemErro = document.getElementById('mensagemErro');
-  const blocosDia = document.getElementById('blocosDia');
-  const statusSalvo = document.getElementById('statusSalvo');
-  const agendaContainer = document.getElementById('agendaContainer');
-  const mensagemLogin = document.getElementById('mensagemLogin');
+  // --- Funções da Agenda ---
+  function adicionarBloco(tipo = "foco", inicio = "09:00", fim = "10:00", tarefaIds = [], id = null) {
+    const blocoId = id || `bloco_${Date.now()}`;
+    const div = document.createElement("div");
+    div.className = `bloco ${tipo}`;
+    div.dataset.id = blocoId;
 
-  function toggleMenu() {
-    const menu = document.getElementById("menu");
-    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    div.innerHTML = `
+      <div class="bloco-header">
+        <select onchange="this.parentElement.parentElement.className='bloco ' + this.value; salvarAgenda();">
+          <option value="foco" ${tipo === "foco" ? "selected" : ""}>Foco</option>
+          <option value="estudo" ${tipo === "estudo" ? "selected" : ""}>Estudo</option>
+          <option value="descanso" ${tipo === "descanso" ? "selected" : ""}>Descanso</option>
+          <option value="alerta" ${tipo === "alerta" ? "selected" : ""}>Alerta</option>
+        </select>
+        <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()">
+        <span>até</span>
+        <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()">
+        <div class="main-controls">
+            <button onclick="abrirModalAssociar('${blocoId}')">🔗</button>
+            <button onclick="removerBloco(this.parentElement.parentElement.parentElement)">🗑️</button>
+        </div>
+      </div>
+      <div class="bloco-body" id="tarefas-${blocoId}"></div>
+    `;
+    document.getElementById('blocosDia').appendChild(div);
+    salvarAgenda();
+    carregarTarefasDoBloco(blocoId, tarefaIds);
   }
 
-  function toggleTheme() {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-  }
-
-  function carregarCoresSalvas() {
-    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
-      const corSalva = localStorage.getItem(variable);
-      if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
-    });
-    if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark");
-    }
-  }
-
-  function mostrarStatusSalvo() {
-      statusSalvo.style.opacity = 1;
-      setTimeout(() => { statusSalvo.style.opacity = 0; }, 1500); // Esconde após 1.5s
-  }
-
-  function mostrarErro(mensagem) {
-      console.error("ERRO:", mensagem);
-      mensagemErro.textContent = mensagem;
-      mensagemErro.style.display = 'block';
-      
-      // Adiciona o botão de tentar novamente
-      const btnTentarNovamente = document.getElementById('btnTentarNovamente');
-      if (!btnTentarNovamente) {
-          const btn = document.createElement('button');
-          btn.id = 'btnTentarNovamente';
-          btn.textContent = 'Tentar Novamente';
-          btn.onclick = carregarAgenda;
-          mensagemErro.appendChild(btn);
-      }
-  }
-
-  function esconderErro() {
-      mensagemErro.style.display = 'none';
-  }
-
-  // --- Funções da Agenda com Firestore --- 
-  function salvarAgenda() {
+  async function salvarAgenda() {
     if (!currentUser) return;
-    esconderErro(); // Esconde mensagens de erro anteriores
-
-    // Debounce para evitar salvamentos múltiplos rápidos
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        console.log("Salvando agenda no Firestore para:", currentUser.uid);
-        
-        try {
-            // Coleta os dados dos blocos
-            const blocos = [...document.querySelectorAll(".bloco")].map(bloco => {
-              return {
-                id: bloco.dataset.id,
-                tipo: bloco.querySelector("select").value,
-                inicio: bloco.querySelector(".inicio").value,
-                fim: bloco.querySelector(".fim").value
-              };
-            });
-
-            // Verifica se há dados para salvar
-            if (!blocos || blocos.length === 0) {
-                console.log("Nenhum bloco para salvar, adicionando bloco padrão");
-                adicionarBloco("foco", "09:00", "10:00", false);
-                return; // Sai da função, o adicionarBloco vai chamar salvarAgenda novamente
-            }
-
-            // Atualiza estatísticas com base nas alterações
-            atualizarEstatisticasComBlocos(blocos);
-
-            // Prepara o objeto de dados
-            const agendaData = { 
-                blocos: blocos,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            // Salva no Firestore
-            db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia")
-              .set(agendaData)
-              .then(() => {
-                console.log("Agenda salva com sucesso no Firestore!");
-                mostrarStatusSalvo();
-                
-                // Atualiza o rastreamento de blocos
-                blocosAnteriores = {};
-                blocos.forEach(bloco => {
-                  blocosAnteriores[bloco.id] = { ...bloco };
-                });
-              })
-              .catch((error) => {
-                console.error("Erro ao salvar agenda no Firestore:", error);
-                mostrarErro("Erro ao salvar a agenda: " + error.message);
-                
-                // Salva localmente como backup
-                localStorage.setItem(`agenda-backup-${currentUser.uid}`, JSON.stringify(blocos));
-                console.log("Backup da agenda salvo no localStorage");
-              });
-        } catch (error) {
-            console.error("Erro ao processar dados da agenda:", error);
-            mostrarErro("Erro ao processar dados da agenda: " + error.message);
-        }
-    }, 1000); // Aguarda 1 segundo após a última alteração para salvar
+    const blocos = [...document.querySelectorAll(".bloco")].map(b => ({
+      id: b.dataset.id,
+      tipo: b.querySelector("select").value,
+      inicio: b.querySelector(".inicio").value,
+      fim: b.querySelector(".fim").value,
+      tarefaIds: JSON.parse(b.dataset.tarefaIds || '[]')
+    }));
+    await db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia").set({ blocos });
   }
 
   async function carregarAgenda() {
     if (!currentUser) return;
-    esconderErro(); // Esconde mensagens de erro anteriores
-    
-    console.log("Carregando agenda do Firestore para:", currentUser.uid);
-    blocosDia.innerHTML = ''; // Limpa blocos existentes
-    blocosAnteriores = {}; // Limpa o rastreamento de blocos
-
-    try {
-      // Tenta carregar do Firestore
-      const docRef = db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia");
-      const docSnap = await docRef.get();
-
-      console.log("Documento obtido do Firestore:", docSnap.exists ? "Existe" : "Não existe");
-
-      if (docSnap.exists) {
-        const data = docSnap.data();
-        console.log("Dados da agenda carregados:", data);
-        
-        if (data && data.blocos && Array.isArray(data.blocos) && data.blocos.length > 0) {
-            // Renderiza os blocos da agenda
-            data.blocos.forEach(b => {
-                // Verifica se os dados do bloco são válidos
-                if (b && b.tipo && b.inicio && b.fim) {
-                    adicionarBloco(b.tipo, b.inicio, b.fim, false, b.id);
-                    // Rastreia o bloco
-                    blocosAnteriores[b.id] = { ...b };
-                } else {
-                    console.warn("Bloco com dados inválidos ignorado:", b);
-                }
-            });
-            console.log("Agenda carregada com sucesso!");
-        } else {
-            console.log("Documento existe mas não tem blocos válidos, criando bloco padrão");
-            adicionarBloco("foco", "09:00", "10:00", true);
-        }
-      } else {
-        // Documento não existe, verifica se há backup local
-        const backupData = localStorage.getItem(`agenda-backup-${currentUser.uid}`);
-        if (backupData) {
-            console.log("Usando backup local da agenda");
-            try {
-                const blocos = JSON.parse(backupData);
-                if (Array.isArray(blocos) && blocos.length > 0) {
-                    blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false, b.id));
-                    // Tenta salvar o backup no Firestore
-                    salvarAgenda();
-                    return;
-                }
-            } catch (e) {
-                console.error("Erro ao processar backup local:", e);
-            }
-        }
-        
-        // Sem documento e sem backup válido, cria um bloco padrão
-        console.log("Nenhuma agenda encontrada, criando bloco padrão");
-        adicionarBloco("foco", "09:00", "10:00", true);
-      }
-    } catch (error) {
-      console.error("Erro ao carregar agenda do Firestore:", error);
-      mostrarErro("Erro ao carregar sua agenda: " + error.message);
-      
-      // Tenta usar backup local em caso de erro
-      try {
-          const backupData = localStorage.getItem(`agenda-backup-${currentUser.uid}`);
-          if (backupData) {
-              console.log("Usando backup local da agenda após erro");
-              const blocos = JSON.parse(backupData);
-              if (Array.isArray(blocos) && blocos.length > 0) {
-                  blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, false, b.id));
-              }
-          } else {
-              // Sem backup, cria um bloco padrão
-              adicionarBloco("foco", "09:00", "10:00", false);
-          }
-      } catch (e) {
-          console.error("Erro ao processar backup local:", e);
-          adicionarBloco("foco", "09:00", "10:00", false);
-      }
-    }
-  }
-
-  function adicionarBloco(tipo = "foco", inicio = "09:00", fim = "10:00", salvar = true, id = null) {
-    if (!currentUser) return;
-    
-    try {
-        const blocoId = id || `bloco_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const div = document.createElement("div");
-        div.className = `bloco ${tipo}`;
-        div.dataset.id = blocoId;
-
-        div.innerHTML = `
-          <select onchange="this.parentElement.className='bloco ' + this.value; salvarAgenda();">
-            <option value="foco" ${tipo === "foco" ? "selected" : ""}>Foco</option>
-            <option value="estudo" ${tipo === "estudo" ? "selected" : ""}>Estudo</option>
-            <option value="descanso" ${tipo === "descanso" ? "selected" : ""}>Descanso</option>
-            <option value="alerta" ${tipo === "alerta" ? "selected" : ""}>Alerta</option>
-          </select>
-          <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()">
-          <span>até</span>
-          <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()">
-          <button onclick="removerBloco(this.parentElement)">🗑️</button>
-        `;
-        
-        blocosDia.appendChild(div);
-        
-        // Registra o novo bloco nas estatísticas se for um bloco novo (não carregado do Firestore)
-        if (salvar && !id) {
-            registrarAtividade(tipo, calcularDuracaoEmMinutos(inicio, fim), blocoId);
-        }
-        
-        if (salvar) salvarAgenda();
-    } catch (error) {
-        console.error("Erro ao adicionar bloco:", error);
-        mostrarErro("Erro ao adicionar bloco: " + error.message);
+    const doc = await db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia").get();
+    if (doc.exists) {
+      document.getElementById('blocosDia').innerHTML = '';
+      doc.data().blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, b.tarefaIds, b.id));
     }
   }
 
   function removerBloco(elemento) {
-    if (!currentUser) return;
-    
-    try {
-        const blocoId = elemento.dataset.id;
-        const tipo = elemento.querySelector("select").value;
-        
-        // Registra a remoção nas estatísticas
-        removerAtividadeEstatisticas(tipo, blocoId);
-        
-        // Remove o elemento da DOM
-        elemento.remove();
-        
-        // Salva a agenda atualizada
-        salvarAgenda();
-    } catch (error) {
-        console.error("Erro ao remover bloco:", error);
-        mostrarErro("Erro ao remover bloco: " + error.message);
-    }
+    elemento.remove();
+    salvarAgenda();
   }
 
-  // --- Funções para integração com estatísticas ---
-  
-  // Calcula a duração em minutos entre dois horários
-  function calcularDuracaoEmMinutos(inicio, fim) {
-    const [horaInicio, minInicio] = inicio.split(':').map(Number);
-    const [horaFim, minFim] = fim.split(':').map(Number);
-    
-    let duracaoMinutos = (horaFim * 60 + minFim) - (horaInicio * 60 + minInicio);
-    
-    // Se a duração for negativa (ex: das 23:00 às 01:00), assume que passa para o dia seguinte
-    if (duracaoMinutos < 0) {
-        duracaoMinutos += 24 * 60; // Adiciona 24 horas em minutos
-    }
-    
-    return duracaoMinutos;
-  }
-  
-  // Registra uma nova atividade nas estatísticas
-  async function registrarAtividade(tipo, duracao, blocoId) {
-    if (!currentUser) return;
-    
-    try {
-        // Cria timestamps para início e fim
-        const agora = new Date();
-        const inicio = firebase.firestore.Timestamp.fromDate(agora);
-        const fimDate = new Date(agora.getTime() + duracao * 60000); // Adiciona a duração em milissegundos
-        const fim = firebase.firestore.Timestamp.fromDate(fimDate);
-        
-        // Formata a data para YYYY-MM-DD
-        const data = agora.toISOString().split('T')[0];
-        
-        // Cria o registro com referência ao bloco da agenda
-        const registro = {
-            tipo: tipo,
-            duracao: duracao, // em minutos
-            inicio: inicio,
-            fim: fim,
-            data: data,
-            blocoId: blocoId,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        
-        // Salva no Firestore
-        await db.collection("users").doc(currentUser.uid)
-                .collection("estatisticas")
-                .collection("registros")
-                .doc(blocoId) // Usa o ID do bloco como ID do documento
-                .set(registro);
-        
-        console.log("Atividade registrada com sucesso:", registro);
-        
-        // Atualiza as estatísticas resumidas
-        await atualizarEstatisticasResumidas(tipo, 1);
-        
-    } catch (error) {
-        console.error("Erro ao registrar atividade:", error);
-    }
-  }
-  
-  // Remove uma atividade das estatísticas
-  async function removerAtividadeEstatisticas(tipo, blocoId) {
-    if (!currentUser) return;
-    
-    try {
-        // Remove o registro individual
-        await db.collection("users").doc(currentUser.uid)
-                .collection("estatisticas")
-                .collection("registros")
-                .doc(blocoId)
-                .delete();
-        
-        console.log("Registro de atividade removido:", blocoId);
-        
-        // Atualiza as estatísticas resumidas (decrementa)
-        await atualizarEstatisticasResumidas(tipo, -1);
-        
-    } catch (error) {
-        console.error("Erro ao remover atividade das estatísticas:", error);
-    }
-  }
-  
-  // Atualiza as estatísticas resumidas
-  async function atualizarEstatisticasResumidas(tipo, incremento) {
-    if (!currentUser) return;
-    
-    try {
-        const docRef = db.collection("users").doc(currentUser.uid)
-                        .collection("estatisticas")
-                        .doc("resumo");
-        
-        // Obtém o documento atual ou cria um novo
-        const doc = await docRef.get();
-        const dados = doc.exists ? doc.data() : {};
-        
-        // Garante que os períodos existam
-        if (!dados.hoje) dados.hoje = { estudo: 0, foco: 0, descanso: 0, alerta: 0 };
-        if (!dados.semana) dados.semana = { estudo: 0, foco: 0, descanso: 0, alerta: 0 };
-        if (!dados.mes) dados.mes = { estudo: 0, foco: 0, descanso: 0, alerta: 0 };
-        
-        // Incrementa ou decrementa os contadores para cada período
-        dados.hoje[tipo] = Math.max(0, (dados.hoje[tipo] || 0) + incremento);
-        dados.semana[tipo] = Math.max(0, (dados.semana[tipo] || 0) + incremento);
-        dados.mes[tipo] = Math.max(0, (dados.mes[tipo] || 0) + incremento);
-        
-        // Adiciona timestamp de atualização
-        dados.hoje.ultimaAtualizacao = firebase.firestore.FieldValue.serverTimestamp();
-        dados.semana.ultimaAtualizacao = firebase.firestore.FieldValue.serverTimestamp();
-        dados.mes.ultimaAtualizacao = firebase.firestore.FieldValue.serverTimestamp();
-        
-        // Salva as estatísticas atualizadas
-        await docRef.set(dados);
-        
-        console.log(`Estatísticas resumidas atualizadas: ${tipo} ${incremento > 0 ? '+' : ''}${incremento}`);
-        
-    } catch (error) {
-        console.error("Erro ao atualizar estatísticas resumidas:", error);
-    }
-  }
-  
-  // Atualiza estatísticas com base nas alterações nos blocos
-  async function atualizarEstatisticasComBlocos(blocos) {
-    if (!currentUser) return;
-    
-    try {
-        // Para cada bloco atual
-        for (const bloco of blocos) {
-            // Se é um bloco novo (não estava no rastreamento anterior)
-            if (!blocosAnteriores[bloco.id]) {
-                console.log("Novo bloco detectado:", bloco);
-                const duracao = calcularDuracaoEmMinutos(bloco.inicio, bloco.fim);
-                await registrarAtividade(bloco.tipo, duracao, bloco.id);
-            } 
-            // Se é um bloco existente que foi modificado
-            else if (
-                blocosAnteriores[bloco.id].tipo !== bloco.tipo ||
-                blocosAnteriores[bloco.id].inicio !== bloco.inicio ||
-                blocosAnteriores[bloco.id].fim !== bloco.fim
-            ) {
-                console.log("Bloco modificado:", bloco);
-                
-                // Se o tipo mudou, atualiza as estatísticas
-                if (blocosAnteriores[bloco.id].tipo !== bloco.tipo) {
-                    // Decrementa o tipo antigo
-                    await atualizarEstatisticasResumidas(blocosAnteriores[bloco.id].tipo, -1);
-                    // Incrementa o novo tipo
-                    await atualizarEstatisticasResumidas(bloco.tipo, 1);
-                }
-                
-                // Atualiza o registro individual
-                const duracao = calcularDuracaoEmMinutos(bloco.inicio, bloco.fim);
-                const agora = new Date();
-                const inicio = firebase.firestore.Timestamp.fromDate(agora);
-                const fimDate = new Date(agora.getTime() + duracao * 60000);
-                const fim = firebase.firestore.Timestamp.fromDate(fimDate);
-                
-                await db.collection("users").doc(currentUser.uid)
-                        .collection("estatisticas")
-                        .collection("registros")
-                        .doc(bloco.id)
-                        .update({
-                            tipo: bloco.tipo,
-                            duracao: duracao,
-                            inicio: inicio,
-                            fim: fim,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-            }
-        }
-        
-        // Verifica blocos que foram removidos
-        for (const id in blocosAnteriores) {
-            if (!blocos.find(b => b.id === id)) {
-                console.log("Bloco removido:", blocosAnteriores[id]);
-                await removerAtividadeEstatisticas(blocosAnteriores[id].tipo, id);
-            }
-        }
-        
-    } catch (error) {
-        console.error("Erro ao atualizar estatísticas com blocos:", error);
-    }
+  // --- Funções de Associação de Tarefas ---
+  async function abrirModalAssociar(blocoId) {
+    document.getElementById('blocoIdParaAssociar').value = blocoId;
+    const tarefasSnapshot = await db.collection("users").doc(currentUser.uid).collection("tarefas").get();
+    const listaTarefasModal = document.getElementById('listaTarefasModal');
+    listaTarefasModal.innerHTML = '';
+    const bloco = document.querySelector(`.bloco[data-id='${blocoId}']`);
+    const tarefaIdsAssociadas = JSON.parse(bloco.dataset.tarefaIds || '[]');
+
+    tarefasSnapshot.forEach(doc => {
+      const tarefa = { id: doc.id, ...doc.data() };
+      const isChecked = tarefaIdsAssociadas.includes(tarefa.id) ? 'checked' : '';
+      listaTarefasModal.innerHTML += `
+        <span class="tarefa-item">
+          <input type="checkbox" id="${tarefa.id}" value="${tarefa.id}" ${isChecked}>
+          <label for="${tarefa.id}">${tarefa.titulo}</label>
+        </span>
+      `;
+    });
+    document.getElementById('modalAssociarTarefa').style.display = 'block';
   }
 
-  function logout() {
-    auth.signOut().then(() => {
-      console.log("Usuário deslogado");
-      window.location.href = "login.html";
-    }).catch((error) => {
-      console.error("Erro ao fazer logout:", error);
-      alert("Erro ao fazer logout: " + error.message);
+  function fecharModalAssociar() {
+    document.getElementById('modalAssociarTarefa').style.display = 'none';
+  }
+
+  function salvarAssociacaoTarefas() {
+    const blocoId = document.getElementById('blocoIdParaAssociar').value;
+    const bloco = document.querySelector(`.bloco[data-id='${blocoId}']`);
+    const tarefaIds = [...document.querySelectorAll('#listaTarefasModal input:checked')].map(input => input.value);
+    bloco.dataset.tarefaIds = JSON.stringify(tarefaIds);
+    salvarAgenda();
+    carregarTarefasDoBloco(blocoId, tarefaIds);
+    fecharModalAssociar();
+  }
+
+  async function carregarTarefasDoBloco(blocoId, tarefaIds) {
+      const container = document.getElementById(`tarefas-${blocoId}`);
+      if (!tarefaIds || tarefaIds.length === 0) {
+          container.innerHTML = '';
+          return;
+      }
+      container.innerHTML = '<h4>Tarefas Associadas:</h4><ul>';
+      for (const tarefaId of tarefaIds) {
+          const tarefaDoc = await db.collection("users").doc(currentUser.uid).collection("tarefas").doc(tarefaId).get();
+          if (tarefaDoc.exists) {
+              container.querySelector('ul').innerHTML += `<li>${tarefaDoc.data().titulo}</li>`;
+          }
+      }
+      container.innerHTML += '</ul>';
+  }
+
+  // --- Notificações Interativas ---
+  function verificarAgenda() {
+    const agora = new Date();
+    const horaAtual = agora.getHours().toString().padStart(2, '0');
+    const minutoAtual = agora.getMinutes().toString().padStart(2, '0');
+    const tempoAtual = `${horaAtual}:${minutoAtual}`;
+
+    document.querySelectorAll('.bloco').forEach(blocoEl => {
+      const inicio = blocoEl.querySelector('.inicio').value;
+      if (inicio === tempoAtual && !blocoEl.dataset.notificado) {
+        blocoEl.dataset.notificado = 'true';
+        const tipo = blocoEl.querySelector('select').value;
+        const blocoId = blocoEl.dataset.id;
+        mostrarNotificacao(blocoId, tipo);
+      }
     });
   }
 
-  // Listener de autenticação
+  async function mostrarNotificacao(blocoId, tipo) {
+    const modal = document.getElementById('modalNotificacao');
+    document.getElementById('notificacaoTitulo').textContent = `Hora de ${tipo}!`;
+    document.getElementById('notificacaoMensagem').textContent = `Já vai iniciar seu período de ${tipo}?`;
+    
+    const tarefasContainer = document.getElementById('notificacaoTarefas');
+    const bloco = document.querySelector(`.bloco[data-id='${blocoId}']`);
+    const tarefaIds = JSON.parse(bloco.dataset.tarefaIds || '[]');
+    if (tarefaIds.length > 0) {
+        tarefasContainer.innerHTML = '<h5>Tarefas para este bloco:</h5><ul></ul>';
+        for (const tarefaId of tarefaIds) {
+            const tarefaDoc = await db.collection("users").doc(currentUser.uid).collection("tarefas").doc(tarefaId).get();
+            if (tarefaDoc.exists) {
+                tarefasContainer.querySelector('ul').innerHTML += `<li>${tarefaDoc.data().titulo}</li>`;
+            }
+        }
+    } else {
+        tarefasContainer.innerHTML = '';
+    }
+
+    document.getElementById('btnConfirmarBloco').onclick = () => confirmarInicioBloco(blocoId, tipo);
+    modal.style.display = 'block';
+  }
+
+  function fecharNotificacao() {
+    document.getElementById('modalNotificacao').style.display = 'none';
+  }
+
+  function confirmarInicioBloco(blocoId, tipo) {
+    console.log(`Bloco ${blocoId} (${tipo}) confirmado. Iniciando registro de tempo.`);
+    // Aqui você chamaria a função para registrar o tempo nas estatísticas
+    // registrarAtividade(tipo, duracao, blocoId);
+    document.querySelectorAll('.bloco').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.bloco[data-id='${blocoId}']`).classList.add('active');
+    fecharNotificacao();
+  }
+
+  // --- Autenticação e Inicialização ---
   auth.onAuthStateChanged(user => {
+    const agendaContainer = document.getElementById('agendaContainer');
+    const mensagemLogin = document.getElementById('mensagemLogin');
     if (user) {
       currentUser = user;
-      console.log("Usuário logado:", currentUser.uid);
       agendaContainer.style.display = 'block';
       mensagemLogin.style.display = 'none';
       carregarAgenda();
+      agendaIntervalo = setInterval(verificarAgenda, 60000); // Verifica a cada minuto
     } else {
       currentUser = null;
-      console.log("Nenhum usuário logado");
       agendaContainer.style.display = 'none';
       mensagemLogin.style.display = 'block';
+      clearInterval(agendaIntervalo);
     }
   });
 
-  // Inicialização da página
-  window.addEventListener("DOMContentLoaded", () => {
-    carregarCoresSalvas();
-    // carregarAgenda é chamado pelo onAuthStateChanged
+  window.addEventListener('DOMContentLoaded', () => {
+    // Funções de inicialização como carregarCoresSalvas, etc.
   });
+
 </script>
 </body>
 </html>

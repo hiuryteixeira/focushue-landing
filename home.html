@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard - FocusHue</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#81C784">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="FocusHue">
+  <meta name="msapplication-TileColor" content="#81C784">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-192x192.png">
+  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* Variáveis CSS padronizadas do FocusHue */
@@ -896,6 +912,19 @@
     // Atualiza o relógio imediatamente e depois a cada segundo
     setInterval(atualizarRelogio, 1000);
   });
+
+  // PWA - Registro do Service Worker
+  if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+              .then(function(registration) {
+                  console.log('Service Worker registrado com sucesso:', registration.scope);
+              })
+              .catch(function(error) {
+                  console.log('Falha ao registrar Service Worker:', error);
+              });
+      });
+  }
 
 </script>
 

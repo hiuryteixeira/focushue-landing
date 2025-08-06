@@ -1,275 +1,276 @@
-// FocusHue Service Worker
-const CACHE_NAME = 'focushue-v1';
-const ASSETS_TO_CACHE = [
+// Service Worker para FocusHue PWA
+// Versão 1.0.0
+
+const CACHE_NAME = 'focushue-v1.0.0';
+const OFFLINE_URL = '/offline.html';
+
+// Arquivos essenciais para cache
+const ESSENTIAL_FILES = [
   '/',
-  '/dashboard_v1.html',
-  '/agenda.html',
-  '/tarefas.html',
-  '/estatisticas.html',
-  '/config.html',
-  '/notificacoes.html',
+  '/index.html',
+  '/home.html',
   '/login.html',
   '/cadastro.html',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-72x72.png',
-  '/icons/icon-96x96.png',
-  '/icons/icon-128x128.png',
-  '/icons/icon-144x144.png',
-  '/icons/icon-152x152.png',
-  '/icons/icon-192x192.png',
-  '/icons/icon-384x384.png',
-  '/icons/icon-512x512.png',
+  '/agenda.html',
+  '/tarefas.html',
+  '/config.html',
+  '/estatisticas.html',
+  '/notificacoes.html',
+  '/paleta.html',
+  '/offline.html',
+  '/manifest.json'
+];
+
+// Recursos externos essenciais
+const EXTERNAL_RESOURCES = [
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js',
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js',
-  'https://cdn.jsdelivr.net/npm/chart.js'
+  'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg'
 ];
 
 // Instalação do Service Worker
-self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Instalando...');
+self.addEventListener('install', event => {
+  console.log('[SW] Instalando Service Worker...');
   
-  // Pré-cache de arquivos essenciais
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[Service Worker] Cacheando arquivos');
-        return cache.addAll(ASSETS_TO_CACHE);
+      .then(cache => {
+        console.log('[SW] Cache aberto');
+        
+        // Cache arquivos essenciais
+        const cachePromises = [
+          cache.addAll(ESSENTIAL_FILES.map(url => new Request(url, { cache: 'reload' }))),
+          cache.addAll(EXTERNAL_RESOURCES.map(url => new Request(url, { mode: 'cors' })))
+        ];
+        
+        return Promise.all(cachePromises);
       })
       .then(() => {
-        console.log('[Service Worker] Instalação concluída');
+        console.log('[SW] Todos os arquivos foram cacheados');
+        // Força a ativação imediata
         return self.skipWaiting();
       })
-      .catch((error) => {
-        console.error('[Service Worker] Erro durante instalação:', error);
+      .catch(error => {
+        console.error('[SW] Erro durante a instalação:', error);
       })
   );
 });
 
 // Ativação do Service Worker
-self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Ativando...');
+self.addEventListener('activate', event => {
+  console.log('[SW] Ativando Service Worker...');
   
-  // Limpa caches antigos
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('[Service Worker] Removendo cache antigo:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('[Service Worker] Ativação concluída');
-      return self.clients.claim();
-    })
+    caches.keys()
+      .then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheName !== CACHE_NAME) {
+              console.log('[SW] Removendo cache antigo:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+      .then(() => {
+        console.log('[SW] Service Worker ativado');
+        // Toma controle de todas as páginas imediatamente
+        return self.clients.claim();
+      })
   );
 });
 
-// Estratégia de cache: Cache First, falling back to Network
-self.addEventListener('fetch', (event) => {
-  // Ignora requisições para o Firebase e outras APIs externas
-  if (event.request.url.includes('firestore.googleapis.com') || 
-      event.request.url.includes('identitytoolkit.googleapis.com') ||
-      event.request.url.includes('fcm.googleapis.com')) {
+// Interceptação de requisições (estratégia Cache First para recursos estáticos)
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  const url = new URL(request.url);
+  
+  // Ignora requisições não-GET
+  if (request.method !== 'GET') {
+    return;
+  }
+  
+  // Ignora requisições para APIs externas (Firebase, etc.) exceto recursos específicos
+  if (url.origin !== location.origin && !EXTERNAL_RESOURCES.includes(request.url)) {
     return;
   }
   
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - retorna a resposta do cache
+    caches.match(request)
+      .then(response => {
+        // Se encontrou no cache, retorna
         if (response) {
-          console.log('[Service Worker] Servindo do cache:', event.request.url);
+          console.log('[SW] Servindo do cache:', request.url);
           return response;
         }
         
-        // Não encontrado no cache - busca na rede
-        console.log('[Service Worker] Buscando na rede:', event.request.url);
-        return fetch(event.request)
-          .then((networkResponse) => {
+        // Se não encontrou no cache, busca na rede
+        return fetch(request)
+          .then(response => {
             // Verifica se a resposta é válida
-            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-              return networkResponse;
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
             }
             
-            // Clona a resposta para poder armazená-la no cache
-            const responseToCache = networkResponse.clone();
+            // Clona a resposta para cache
+            const responseToCache = response.clone();
             
-            // Adiciona ao cache para uso futuro
             caches.open(CACHE_NAME)
-              .then((cache) => {
-                console.log('[Service Worker] Cacheando novo recurso:', event.request.url);
-                cache.put(event.request, responseToCache);
+              .then(cache => {
+                cache.put(request, responseToCache);
+                console.log('[SW] Adicionado ao cache:', request.url);
               });
             
-            return networkResponse;
+            return response;
           })
-          .catch((error) => {
-            console.error('[Service Worker] Erro de fetch:', error);
+          .catch(error => {
+            console.log('[SW] Erro na rede para:', request.url, error);
             
-            // Se for uma página HTML, retorna a página offline
-            if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('/offline.html');
+            // Se é uma navegação (página HTML), retorna página offline
+            if (request.destination === 'document') {
+              return caches.match(OFFLINE_URL);
             }
             
-            return new Response('Recurso não disponível offline', {
-              status: 503,
-              statusText: 'Serviço indisponível'
-            });
+            // Para outros recursos, tenta encontrar algo similar no cache
+            return caches.match('/index.html');
           });
       })
   );
 });
 
 // Gerenciamento de notificações push
-self.addEventListener('push', (event) => {
-  console.log('[Service Worker] Notificação push recebida:', event);
+self.addEventListener('push', event => {
+  console.log('[SW] Push recebido:', event);
   
-  if (!event.data) {
-    console.log('[Service Worker] Notificação push sem dados');
-    return;
-  }
-  
-  const notificationData = event.data.json();
   const options = {
-    body: notificationData.body || 'Notificação do FocusHue',
-    icon: notificationData.icon || '/icons/icon-192x192.png',
-    badge: '/icons/badge-72x72.png',
+    body: event.data ? event.data.text() : 'Nova notificação do FocusHue',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-72x72.png',
     vibrate: [100, 50, 100],
     data: {
-      url: notificationData.url || '/'
+      dateOfArrival: Date.now(),
+      primaryKey: '1'
     },
-    actions: notificationData.actions || [
+    actions: [
       {
-        action: 'confirmar',
-        title: 'Confirmar',
-        icon: '/icons/check-24x24.png'
+        action: 'explore',
+        title: 'Abrir FocusHue',
+        icon: '/icons/icon-96x96.png'
       },
       {
-        action: 'adiar',
-        title: 'Adiar',
-        icon: '/icons/snooze-24x24.png'
+        action: 'close',
+        title: 'Fechar',
+        icon: '/icons/icon-96x96.png'
       }
     ]
   };
   
   event.waitUntil(
-    self.registration.showNotification(
-      notificationData.title || 'FocusHue',
-      options
-    )
+    self.registration.showNotification('FocusHue', options)
   );
 });
 
-// Gerenciamento de cliques em notificações
-self.addEventListener('notificationclick', (event) => {
-  console.log('[Service Worker] Clique em notificação:', event);
+// Clique em notificações
+self.addEventListener('notificationclick', event => {
+  console.log('[SW] Clique na notificação:', event);
   
   event.notification.close();
   
-  // Gerencia ações específicas
-  if (event.action === 'confirmar') {
-    console.log('[Service Worker] Ação "Confirmar" selecionada');
-    // Lógica para confirmar (implementar conforme necessário)
-  } else if (event.action === 'adiar') {
-    console.log('[Service Worker] Ação "Adiar" selecionada');
-    // Lógica para adiar (implementar conforme necessário)
-  }
-  
-  // Abre a URL associada à notificação
-  const urlToOpen = event.notification.data && event.notification.data.url
-    ? event.notification.data.url
-    : '/';
-  
-  event.waitUntil(
-    clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    })
-    .then((windowClients) => {
-      // Verifica se já há uma janela aberta para reutilizar
-      for (let client of windowClients) {
-        if (client.url === urlToOpen && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      
-      // Se não houver janela aberta, abre uma nova
-      if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
-      }
-    })
-  );
-});
-
-// Sincronização em segundo plano
-self.addEventListener('sync', (event) => {
-  console.log('[Service Worker] Evento de sincronização:', event);
-  
-  if (event.tag === 'sync-agenda') {
-    event.waitUntil(sincronizarAgenda());
-  } else if (event.tag === 'sync-tarefas') {
-    event.waitUntil(sincronizarTarefas());
+  if (event.action === 'explore') {
+    // Abre ou foca na janela do FocusHue
+    event.waitUntil(
+      clients.matchAll({ type: 'window' })
+        .then(clientList => {
+          for (const client of clientList) {
+            if (client.url === '/' && 'focus' in client) {
+              return client.focus();
+            }
+          }
+          if (clients.openWindow) {
+            return clients.openWindow('/');
+          }
+        })
+    );
   }
 });
 
-// Função para sincronizar agenda quando online
-async function sincronizarAgenda() {
-  try {
-    const pendingAgendaData = await localforage.getItem('pendingAgendaChanges');
-    
-    if (!pendingAgendaData || pendingAgendaData.length === 0) {
-      console.log('[Service Worker] Nenhuma alteração pendente na agenda');
-      return;
-    }
-    
-    console.log('[Service Worker] Sincronizando alterações da agenda:', pendingAgendaData);
-    
-    // Aqui seria implementada a lógica para enviar os dados ao servidor
-    // Usando fetch para API ou Firebase SDK
-    
-    // Após sincronização bem-sucedida, limpa os dados pendentes
-    await localforage.removeItem('pendingAgendaChanges');
-    console.log('[Service Worker] Sincronização da agenda concluída');
-  } catch (error) {
-    console.error('[Service Worker] Erro ao sincronizar agenda:', error);
-    throw error; // Permite que o evento de sincronização seja repetido posteriormente
-  }
-}
-
-// Função para sincronizar tarefas quando online
-async function sincronizarTarefas() {
-  try {
-    const pendingTasksData = await localforage.getItem('pendingTaskChanges');
-    
-    if (!pendingTasksData || pendingTasksData.length === 0) {
-      console.log('[Service Worker] Nenhuma alteração pendente nas tarefas');
-      return;
-    }
-    
-    console.log('[Service Worker] Sincronizando alterações das tarefas:', pendingTasksData);
-    
-    // Aqui seria implementada a lógica para enviar os dados ao servidor
-    // Usando fetch para API ou Firebase SDK
-    
-    // Após sincronização bem-sucedida, limpa os dados pendentes
-    await localforage.removeItem('pendingTaskChanges');
-    console.log('[Service Worker] Sincronização das tarefas concluída');
-  } catch (error) {
-    console.error('[Service Worker] Erro ao sincronizar tarefas:', error);
-    throw error; // Permite que o evento de sincronização seja repetido posteriormente
-  }
-}
-
-// Mensagens do cliente para o Service Worker
-self.addEventListener('message', (event) => {
-  console.log('[Service Worker] Mensagem recebida do cliente:', event.data);
+// Sincronização em background
+self.addEventListener('sync', event => {
+  console.log('[SW] Background sync:', event.tag);
   
-  if (event.data.action === 'skipWaiting') {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(
+      // Aqui você pode implementar sincronização de dados
+      // Por exemplo, enviar dados pendentes para o Firebase
+      syncPendingData()
+    );
+  }
+});
+
+// Função para sincronizar dados pendentes
+async function syncPendingData() {
+  try {
+    // Implementar lógica de sincronização
+    console.log('[SW] Sincronizando dados pendentes...');
+    
+    // Exemplo: buscar dados do IndexedDB e enviar para Firebase
+    // const pendingData = await getPendingDataFromIndexedDB();
+    // await sendDataToFirebase(pendingData);
+    
+    console.log('[SW] Sincronização concluída');
+  } catch (error) {
+    console.error('[SW] Erro na sincronização:', error);
+  }
+}
+
+// Atualização do Service Worker
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+  
+  if (event.data && event.data.type === 'GET_VERSION') {
+    event.ports[0].postMessage({ version: CACHE_NAME });
+  }
 });
+
+// Limpeza periódica do cache
+self.addEventListener('periodicsync', event => {
+  if (event.tag === 'cache-cleanup') {
+    event.waitUntil(cleanupCache());
+  }
+});
+
+async function cleanupCache() {
+  try {
+    const cache = await caches.open(CACHE_NAME);
+    const requests = await cache.keys();
+    
+    // Remove entradas antigas do cache (mais de 7 dias)
+    const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    
+    for (const request of requests) {
+      const response = await cache.match(request);
+      const dateHeader = response.headers.get('date');
+      
+      if (dateHeader) {
+        const responseDate = new Date(dateHeader).getTime();
+        if (responseDate < oneWeekAgo) {
+          await cache.delete(request);
+          console.log('[SW] Removido do cache (expirado):', request.url);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('[SW] Erro na limpeza do cache:', error);
+  }
+}
+
+// Log de informações do Service Worker
+console.log('[SW] Service Worker do FocusHue carregado');
+console.log('[SW] Versão do cache:', CACHE_NAME);
+console.log('[SW] Arquivos essenciais:', ESSENTIAL_FILES.length);
+console.log('[SW] Recursos externos:', EXTERNAL_RESOURCES.length);
+

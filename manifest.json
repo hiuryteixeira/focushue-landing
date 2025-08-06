@@ -1,96 +1,131 @@
 {
-  "name": "FocusHue - Sistema Cromático de Foco",
+  "name": "FocusHue System™",
   "short_name": "FocusHue",
-  "description": "Organize seu tempo e aumente sua produtividade com o sistema cromático FocusHue",
-  "start_url": "/dashboard_v1.html",
+  "description": "Sistema cromático de foco pessoal que usa cores, sons e luzes para transformar o ambiente à sua volta em um lembrete constante das suas metas.",
+  "version": "1.0.0",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#d7e3da",
   "theme_color": "#81C784",
   "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["productivity", "lifestyle", "utilities"],
   "icons": [
     {
       "src": "icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "icons/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     }
   ],
   "shortcuts": [
     {
       "name": "Agenda",
       "short_name": "Agenda",
-      "description": "Visualize e gerencie sua agenda diária",
+      "description": "Acesse sua agenda de blocos de foco",
       "url": "/agenda.html",
-      "icons": [{ "src": "icons/agenda-192x192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "icons/shortcut-agenda.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Tarefas",
       "short_name": "Tarefas",
-      "description": "Gerencie suas tarefas pendentes",
+      "description": "Gerencie suas tarefas",
       "url": "/tarefas.html",
-      "icons": [{ "src": "icons/tarefas-192x192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "icons/shortcut-tarefas.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Visualize seu painel de controle",
+      "url": "/home.html",
+      "icons": [
+        {
+          "src": "icons/shortcut-dashboard.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
     }
   ],
   "screenshots": [
     {
-      "src": "screenshots/dashboard-mobile.jpg",
-      "sizes": "1080x1920",
-      "type": "image/jpeg",
-      "platform": "narrow",
-      "label": "Dashboard do FocusHue em dispositivos móveis"
+      "src": "screenshots/desktop-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard do FocusHue no desktop"
     },
     {
-      "src": "screenshots/agenda-mobile.jpg",
-      "sizes": "1080x1920",
-      "type": "image/jpeg",
-      "platform": "narrow",
-      "label": "Agenda do FocusHue em dispositivos móveis"
+      "src": "screenshots/mobile-agenda.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Agenda do FocusHue no mobile"
     }
   ],
-  "categories": ["productivity", "lifestyle", "utilities"],
-  "lang": "pt-BR",
-  "dir": "ltr",
-  "prefer_related_applications": false
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }
+

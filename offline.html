@@ -1,101 +1,145 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FocusHue - Offline</title>
-  <style>
-    :root {
-      --foco: #81C784;
-      --estudo: #6BAED6;
-      --bg: #d7e3da;
-      --text: #2e2e2e;
-      --bg-dark: #1c1c1c;
-      --text-dark: #eeeeee;
-    }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
-      text-align: center;
-    }
-    body.dark {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
-    .offline-container {
-      max-width: 500px;
-      padding: 30px;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    body.dark .offline-container {
-      background-color: #2c2c2c;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    h1 {
-      margin-top: 0;
-      color: var(--foco);
-    }
-    .icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-    }
-    p {
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-    button {
-      background-color: var(--foco);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: var(--estudo);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - FocusHue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --estudo: #6BAED6;
+            --foco: #81C784;
+            --descanso: #F4E06D;
+            --alerta: #EF9A9A;
+            --bg: #d7e3da;
+            --text: #2e2e2e;
+            --bg-dark: #1c1c1c;
+            --text-dark: #eeeeee;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        body.dark .container {
+            background-color: #2e2e2e;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: var(--foco);
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .icon {
+            font-size: 4em;
+            color: var(--estudo);
+            margin-bottom: 20px;
+        }
+
+        .home-button {
+            background-color: var(--estudo);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .home-button:hover {
+            background-color: #5a9bd4;
+            transform: translateY(-2px);
+        }
+
+        /* Tema escuro para o botão */
+        body.dark .home-button {
+            background-color: var(--foco);
+        }
+
+        body.dark .home-button:hover {
+            background-color: #6bb76e;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .icon {
+                font-size: 3em;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="offline-container">
-    <div class="icon">📶</div>
-    <h1>Você está offline</h1>
-    <p>Parece que você está sem conexão com a internet. Algumas funcionalidades do FocusHue podem estar limitadas.</p>
-    <p>Você ainda pode acessar suas tarefas e agenda salvas anteriormente.</p>
-    <button onclick="tentarReconectar()">Tentar novamente</button>
-  </div>
+    <div class="container">
+        <div class="icon">🌐</div>
+        <h1>Você está offline!</h1>
+        <p>Parece que você não está conectado à internet. Mas não se preocupe, o FocusHue está pronto para funcionar offline.</p>
+        <p>Você pode continuar usando as funcionalidades que já foram carregadas.</p>
+        <a href="/" class="home-button">Voltar para o Início</a>
+    </div>
 
-  <script>
-    // Verifica se o tema escuro está ativado
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark');
-    }
-    
-    // Função para tentar reconectar
-    function tentarReconectar() {
-      window.location.reload();
-    }
-    
-    // Verifica periodicamente se a conexão foi restaurada
-    setInterval(() => {
-      if (navigator.onLine) {
-        window.location.reload();
-      }
-    }, 5000);
-  </script>
+    <script>
+        // Função para carregar o tema salvo no localStorage
+        function carregarTema() {
+            const tema = localStorage.getItem("theme");
+            if (tema === "dark") {
+                document.body.classList.add("dark");
+            }
+        }
+
+        // Carrega o tema quando a página é carregada
+        document.addEventListener("DOMContentLoaded", carregarTema);
+    </script>
 </body>
 </html>
+

@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FocusHue System™</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#81C784">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="FocusHue">
+    <meta name="msapplication-TileColor" content="#81C784">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-192x192.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Variáveis CSS padronizadas do FocusHue */
@@ -332,6 +349,124 @@
             });
         }
     }
+
+    // PWA - Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('Service Worker registrado com sucesso:', registration.scope);
+                    
+                    // Verifica por atualizações
+                    registration.addEventListener('updatefound', function() {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', function() {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Nova versão disponível
+                                if (confirm('Nova versão do FocusHue disponível! Deseja atualizar?')) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
+                })
+                .catch(function(error) {
+                    console.log('Falha ao registrar Service Worker:', error);
+                });
+        });
+    }
+
+    // PWA - Prompt de instalação
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', function(e) {
+        console.log('Evento beforeinstallprompt disparado');
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Mostra botão de instalação personalizado
+        showInstallButton();
+    });
+
+    function showInstallButton() {
+        // Cria botão de instalação se não existir
+        if (!document.getElementById('install-button')) {
+            const installButton = document.createElement('button');
+            installButton.id = 'install-button';
+            installButton.textContent = '📱 Instalar App';
+            installButton.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--foco);
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-weight: 600;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                transition: all 0.3s ease;
+                font-family: 'Inter', sans-serif;
+            `;
+            
+            installButton.addEventListener('click', function() {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(function(choiceResult) {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('Usuário aceitou instalar o PWA');
+                        } else {
+                            console.log('Usuário recusou instalar o PWA');
+                        }
+                        deferredPrompt = null;
+                        installButton.remove();
+                    });
+                }
+            });
+            
+            installButton.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+            });
+            
+            installButton.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+            });
+            
+            document.body.appendChild(installButton);
+        }
+    }
+
+    // PWA - Detecta quando o app foi instalado
+    window.addEventListener('appinstalled', function(e) {
+        console.log('FocusHue PWA foi instalado');
+        const installButton = document.getElementById('install-button');
+        if (installButton) {
+            installButton.remove();
+        }
+        
+        // Mostra mensagem de sucesso
+        const successMessage = document.createElement('div');
+        successMessage.textContent = '✅ FocusHue instalado com sucesso!';
+        successMessage.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--foco);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(successMessage);
+        setTimeout(() => successMessage.remove(), 3000);
+    });
 </script>
 
 </body>

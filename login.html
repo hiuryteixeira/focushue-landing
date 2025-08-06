@@ -4,18 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - FocusHue</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* Variáveis CSS padronizadas do FocusHue */
     :root {
       --estudo: #6BAED6;
-      --foco: #81C784; /* Verde principal */
-      --foco-hover: #618264; /* Verde mais escuro para hover, como em cadastro.html */
+      --foco: #81C784;
+      --foco-hover: #618264;
       --descanso: #F4E06D;
       --alerta: #EF9A9A;
-      --bg: #d7e3da; /* Fundo claro */
-      --text: #2e2e2e; /* Texto escuro */
-      --bg-dark: #1c1c1c; /* Fundo escuro */
-      --text-dark: #eeeeee; /* Texto claro */
+      --bg: #d7e3da;
+      --text: #2e2e2e;
+      --bg-dark: #1c1c1c;
+      --text-dark: #eeeeee;
       --container-bg: #ffffff;
       --container-bg-dark: #2e2e2e;
       --input-border: #ccc;
@@ -39,7 +40,7 @@
 
     body {
       margin: 0;
-      font-family: 'Inter', 'Segoe UI', sans-serif; /* Usando Inter como principal */
+      font-family: 'Inter', 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text);
       display: flex;
@@ -48,7 +49,7 @@
       justify-content: center;
       min-height: 100vh;
       transition: background-color 0.3s, color 0.3s;
-      padding: 20px; /* Adiciona padding para evitar que o container cole nas bordas em telas menores */
+      padding: 20px;
     }
 
     body.dark {
@@ -58,13 +59,14 @@
 
     .login-container {
       background: var(--container-bg);
-      padding: 35px 45px; /* Aumentando padding */
+      padding: 35px 45px;
       border-radius: 10px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       text-align: center;
       max-width: 400px;
       width: 100%;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      position: relative;
     }
 
     .login-container.dark {
@@ -72,28 +74,62 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
 
+    /* Botão de tema no container */
+    .theme-toggle {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: opacity 0.3s;
+    }
+
+    .theme-toggle:hover {
+      opacity: 0.7;
+    }
+
+    .dark .theme-toggle {
+      color: var(--text-dark);
+    }
+
     .logo {
-        width: 50px; /* Tamanho similar ao cadastro */
+        width: 50px;
         margin-bottom: 1rem;
     }
 
     h1 {
-      margin-bottom: 25px; /* Mais espaço abaixo do título */
+      margin-bottom: 25px;
       font-size: 1.8rem;
       font-weight: 600;
+      color: var(--text);
+    }
+
+    .dark h1 {
+      color: var(--text-dark);
     }
 
     input[type="email"],
     input[type="password"] {
       width: 100%;
       padding: 12px;
-      margin-bottom: 15px; /* Espaçamento entre inputs */
+      margin-bottom: 15px;
       border-radius: 6px;
       border: 1px solid var(--input-border);
       font-size: 1rem;
       background-color: var(--container-bg);
       color: var(--text);
-      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: var(--foco);
+      box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.1);
     }
 
     .dark input[type="email"],
@@ -103,26 +139,39 @@
         border: 1px solid var(--input-border-dark);
     }
 
+    .dark input[type="email"]:focus,
+    .dark input[type="password"]:focus {
+      border-color: var(--foco);
+      box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.2);
+    }
+
     button {
       width: 100%;
       padding: 12px;
-      margin-top: 10px; /* Espaçamento padrão acima dos botões */
+      margin-top: 10px;
       font-size: 1rem;
-      font-weight: 600; /* Deixa o texto do botão mais forte */
+      font-weight: 600;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
     }
 
     .login-btn {
       background: var(--foco);
       color: var(--button-text);
-      margin-top: 20px; /* Mais espaço acima do botão principal */
+      margin-top: 20px;
     }
 
     .login-btn:hover {
       background: var(--foco-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(129, 199, 132, 0.3);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
     }
 
     .google-btn {
@@ -133,7 +182,7 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-top: 15px; /* Espaçamento ajustado */
+      margin-top: 15px;
     }
 
     .google-btn img {
@@ -149,44 +198,119 @@
 
     .google-btn:hover {
         opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .links {
-        margin-top: 25px; /* Mais espaço antes dos links */
+        margin-top: 25px;
         font-size: 0.9rem;
         display: flex;
-        flex-direction: column; /* Empilha os links */
-        gap: 10px; /* Espaço entre os links */
+        flex-direction: column;
+        gap: 10px;
         align-items: center;
     }
 
-    .links a, .toggle-theme {
+    .links a {
       color: var(--link-color);
       text-decoration: none;
-      cursor: pointer;
+      transition: color 0.3s;
     }
 
-    .links a:hover, .toggle-theme:hover {
+    .links a:hover {
+      color: var(--foco);
       text-decoration: underline;
     }
 
-    .dark .links a, .dark .toggle-theme {
+    .dark .links a {
         color: var(--link-color-dark);
+    }
+
+    .dark .links a:hover {
+      color: var(--foco);
     }
 
     .msg {
         font-size: 0.9rem;
         color: var(--alerta);
         margin-top: 15px;
-        min-height: 1.2em; /* Reserva espaço para a mensagem */
+        min-height: 1.2em;
+        text-align: center;
+    }
+
+    .msg.success {
+      color: var(--foco);
+    }
+
+    /* Link para voltar à página inicial */
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: opacity 0.3s;
+    }
+
+    .back-link:hover {
+      opacity: 0.7;
+    }
+
+    .dark .back-link {
+      color: var(--text-dark);
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 25px 30px;
+        margin: 10px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .back-link {
+        position: relative;
+        top: auto;
+        left: auto;
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+    }
+
+    /* Animação de entrada */
+    .login-container {
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
   </style>
 </head>
 <body>
+  <!-- Link para voltar à página inicial -->
+  <a href="index.html" class="back-link" aria-label="Voltar à página inicial">← Início</a>
+
   <div class="login-container" id="loginBox">
-    <!-- Opcional: Adicionar logo -->
+    <!-- Botão de tema -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema claro/escuro">🌙</button>
+    
+    <!-- Logo opcional (descomente se tiver o arquivo) -->
     <!-- <img src="logo-focushue.png" alt="FocusHue Logo" class="logo" /> -->
+    
     <h1>Entrar no FocusHue™</h1>
 
     <input type="email" id="email" placeholder="E-mail" aria-label="E-mail" />
@@ -197,13 +321,12 @@
     <button class="login-btn" onclick="loginEmail()">Entrar</button>
 
     <button class="google-btn" onclick="loginGoogle()">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon" /> <!-- Icone oficial do Firebase UI -->
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon" />
       Entrar com Google
     </button>
 
     <div class="links">
-        <a href="cadastro.html">Não tem uma conta? Cadastre-se</a> <!-- Atualizado para apontar para cadastro_v3 -->
-        <span class="toggle-theme" onclick="toggleTheme()" role="button" aria-label="Alternar tema claro/escuro">🌙 Alternar Tema</span>
+        <a href="cadastro.html">Não tem uma conta? Cadastre-se</a>
     </div>
 
   </div>
@@ -212,8 +335,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script>
+    // Configuração Firebase
     const firebaseConfig = {
-      // Mantenha sua configuração original aqui
       apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
       authDomain: "focushue-16683.firebaseapp.com",
       projectId: "focushue-16683",
@@ -226,39 +349,40 @@
 
     const loginBox = document.getElementById("loginBox");
     const body = document.body;
-    const themeToggle = document.querySelector('.toggle-theme');
+    const themeToggle = document.querySelector('.theme-toggle');
 
-    // Verifica preferência de tema no localStorage
-    if (localStorage.getItem('theme') === 'dark') {
-        body.classList.add('dark');
-        loginBox.classList.add('dark');
-        themeToggle.textContent = '☀️ Alternar Tema Claro';
-    } else {
-        themeToggle.textContent = '🌙 Alternar Tema Escuro';
-    }
-
+    // Função para alternar tema
     function toggleTheme() {
       body.classList.toggle("dark");
       loginBox.classList.toggle("dark");
 
-      // Salva preferência e atualiza texto do botão
-      if (body.classList.contains('dark')) {
-          localStorage.setItem('theme', 'dark');
-          themeToggle.textContent = '☀️ Alternar Tema Claro';
+      const isDark = body.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      themeToggle.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    // Carrega tema salvo
+    function carregarTema() {
+      const tema = localStorage.getItem('theme');
+      if (tema === 'dark') {
+          body.classList.add('dark');
+          loginBox.classList.add('dark');
+          themeToggle.textContent = '☀️';
       } else {
-          localStorage.setItem('theme', 'light');
-          themeToggle.textContent = '🌙 Alternar Tema Escuro';
+          themeToggle.textContent = '🌙';
       }
     }
 
+    // Função para exibir mensagens
     function showMessage(message, isError = true) {
         const msgElement = document.getElementById("mensagemErro");
         msgElement.innerText = message;
-        msgElement.style.color = isError ? 'var(--alerta)' : 'var(--foco)';
+        msgElement.className = isError ? 'msg' : 'msg success';
     }
 
+    // Função de login com email/senha
     function loginEmail() {
-      const email = document.getElementById("email").value;
+      const email = document.getElementById("email").value.trim();
       const senha = document.getElementById("senha").value;
       showMessage(''); // Limpa mensagens anteriores
 
@@ -267,63 +391,122 @@
           return;
       }
 
+      // Validação básica de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+          showMessage("Por favor, insira um e-mail válido.");
+          return;
+      }
+
       auth.signInWithEmailAndPassword(email, senha)
         .then((userCredential) => {
-          // Login bem-sucedido
           console.log("Login bem-sucedido:", userCredential.user);
-          window.location.href = "home.html"; // Redireciona para a página principal (home.html)
+          showMessage("Login realizado com sucesso! Redirecionando...", false);
+          setTimeout(() => {
+            window.location.href = "home.html";
+          }, 1500);
         })
         .catch(error => {
           console.error("Erro no login:", error);
           let friendlyMessage = "Ocorreu um erro ao tentar fazer login.";
-          if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+          
+          switch(error.code) {
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+            case 'auth/invalid-credential':
               friendlyMessage = "E-mail ou senha inválidos.";
-          } else if (error.code === 'auth/invalid-email') {
+              break;
+            case 'auth/invalid-email':
               friendlyMessage = "Formato de e-mail inválido.";
+              break;
+            case 'auth/too-many-requests':
+              friendlyMessage = "Muitas tentativas de login. Tente novamente mais tarde.";
+              break;
+            case 'auth/network-request-failed':
+              friendlyMessage = "Erro de conexão. Verifique sua internet.";
+              break;
+            case 'auth/unauthorized-domain':
+              friendlyMessage = "Erro: Domínio não autorizado. Verifique a configuração do Firebase.";
+              break;
           }
+          
           showMessage(friendlyMessage);
         });
     }
 
+    // Função de login com Google
     function loginGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       showMessage(''); // Limpa mensagens anteriores
 
       auth.signInWithPopup(provider)
         .then((result) => {
-          // Login com Google bem-sucedido
           console.log("Login com Google bem-sucedido:", result.user);
-          window.location.href = "home.html"; // Redireciona para a página principal (home.html)
+          showMessage("Login realizado com sucesso! Redirecionando...", false);
+          setTimeout(() => {
+            window.location.href = "home.html";
+          }, 1500);
         })
         .catch(error => {
           console.error("Erro no login com Google:", error);
+          
+          // Não mostra erro se o usuário simplesmente fechou o popup
+          if (error.code === 'auth/popup-closed-by-user' || 
+              error.code === 'auth/cancelled-popup-request') {
+              return;
+          }
+          
           let friendlyMessage = "Erro ao fazer login com Google.";
-          // Códigos de erro comuns do Popup: auth/popup-closed-by-user, auth/cancelled-popup-request
-          if (error.code === 'auth/account-exists-with-different-credential') {
+          
+          switch(error.code) {
+            case 'auth/account-exists-with-different-credential':
               friendlyMessage = "Já existe uma conta com este e-mail usando um método de login diferente.";
-          } else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-             // Não mostra mensagem se o usuário simplesmente fechou o popup
-             showMessage(friendlyMessage);
+              break;
+            case 'auth/unauthorized-domain':
+              friendlyMessage = "Erro: Domínio não autorizado. Verifique a configuração do Firebase.";
+              break;
+            case 'auth/network-request-failed':
+              friendlyMessage = "Erro de conexão. Verifique sua internet.";
+              break;
           }
-          // O erro auth/unauthorized-domain deve ser resolvido no console do Firebase
-          if (error.code === 'auth/unauthorized-domain') {
-              showMessage("Erro: Domínio não autorizado para login. Verifique a configuração do Firebase.");
-          }
+          
+          showMessage(friendlyMessage);
         });
     }
 
-    // Adiciona listener para tecla Enter nos campos
-    document.getElementById('email').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            loginEmail();
+    // Listeners para tecla Enter
+    function setupEnterListeners() {
+      document.getElementById('email').addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+              loginEmail();
+          }
+      });
+      
+      document.getElementById('senha').addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+              loginEmail();
+          }
+      });
+    }
+
+    // Verifica se o usuário já está logado
+    function verificarUsuarioLogado() {
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          // Usuário já está logado, redireciona para home
+          window.location.href = "home.html";
         }
-    });
-    document.getElementById('senha').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            loginEmail();
-        }
+      });
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarTema();
+      setupEnterListeners();
+      verificarUsuarioLogado();
     });
 
   </script>
 </body>
 </html>
+

@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Agenda Integrada - FocusHue</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Variáveis CSS padronizadas do FocusHue */
     :root {
       --estudo: #6BAED6;
       --foco: #81C784;
@@ -15,26 +17,37 @@
       --bg-dark: #1c1c1c;
       --text-dark: #eeeeee;
     }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text);
       transition: background-color 0.3s, color 0.3s;
     }
+
     body.dark {
       background-color: var(--bg-dark);
       color: var(--text-dark);
     }
+
+    /* Header padronizado */
     header {
       background: linear-gradient(to right, var(--foco), var(--estudo));
       padding: 20px;
       color: white;
       text-align: center;
       font-size: 1.6rem;
-      font-weight: bold;
+      font-weight: 600;
       position: relative;
     }
+
     .menu-toggle, .theme-toggle {
       position: absolute;
       top: 20px;
@@ -43,9 +56,17 @@
       border: none;
       color: white;
       cursor: pointer;
+      transition: opacity 0.3s;
     }
+
     .menu-toggle { left: 20px; }
     .theme-toggle { right: 20px; }
+
+    .menu-toggle:hover, .theme-toggle:hover {
+      opacity: 0.8;
+    }
+
+    /* Menu de navegação padronizado */
     nav {
       display: none;
       flex-direction: column;
@@ -57,129 +78,277 @@
       padding: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       z-index: 100;
+      min-width: 200px;
     }
+
     body.dark nav {
       background: rgba(40,40,40,0.95);
     }
+
     nav a {
-      padding: 10px;
+      padding: 10px 15px;
       text-decoration: none;
       color: #333;
       font-weight: 500;
       border-radius: 5px;
       transition: background-color 0.3s, color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
     body.dark nav a {
       color: #eee;
     }
+
     nav a:hover {
       background: var(--foco);
       color: white;
     }
+
+    /* Container da agenda */
     .agenda-container {
-      max-width: 700px;
+      max-width: 800px;
       margin: 30px auto;
       padding: 0 20px;
     }
+
+    /* Estilos dos blocos */
     .bloco {
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 15px;
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 18px;
       color: white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
+
+    .bloco::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.3);
+    }
+
     .bloco.active {
         transform: scale(1.02);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        border: 2px solid rgba(255,255,255,0.5);
     }
+
     .bloco-header {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
+        flex-wrap: wrap;
     }
+
     .bloco-body {
-        padding-top: 10px;
-        margin-top: 10px;
-        border-top: 1px solid rgba(255,255,255,0.3);
+        padding-top: 12px;
+        margin-top: 12px;
+        border-top: 1px solid rgba(255,255,255,0.2);
     }
-    .bloco-body h4 { margin: 0 0 8px 0; font-size: 0.9rem; }
-    .bloco-body ul { margin: 0; padding-left: 20px; font-size: 0.9rem; }
+
+    .bloco-body h4 { 
+      margin: 0 0 10px 0; 
+      font-size: 0.95rem; 
+      font-weight: 600;
+    }
+
+    .bloco-body ul { 
+      margin: 0; 
+      padding-left: 20px; 
+      font-size: 0.9rem; 
+      line-height: 1.4;
+    }
+
+    .bloco-body li {
+      margin-bottom: 4px;
+    }
+
+    /* Controles dos blocos */
     select, input[type="time"] {
-      padding: 6px 8px;
-      border-radius: 5px;
-      border: 1px solid rgba(0,0,0,0.1);
-      font-weight: bold;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      font-weight: 600;
       font-size: 0.9rem;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-family: 'Inter', sans-serif;
     }
+
+    select:focus, input[type="time"]:focus {
+      outline: none;
+      border-color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.2);
+    }
+
     body.dark select, body.dark input[type="time"] {
-      background-color: #333;
-      color: #eee;
-      border-color: #555;
+      background: rgba(0,0,0,0.2);
+      border-color: rgba(255,255,255,0.2);
     }
+
     .bloco button {
         background: rgba(255,255,255,0.2);
         border: none;
         color: white;
-        padding: 5px 9px;
-        border-radius: 5px;
+        padding: 6px 10px;
+        border-radius: 6px;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.9rem;
     }
-    .bloco .main-controls { margin-left: auto; display: flex; gap: 8px; }
-    .bloco button:hover { background: rgba(255,255,255,0.4); }
-    .estudo { background-color: var(--estudo); }
-    .foco { background-color: var(--foco); }
-    .descanso { background-color: var(--descanso); color: #333; }
-    .descanso button { color: #333; background: rgba(0,0,0,0.1); }
-    .descanso button:hover { background: rgba(0,0,0,0.2); }
-    .alerta { background-color: var(--alerta); }
+
+    .bloco .main-controls { 
+      margin-left: auto; 
+      display: flex; 
+      gap: 8px; 
+      flex-shrink: 0;
+    }
+
+    .bloco button:hover { 
+      background: rgba(255,255,255,0.4); 
+      transform: translateY(-1px);
+    }
+
+    /* Cores dos blocos */
+    .estudo { background: linear-gradient(135deg, var(--estudo), #5a9bd4); }
+    .foco { background: linear-gradient(135deg, var(--foco), #6bb76e); }
+    .descanso { 
+      background: linear-gradient(135deg, var(--descanso), #f0d84a); 
+      color: var(--text); 
+    }
+    .descanso button { 
+      color: var(--text); 
+      background: rgba(0,0,0,0.1); 
+    }
+    .descanso button:hover { 
+      background: rgba(0,0,0,0.2); 
+    }
+    .descanso select, .descanso input[type="time"] {
+      color: var(--text);
+      background: rgba(0,0,0,0.1);
+      border-color: rgba(0,0,0,0.2);
+    }
+    .alerta { background: linear-gradient(135deg, var(--alerta), #e57373); }
+
+    /* Botão adicionar */
     .add-btn {
-      margin-top: 20px;
-      padding: 12px 24px;
+      margin: 30px auto 20px;
+      padding: 14px 28px;
       font-size: 1rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      background-color: var(--foco);
+      background: linear-gradient(135deg, var(--foco), var(--estudo));
       color: white;
-      font-weight: bold;
-      transition: background-color 0.3s;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: block;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
-    .add-btn:hover { background-color: var(--estudo); }
-    footer {
-      text-align: center;
-      padding: 30px 0;
-      font-size: 0.9rem;
-      color: #999;
+
+    .add-btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     }
-	    .customize {
+
+    /* Seção de personalização */
+    .customize {
       text-align: center;
       margin: 40px auto;
+      padding: 20px;
     }
 
-    .customize button {
+    .customize-btn {
       margin: 5px;
-      padding: 10px 18px;
+      padding: 12px 20px;
       border: none;
-      background: #555;
+      background: linear-gradient(135deg, #666, #888);
       color: white;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .customize button:hover {
-      background: var(--foco);
+    .customize-btn:hover {
+      background: linear-gradient(135deg, var(--foco), var(--estudo));
+      transform: translateY(-1px);
     }
+
+    /* Mensagem de login */
     #mensagemLogin {
         text-align: center;
-        margin-top: 50px;
-        font-size: 1.1rem;
+        margin: 50px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        max-width: 500px;
     }
-    #mensagemLogin a { color: var(--estudo); font-weight: bold; }
-    body.dark #mensagemLogin a { color: var(--foco); }
-    /* Modal */
+
+    body.dark #mensagemLogin {
+      background: #2e2e2e;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    #mensagemLogin h3 {
+      margin-bottom: 15px;
+      color: var(--text);
+    }
+
+    body.dark #mensagemLogin h3 {
+      color: var(--text-dark);
+    }
+
+    #mensagemLogin p {
+      margin-bottom: 20px;
+      color: var(--text);
+      opacity: 0.8;
+    }
+
+    body.dark #mensagemLogin p {
+      color: var(--text-dark);
+    }
+
+    #mensagemLogin a { 
+      color: var(--estudo); 
+      font-weight: 600; 
+      text-decoration: none;
+      margin: 0 10px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      background: rgba(107, 174, 214, 0.1);
+      transition: all 0.3s;
+    }
+
+    #mensagemLogin a:hover {
+      background: var(--estudo);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    body.dark #mensagemLogin a { 
+      color: var(--foco); 
+      background: rgba(129, 199, 132, 0.1);
+    }
+
+    body.dark #mensagemLogin a:hover {
+      background: var(--foco);
+    }
+
+    /* Modais */
     .modal {
         display: none; 
         position: fixed; 
@@ -190,99 +359,293 @@
         height: 100%; 
         overflow: auto; 
         background-color: rgba(0,0,0,0.6); 
+        backdrop-filter: blur(4px);
     }
+
     .modal-content {
         background-color: var(--bg);
-        margin: 10% auto; 
-        padding: 25px 35px;
-        border: 1px solid #888;
+        margin: 8% auto; 
+        padding: 30px;
+        border: none;
         width: 90%; 
         max-width: 500px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         color: var(--text);
+        animation: modalSlideIn 0.3s ease-out;
     }
-    .dark .modal-content { background-color: #2c2c2c; color: var(--text-dark); border-color: #555; }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dark .modal-content { 
+      background-color: #2c2c2c; 
+      color: var(--text-dark); 
+    }
+
+    .modal-content h3 {
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
     .modal-buttons {
         text-align: right;
-        margin-top: 20px;
+        margin-top: 25px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
     }
+
     .modal-buttons button {
-        padding: 10px 20px;
+        padding: 12px 24px;
         border: none;
-        border-radius: 5px;
+        border-radius: 8px;
         cursor: pointer;
-        margin-left: 10px;
-        font-weight: bold;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
     }
-    .save-btn { background-color: var(--foco); color: white; }
-    .cancel-btn { background-color: #ccc; color: #333; }
-    .dark .cancel-btn { background-color: #555; color: var(--text-dark); }
-    #listaTarefasModal .tarefa-item { display: block; margin-bottom: 10px; }
-    #listaTarefasModal label { margin-left: 8px; }
-    
-    /* Responsividade para mobile */
-    @media (max-width: 600px) {
-      .bloco-header {
-        flex-wrap: wrap;
+
+    .save-btn { 
+      background-color: var(--foco); 
+      color: white; 
+    }
+
+    .save-btn:hover {
+      background-color: #6bb76e;
+      transform: translateY(-1px);
+    }
+
+    .cancel-btn { 
+      background-color: #ccc; 
+      color: #333; 
+    }
+
+    .cancel-btn:hover {
+      background-color: #bbb;
+    }
+
+    .dark .cancel-btn { 
+      background-color: #555; 
+      color: var(--text-dark); 
+    }
+
+    .dark .cancel-btn:hover {
+      background-color: #666;
+    }
+
+    /* Lista de tarefas no modal */
+    #listaTarefasModal {
+      max-height: 250px; 
+      overflow-y: auto; 
+      padding: 15px; 
+      border: 1px solid #ddd; 
+      border-radius: 8px;
+      background: rgba(0,0,0,0.02);
+    }
+
+    .dark #listaTarefasModal {
+      border-color: #555;
+      background: rgba(255,255,255,0.02);
+    }
+
+    #listaTarefasModal .tarefa-item { 
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px; 
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+    }
+
+    #listaTarefasModal .tarefa-item:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    .dark #listaTarefasModal .tarefa-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    #listaTarefasModal input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    #listaTarefasModal label { 
+      margin-left: 0;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    /* Notificações */
+    .notification-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--foco);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 1000;
+      animation: slideInRight 0.3s ease-out;
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100px);
       }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      font-size: 0.9rem;
+      color: #999;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      margin-top: 60px;
+    }
+
+    body.dark footer {
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .agenda-container {
+        padding: 0 15px;
+      }
+
+      .bloco-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
       .bloco .main-controls {
         margin-left: 0;
-        margin-top: 10px;
-        width: 100%;
-        justify-content: flex-end;
+        justify-content: center;
+        order: -1;
       }
+
       .modal-content {
         width: 95%;
-        padding: 15px;
+        padding: 20px;
         margin: 15% auto;
       }
+
+      .modal-buttons {
+        flex-direction: column;
+      }
+
+      .modal-buttons button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      select, input[type="time"] {
+        width: 100%;
+        margin-bottom: 8px;
+      }
     }
+
+    /* Animações de entrada */
+    .bloco {
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .bloco:nth-child(2) { animation-delay: 0.1s; }
+    .bloco:nth-child(3) { animation-delay: 0.2s; }
+    .bloco:nth-child(4) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
   </style>
 </head>
 <body>
 
 <header>
-  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">☰</button>
   Agenda Integrada
-  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button>
 </header>
 
 <nav id="menu">
   <a href="index.html">🏠 Início</a>
+  <a href="home.html">📊 Dashboard</a>
   <a href="agenda.html">📅 Agenda</a>
   <a href="tarefas.html">✅ Tarefas</a>
   <a href="config.html">⚙️ Configurações</a>
-  <a href="estatisticas.html">📊 Estatísticas</a>
+  <a href="estatisticas.html">📈 Estatísticas</a>
   <a href="notificacoes.html">🔔 Notificações</a>
   <a href="#" onclick="logout()">🚪 Sair</a>
 </nav>
 
+<!-- Conteúdo principal da agenda -->
 <section class="agenda-container" id="agendaContainer">
   <div id="blocosDia"></div>
   <button class="add-btn" onclick="adicionarBloco()">+ Adicionar Bloco</button>
 </section>
 
+<!-- Mensagem para usuário não logado -->
 <div id="mensagemLogin" style="display: none;">
-  <p>Você precisa estar logado para ver e editar sua agenda.</p>
-  <p><a href="login.html">Fazer Login</a> ou <a href="cadastro.html">Criar Conta</a></p>
+  <h3>🔐 Acesso Restrito</h3>
+  <p>Você precisa estar logado para ver e editar sua agenda personalizada.</p>
+  <div>
+    <a href="login.html">Fazer Login</a>
+    <a href="cadastro.html">Criar Conta</a>
+  </div>
 </div>
 
+<!-- Seção de personalização -->
 <div class="customize">
-  <button onclick="window.location.href='paleta.html'">🎨 Personalizar Cores</button>
+  <button class="customize-btn" onclick="abrirModalCores()">
+    🎨 Personalizar Cores
+    <span style="display: inline-flex; gap: 3px; margin-left: 5px;">
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--foco);"></span>
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--estudo);"></span>
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--descanso);"></span>
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--alerta);"></span>
+    </span>
+  </button>
 </div>
 
 <!-- Modal para associar tarefas -->
 <div id="modalAssociarTarefa" class="modal">
   <div class="modal-content">
-    <h3>Associar Tarefas ao Bloco</h3>
+    <h3>🔗 Associar Tarefas ao Bloco</h3>
+    <p>Selecione as tarefas que você deseja associar a este bloco:</p>
     <input type="hidden" id="blocoIdParaAssociar">
-    <div id="listaTarefasModal" style="max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-      <!-- Lista de tarefas do usuário será carregada aqui -->
+    <div id="listaTarefasModal">
+      <!-- Lista de tarefas será carregada aqui -->
     </div>
     <div class="modal-buttons">
       <button class="cancel-btn" onclick="fecharModalAssociar()">Cancelar</button>
-      <button class="save-btn" onclick="salvarAssociacaoTarefas()">Salvar</button>
+      <button class="save-btn" onclick="salvarAssociacaoTarefas()">Salvar Associações</button>
     </div>
   </div>
 </div>
@@ -290,16 +653,58 @@
 <!-- Modal de notificação interativa -->
 <div id="modalNotificacao" class="modal">
   <div class="modal-content">
-    <h3 id="notificacaoTitulo"></h3>
+    <h3 id="notificacaoTitulo">🔔 Hora de Começar!</h3>
     <p id="notificacaoMensagem"></p>
     <div id="notificacaoTarefas"></div>
     <div class="modal-buttons">
       <button class="cancel-btn" onclick="fecharNotificacao()">Agora não</button>
-      <button class="save-btn" id="btnConfirmarBloco">Confirmar</button>
+      <button class="save-btn" id="btnConfirmarBloco">Confirmar e Iniciar</button>
     </div>
   </div>
 </div>
 
+<!-- Modal de personalização de cores -->
+<div id="modalCores" class="modal">
+  <div class="modal-content">
+    <h3>🎨 Personalizar Cores dos Blocos</h3>
+    <p>Escolha as cores para cada tipo de atividade:</p>
+    
+    <div style="display: grid; gap: 15px; margin: 20px 0;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="corFoco" style="min-width: 80px; font-weight: 500;">🎯 Foco:</label>
+        <input type="color" id="corFoco" value="#81C784" style="width: 50px; height: 35px; border: none; border-radius: 6px; cursor: pointer;">
+        <span id="previewFoco" style="flex: 1; padding: 8px 12px; border-radius: 6px; color: white; font-weight: 500;">Exemplo</span>
+      </div>
+      
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="corEstudo" style="min-width: 80px; font-weight: 500;">📚 Estudo:</label>
+        <input type="color" id="corEstudo" value="#6BAED6" style="width: 50px; height: 35px; border: none; border-radius: 6px; cursor: pointer;">
+        <span id="previewEstudo" style="flex: 1; padding: 8px 12px; border-radius: 6px; color: white; font-weight: 500;">Exemplo</span>
+      </div>
+      
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="corDescanso" style="min-width: 80px; font-weight: 500;">😌 Descanso:</label>
+        <input type="color" id="corDescanso" value="#F4E06D" style="width: 50px; height: 35px; border: none; border-radius: 6px; cursor: pointer;">
+        <span id="previewDescanso" style="flex: 1; padding: 8px 12px; border-radius: 6px; color: #2e2e2e; font-weight: 500;">Exemplo</span>
+      </div>
+      
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="corAlerta" style="min-width: 80px; font-weight: 500;">⚠️ Alerta:</label>
+        <input type="color" id="corAlerta" value="#EF9A9A" style="width: 50px; height: 35px; border: none; border-radius: 6px; cursor: pointer;">
+        <span id="previewAlerta" style="flex: 1; padding: 8px 12px; border-radius: 6px; color: white; font-weight: 500;">Exemplo</span>
+      </div>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="cancel-btn" onclick="restaurarCoresPadrao()">Restaurar Padrão</button>
+      <button class="cancel-btn" onclick="fecharModalCores()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  © 2025 FocusHue™ — Sistema Cromático de Foco.
+</footer>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -322,11 +727,20 @@
 
   let currentUser = null;
   let agendaIntervalo;
+  let blocosAnteriores = [];
 
   // --- Funções de UI e Tema ---
   function toggleMenu() {
     const menu = document.getElementById("menu");
     menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    
+    // Fecha o menu ao clicar fora
+    document.addEventListener('click', function closeMenu(e) {
+      if (!menu.contains(e.target) && !document.querySelector('.menu-toggle').contains(e.target)) {
+        menu.style.display = "none";
+        document.removeEventListener('click', closeMenu);
+      }
+    });
   }
 
   function toggleTheme() {
@@ -353,7 +767,9 @@
     // Carrega cores personalizadas
     ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
       const corSalva = localStorage.getItem(variable);
-      if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
+      if (corSalva) {
+        document.documentElement.style.setProperty(variable, corSalva);
+      }
     });
     
     // Carrega tema claro/escuro
@@ -372,85 +788,148 @@
     const div = document.createElement("div");
     div.className = `bloco ${tipo}`;
     div.dataset.id = blocoId;
+    div.dataset.tarefaIds = JSON.stringify(tarefaIds);
 
     div.innerHTML = `
       <div class="bloco-header">
-        <select onchange="this.parentElement.parentElement.className='bloco ' + this.value; salvarAgenda();">
-          <option value="foco" ${tipo === "foco" ? "selected" : ""}>Foco</option>
-          <option value="estudo" ${tipo === "estudo" ? "selected" : ""}>Estudo</option>
-          <option value="descanso" ${tipo === "descanso" ? "selected" : ""}>Descanso</option>
-          <option value="alerta" ${tipo === "alerta" ? "selected" : ""}>Alerta</option>
+        <select onchange="this.parentElement.parentElement.className='bloco ' + this.value; salvarAgenda();" aria-label="Tipo do bloco">
+          <option value="foco" ${tipo === "foco" ? "selected" : ""}>🎯 Foco</option>
+          <option value="estudo" ${tipo === "estudo" ? "selected" : ""}>📚 Estudo</option>
+          <option value="descanso" ${tipo === "descanso" ? "selected" : ""}>😌 Descanso</option>
+          <option value="alerta" ${tipo === "alerta" ? "selected" : ""}>⚠️ Alerta</option>
         </select>
-        <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()">
+        <input type="time" class="inicio" value="${inicio}" onchange="salvarAgenda()" aria-label="Horário de início">
         <span>até</span>
-        <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()">
+        <input type="time" class="fim" value="${fim}" onchange="salvarAgenda()" aria-label="Horário de fim">
         <div class="main-controls">
-            <button onclick="abrirModalAssociar('${blocoId}')">🔗</button>
-            <button onclick="removerBloco(this.parentElement.parentElement.parentElement)">🗑️</button>
+            <button onclick="abrirModalAssociar('${blocoId}')" title="Associar tarefas" aria-label="Associar tarefas">🔗</button>
+            <button onclick="removerBloco(this.parentElement.parentElement.parentElement)" title="Remover bloco" aria-label="Remover bloco">🗑️</button>
         </div>
       </div>
       <div class="bloco-body" id="tarefas-${blocoId}"></div>
     `;
+    
     document.getElementById('blocosDia').appendChild(div);
     salvarAgenda();
     carregarTarefasDoBloco(blocoId, tarefaIds);
+    
+    // Adiciona animação de entrada
+    setTimeout(() => {
+      div.style.opacity = '0';
+      div.style.transform = 'translateY(20px)';
+      div.style.transition = 'all 0.3s ease';
+      setTimeout(() => {
+        div.style.opacity = '1';
+        div.style.transform = 'translateY(0)';
+      }, 10);
+    }, 10);
   }
 
   async function salvarAgenda() {
     if (!currentUser) return;
-    const blocos = [...document.querySelectorAll(".bloco")].map(b => ({
-      id: b.dataset.id,
-      tipo: b.querySelector("select").value,
-      inicio: b.querySelector(".inicio").value,
-      fim: b.querySelector(".fim").value,
-      tarefaIds: JSON.parse(b.dataset.tarefaIds || '[]')
-    }));
-    await db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia").set({ blocos });
+    
+    try {
+      const blocos = [...document.querySelectorAll(".bloco")].map(b => ({
+        id: b.dataset.id,
+        tipo: b.querySelector("select").value,
+        inicio: b.querySelector(".inicio").value,
+        fim: b.querySelector(".fim").value,
+        tarefaIds: JSON.parse(b.dataset.tarefaIds || '[]')
+      }));
+      
+      await db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia").set({ blocos });
+      
+      // Atualiza estatísticas se houve mudanças
+      await atualizarEstatisticas(blocos);
+      
+      // Mostra notificação de sucesso
+      mostrarNotificacaoSucesso("Agenda salva!");
+      
+    } catch (error) {
+      console.error("Erro ao salvar agenda:", error);
+      mostrarNotificacaoErro("Erro ao salvar agenda. Tente novamente.");
+    }
   }
 
   async function carregarAgenda() {
     if (!currentUser) return;
-    const doc = await db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia").get();
-    if (doc.exists) {
-      document.getElementById('blocosDia').innerHTML = '';
-      doc.data().blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, b.tarefaIds, b.id));
+    
+    try {
+      const doc = await db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia").get();
+      const container = document.getElementById('blocosDia');
+      
+      if (doc.exists) {
+        container.innerHTML = '';
+        const blocos = doc.data().blocos || [];
+        blocos.forEach(b => adicionarBloco(b.tipo, b.inicio, b.fim, b.tarefaIds, b.id));
+        blocosAnteriores = [...blocos];
+      } else {
+        // Adiciona bloco padrão se não houver agenda
+        container.innerHTML = '';
+        adicionarBloco();
+      }
+      
+    } catch (error) {
+      console.error("Erro ao carregar agenda:", error);
+      mostrarNotificacaoErro("Erro ao carregar agenda.");
     }
   }
 
   function removerBloco(elemento) {
-    elemento.remove();
-    salvarAgenda();
+    if (confirm("Tem certeza que deseja remover este bloco?")) {
+      elemento.style.transition = 'all 0.3s ease';
+      elemento.style.opacity = '0';
+      elemento.style.transform = 'translateX(-100px)';
+      
+      setTimeout(() => {
+        elemento.remove();
+        salvarAgenda();
+      }, 300);
+    }
   }
 
   // --- Funções de Associação de Tarefas ---
   async function abrirModalAssociar(blocoId) {
-    document.getElementById('blocoIdParaAssociar').value = blocoId;
-    const tarefasSnapshot = await db.collection("users").doc(currentUser.uid).collection("tarefas").get();
-    const listaTarefasModal = document.getElementById('listaTarefasModal');
-    listaTarefasModal.innerHTML = '';
-    const bloco = document.querySelector(`.bloco[data-id='${blocoId}']`);
-    const tarefaIdsAssociadas = JSON.parse(bloco.dataset.tarefaIds || '[]');
+    try {
+      document.getElementById('blocoIdParaAssociar').value = blocoId;
+      const tarefasSnapshot = await db.collection("users").doc(currentUser.uid).collection("tarefas").get();
+      const listaTarefasModal = document.getElementById('listaTarefasModal');
+      
+      if (tarefasSnapshot.empty) {
+        listaTarefasModal.innerHTML = '<p style="text-align: center; padding: 20px; color: #999;">Nenhuma tarefa encontrada. <a href="tarefas.html" style="color: var(--foco);">Crie suas primeiras tarefas</a></p>';
+      } else {
+        listaTarefasModal.innerHTML = '';
+        const bloco = document.querySelector(`.bloco[data-id='${blocoId}']`);
+        const tarefaIdsAssociadas = JSON.parse(bloco.dataset.tarefaIds || '[]');
 
-    tarefasSnapshot.forEach(doc => {
-      const tarefa = { id: doc.id, ...doc.data() };
-      const isChecked = tarefaIdsAssociadas.includes(tarefa.id) ? 'checked' : '';
-      listaTarefasModal.innerHTML += `
-        <span class="tarefa-item">
-          <input type="checkbox" id="${tarefa.id}" value="${tarefa.id}" ${isChecked}>
-          <label for="${tarefa.id}">${tarefa.titulo}</label>
-        </span>
-      `;
-    });
-    
-    // Aplica tema escuro ao modal se necessário
-    const modalContent = document.querySelector("#modalAssociarTarefa .modal-content");
-    if (document.body.classList.contains("dark")) {
-      modalContent.classList.add("dark");
-    } else {
-      modalContent.classList.remove("dark");
+        tarefasSnapshot.forEach(doc => {
+          const tarefa = { id: doc.id, ...doc.data() };
+          const isChecked = tarefaIdsAssociadas.includes(tarefa.id) ? 'checked' : '';
+          
+          const tarefaDiv = document.createElement('div');
+          tarefaDiv.className = 'tarefa-item';
+          tarefaDiv.innerHTML = `
+            <input type="checkbox" id="${tarefa.id}" value="${tarefa.id}" ${isChecked}>
+            <label for="${tarefa.id}">${tarefa.titulo}</label>
+          `;
+          listaTarefasModal.appendChild(tarefaDiv);
+        });
+      }
+      
+      // Aplica tema escuro ao modal se necessário
+      const modalContent = document.querySelector("#modalAssociarTarefa .modal-content");
+      if (document.body.classList.contains("dark")) {
+        modalContent.classList.add("dark");
+      } else {
+        modalContent.classList.remove("dark");
+      }
+      
+      document.getElementById('modalAssociarTarefa').style.display = 'block';
+      
+    } catch (error) {
+      console.error("Erro ao carregar tarefas:", error);
+      mostrarNotificacaoErro("Erro ao carregar tarefas.");
     }
-    
-    document.getElementById('modalAssociarTarefa').style.display = 'block';
   }
 
   function fecharModalAssociar() {
@@ -461,26 +940,41 @@
     const blocoId = document.getElementById('blocoIdParaAssociar').value;
     const bloco = document.querySelector(`.bloco[data-id='${blocoId}']`);
     const tarefaIds = [...document.querySelectorAll('#listaTarefasModal input:checked')].map(input => input.value);
+    
     bloco.dataset.tarefaIds = JSON.stringify(tarefaIds);
     salvarAgenda();
     carregarTarefasDoBloco(blocoId, tarefaIds);
     fecharModalAssociar();
+    
+    mostrarNotificacaoSucesso(`${tarefaIds.length} tarefa(s) associada(s) ao bloco!`);
   }
 
   async function carregarTarefasDoBloco(blocoId, tarefaIds) {
-      const container = document.getElementById(`tarefas-${blocoId}`);
-      if (!tarefaIds || tarefaIds.length === 0) {
-          container.innerHTML = '';
-          return;
-      }
-      container.innerHTML = '<h4>Tarefas Associadas:</h4><ul>';
+    const container = document.getElementById(`tarefas-${blocoId}`);
+    
+    if (!tarefaIds || tarefaIds.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    try {
+      container.innerHTML = '<h4>📋 Tarefas Associadas:</h4><ul>';
+      
       for (const tarefaId of tarefaIds) {
           const tarefaDoc = await db.collection("users").doc(currentUser.uid).collection("tarefas").doc(tarefaId).get();
           if (tarefaDoc.exists) {
-              container.querySelector('ul').innerHTML += `<li>${tarefaDoc.data().titulo}</li>`;
+              const li = document.createElement('li');
+              li.textContent = tarefaDoc.data().titulo;
+              container.querySelector('ul').appendChild(li);
           }
       }
+      
       container.innerHTML += '</ul>';
+      
+    } catch (error) {
+      console.error("Erro ao carregar tarefas do bloco:", error);
+      container.innerHTML = '<p style="color: #999; font-size: 0.9rem;">Erro ao carregar tarefas</p>';
+    }
   }
 
   // --- Notificações Interativas ---
@@ -503,33 +997,50 @@
 
   async function mostrarNotificacao(blocoId, tipo) {
     const modal = document.getElementById('modalNotificacao');
-    document.getElementById('notificacaoTitulo').textContent = `Hora de ${tipo}!`;
-    document.getElementById('notificacaoMensagem').textContent = `Já vai iniciar seu período de ${tipo}?`;
+    const titulo = document.getElementById('notificacaoTitulo');
+    const mensagem = document.getElementById('notificacaoMensagem');
+    const tarefasDiv = document.getElementById('notificacaoTarefas');
+    const btnConfirmar = document.getElementById('btnConfirmarBloco');
     
-    const tarefasContainer = document.getElementById('notificacaoTarefas');
+    titulo.textContent = `🔔 Hora de ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}!`;
+    mensagem.textContent = `Já vai iniciar seu período de ${tipo}?`;
+    
+    // Carrega tarefas associadas
     const bloco = document.querySelector(`.bloco[data-id='${blocoId}']`);
     const tarefaIds = JSON.parse(bloco.dataset.tarefaIds || '[]');
+    
     if (tarefaIds.length > 0) {
-        tarefasContainer.innerHTML = '<h5>Tarefas para este bloco:</h5><ul></ul>';
+      tarefasDiv.innerHTML = '<h4>📋 Tarefas para este período:</h4><ul>';
+      
+      try {
         for (const tarefaId of tarefaIds) {
-            const tarefaDoc = await db.collection("users").doc(currentUser.uid).collection("tarefas").doc(tarefaId).get();
-            if (tarefaDoc.exists) {
-                tarefasContainer.querySelector('ul').innerHTML += `<li>${tarefaDoc.data().titulo}</li>`;
-            }
+          const tarefaDoc = await db.collection("users").doc(currentUser.uid).collection("tarefas").doc(tarefaId).get();
+          if (tarefaDoc.exists) {
+            const li = document.createElement('li');
+            li.textContent = tarefaDoc.data().titulo;
+            li.style.marginBottom = '5px';
+            tarefasDiv.querySelector('ul').appendChild(li);
+          }
         }
+        tarefasDiv.innerHTML += '</ul>';
+      } catch (error) {
+        console.error("Erro ao carregar tarefas da notificação:", error);
+        tarefasDiv.innerHTML = '<p style="color: #999;">Erro ao carregar tarefas</p>';
+      }
     } else {
-        tarefasContainer.innerHTML = '';
+      tarefasDiv.innerHTML = '<p style="color: #999; font-style: italic;">Nenhuma tarefa associada a este bloco.</p>';
     }
-
-    // Aplica tema escuro ao modal se necessário
-    const modalContent = document.querySelector("#modalNotificacao .modal-content");
+    
+    btnConfirmar.onclick = () => confirmarInicioBloco(blocoId, tipo);
+    
+    // Aplica tema ao modal
+    const modalContent = modal.querySelector('.modal-content');
     if (document.body.classList.contains("dark")) {
       modalContent.classList.add("dark");
     } else {
       modalContent.classList.remove("dark");
     }
-
-    document.getElementById('btnConfirmarBloco').onclick = () => confirmarInicioBloco(blocoId, tipo);
+    
     modal.style.display = 'block';
   }
 
@@ -537,57 +1048,284 @@
     document.getElementById('modalNotificacao').style.display = 'none';
   }
 
-  function confirmarInicioBloco(blocoId, tipo) {
-    console.log(`Bloco ${blocoId} (${tipo}) confirmado. Iniciando registro de tempo.`);
-    // Aqui você chamaria a função para registrar o tempo nas estatísticas
-    // registrarAtividade(tipo, duracao, blocoId);
-    document.querySelectorAll('.bloco').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.bloco[data-id='${blocoId}']`).classList.add('active');
-    fecharNotificacao();
+  async function confirmarInicioBloco(blocoId, tipo) {
+    try {
+      // Marca o bloco como ativo
+      const bloco = document.querySelector(`.bloco[data-id='${blocoId}']`);
+      document.querySelectorAll('.bloco').forEach(b => b.classList.remove('active'));
+      bloco.classList.add('active');
+      
+      // Registra nas estatísticas
+      await registrarAtividadeEstatisticas(tipo);
+      
+      fecharNotificacao();
+      mostrarNotificacaoSucesso(`Período de ${tipo} iniciado! Mantenha o foco.`);
+      
+    } catch (error) {
+      console.error("Erro ao confirmar início do bloco:", error);
+      mostrarNotificacaoErro("Erro ao registrar atividade.");
+    }
   }
 
-  function logout() {
-    auth.signOut().then(() => {
-      console.log("Usuário deslogado");
-      window.location.href = "login.html";
-    }).catch((error) => {
-      console.error("Erro ao fazer logout:", error);
-      alert("Erro ao fazer logout: " + error.message);
+  // --- Funções de Estatísticas ---
+  async function atualizarEstatisticas(blocosAtuais) {
+    if (!currentUser) return;
+    
+    try {
+      // Compara com blocos anteriores para detectar mudanças
+      const blocosAdicionados = blocosAtuais.filter(atual => 
+        !blocosAnteriores.find(anterior => anterior.id === atual.id)
+      );
+      
+      const blocosRemovidos = blocosAnteriores.filter(anterior => 
+        !blocosAtuais.find(atual => atual.id === anterior.id)
+      );
+      
+      // Atualiza contadores
+      for (const bloco of blocosAdicionados) {
+        await incrementarEstatistica(bloco.tipo);
+      }
+      
+      for (const bloco of blocosRemovidos) {
+        await decrementarEstatistica(bloco.tipo);
+      }
+      
+      blocosAnteriores = [...blocosAtuais];
+      
+    } catch (error) {
+      console.error("Erro ao atualizar estatísticas:", error);
+    }
+  }
+
+  async function registrarAtividadeEstatisticas(tipo) {
+    if (!currentUser) return;
+    
+    try {
+      const hoje = new Date().toISOString().split('T')[0];
+      
+      // Registra atividade individual
+      await db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("registros").collection("atividades").add({
+        tipo: tipo,
+        data: hoje,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+    } catch (error) {
+      console.error("Erro ao registrar atividade:", error);
+    }
+  }
+
+  async function incrementarEstatistica(tipo) {
+    if (!currentUser) return;
+    
+    try {
+      const estatisticasRef = db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo");
+      
+      await db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(estatisticasRef);
+        const dados = doc.exists ? doc.data() : {};
+        
+        const hoje = dados.hoje || {};
+        hoje[tipo] = (hoje[tipo] || 0) + 1;
+        
+        transaction.set(estatisticasRef, { hoje }, { merge: true });
+      });
+      
+    } catch (error) {
+      console.error("Erro ao incrementar estatística:", error);
+    }
+  }
+
+  async function decrementarEstatistica(tipo) {
+    if (!currentUser) return;
+    
+    try {
+      const estatisticasRef = db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo");
+      
+      await db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(estatisticasRef);
+        const dados = doc.exists ? doc.data() : {};
+        
+        const hoje = dados.hoje || {};
+        hoje[tipo] = Math.max((hoje[tipo] || 0) - 1, 0);
+        
+        transaction.set(estatisticasRef, { hoje }, { merge: true });
+      });
+      
+    } catch (error) {
+      console.error("Erro ao decrementar estatística:", error);
+    }
+  }
+
+  // --- Funções de Personalização de Cores ---
+  function abrirModalCores() {
+    // Carrega cores atuais
+    document.getElementById('corFoco').value = getComputedStyle(document.documentElement).getPropertyValue('--foco').trim();
+    document.getElementById('corEstudo').value = getComputedStyle(document.documentElement).getPropertyValue('--estudo').trim();
+    document.getElementById('corDescanso').value = getComputedStyle(document.documentElement).getPropertyValue('--descanso').trim();
+    document.getElementById('corAlerta').value = getComputedStyle(document.documentElement).getPropertyValue('--alerta').trim();
+    
+    atualizarPreviewCores();
+    
+    // Aplica tema ao modal
+    const modalContent = document.querySelector("#modalCores .modal-content");
+    if (document.body.classList.contains("dark")) {
+      modalContent.classList.add("dark");
+    } else {
+      modalContent.classList.remove("dark");
+    }
+    
+    document.getElementById('modalCores').style.display = 'block';
+  }
+
+  function fecharModalCores() {
+    document.getElementById('modalCores').style.display = 'none';
+  }
+
+  function atualizarPreviewCores() {
+    const tipos = ['Foco', 'Estudo', 'Descanso', 'Alerta'];
+    
+    tipos.forEach(tipo => {
+      const cor = document.getElementById(`cor${tipo}`).value;
+      const preview = document.getElementById(`preview${tipo}`);
+      const variavel = `--${tipo.toLowerCase()}`;
+      
+      preview.style.backgroundColor = cor;
+      document.documentElement.style.setProperty(variavel, cor);
+      localStorage.setItem(variavel, cor);
+      
+      // Ajusta cor do texto para descanso
+      if (tipo === 'Descanso') {
+        const luminancia = getLuminancia(cor);
+        preview.style.color = luminancia > 0.5 ? '#2e2e2e' : '#ffffff';
+      }
     });
   }
 
-  // --- Autenticação e Inicialização ---
-  auth.onAuthStateChanged(user => {
-    const agendaContainer = document.getElementById('agendaContainer');
-    const mensagemLogin = document.getElementById('mensagemLogin');
-    if (user) {
-      currentUser = user;
-      agendaContainer.style.display = 'block';
-      mensagemLogin.style.display = 'none';
-      carregarAgenda();
-      agendaIntervalo = setInterval(verificarAgenda, 60000); // Verifica a cada minuto
-    } else {
-      currentUser = null;
-      agendaContainer.style.display = 'none';
-      mensagemLogin.style.display = 'block';
-      clearInterval(agendaIntervalo);
-    }
-  });
+  function restaurarCoresPadrao() {
+    const coresPadrao = {
+      'Foco': '#81C784',
+      'Estudo': '#6BAED6', 
+      'Descanso': '#F4E06D',
+      'Alerta': '#EF9A9A'
+    };
+    
+    Object.entries(coresPadrao).forEach(([tipo, cor]) => {
+      document.getElementById(`cor${tipo}`).value = cor;
+      const variavel = `--${tipo.toLowerCase()}`;
+      document.documentElement.style.setProperty(variavel, cor);
+      localStorage.setItem(variavel, cor);
+    });
+    
+    atualizarPreviewCores();
+    mostrarNotificacaoSucesso("Cores restauradas para o padrão!");
+  }
 
-  // Inicialização da página
-  window.addEventListener('DOMContentLoaded', () => {
-    carregarCoresSalvas();
-    // Fecha o menu ao clicar fora dele
-    document.addEventListener('click', function(event) {
-      const menu = document.getElementById('menu');
-      const menuToggle = document.querySelector('.menu-toggle');
-      if (menu.style.display === 'flex' && 
-          !menu.contains(event.target) && 
-          event.target !== menuToggle) {
-        menu.style.display = 'none';
+  function getLuminancia(hex) {
+    const r = parseInt(hex.substr(1, 2), 16) / 255;
+    const g = parseInt(hex.substr(3, 2), 16) / 255;
+    const b = parseInt(hex.substr(5, 2), 16) / 255;
+    
+    return 0.299 * r + 0.587 * g + 0.114 * b;
+  }
+
+  // --- Funções de Notificação ---
+  function mostrarNotificacaoSucesso(mensagem) {
+    mostrarNotificacaoPopup(mensagem, 'success');
+  }
+
+  function mostrarNotificacaoErro(mensagem) {
+    mostrarNotificacaoPopup(mensagem, 'error');
+  }
+
+  function mostrarNotificacaoPopup(mensagem, tipo) {
+    const popup = document.createElement('div');
+    popup.className = 'notification-popup';
+    popup.style.background = tipo === 'success' ? 'var(--foco)' : 'var(--alerta)';
+    popup.textContent = mensagem;
+    
+    document.body.appendChild(popup);
+    
+    setTimeout(() => {
+      popup.style.opacity = '0';
+      popup.style.transform = 'translateX(100px)';
+      setTimeout(() => popup.remove(), 300);
+    }, 3000);
+  }
+
+  // --- Função de Logout ---
+  function logout() {
+    if (confirm("Tem certeza que deseja sair?")) {
+      auth.signOut().then(() => {
+        console.log("Logout realizado com sucesso");
+        window.location.href = "index.html";
+      }).catch((error) => {
+        console.error("Erro no logout:", error);
+        mostrarNotificacaoErro("Erro ao fazer logout.");
+      });
+    }
+  }
+
+  // --- Event Listeners para Personalização de Cores ---
+  document.addEventListener('DOMContentLoaded', function() {
+    // Listeners para mudança de cor em tempo real
+    ['Foco', 'Estudo', 'Descanso', 'Alerta'].forEach(tipo => {
+      const input = document.getElementById(`cor${tipo}`);
+      if (input) {
+        input.addEventListener('input', atualizarPreviewCores);
       }
     });
   });
+
+  // --- Verificação de Autenticação ---
+  auth.onAuthStateChanged(async (user) => {
+    const agendaContainer = document.getElementById("agendaContainer");
+    const mensagemLogin = document.getElementById("mensagemLogin");
+    
+    if (user) {
+      // Usuário logado
+      currentUser = user;
+      console.log("Usuário logado:", user.displayName || user.email);
+      
+      // Mostra a agenda
+      mensagemLogin.style.display = "none";
+      agendaContainer.style.display = "block";
+      
+      // Carrega dados
+      await carregarAgenda();
+      
+      // Configura verificação de notificações
+      agendaIntervalo = setInterval(verificarAgenda, 60000); // Verifica a cada minuto
+      
+    } else {
+      // Usuário não logado
+      currentUser = null;
+      
+      // Limpa interval se existir
+      if (agendaIntervalo) {
+        clearInterval(agendaIntervalo);
+      }
+      
+      // Mostra mensagem de login
+      agendaContainer.style.display = "none";
+      mensagemLogin.style.display = "block";
+    }
+  });
+
+  // --- Inicialização ---
+  document.addEventListener('DOMContentLoaded', function() {
+    carregarCoresSalvas();
+    
+    // Fecha modais ao clicar fora
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+      }
+    });
+  });
+
 </script>
+
 </body>
 </html>
+

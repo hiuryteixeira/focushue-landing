@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hora de Produzir - FocusHue</title>
+  <title>Dashboard - FocusHue</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Variáveis CSS padronizadas do FocusHue */
     :root {
       --estudo: #6BAED6;
       --foco: #81C784;
@@ -15,26 +17,37 @@
       --bg-dark: #1c1c1c;
       --text-dark: #eeeeee;
     }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      transition: all 0.3s ease-in-out;
+      transition: background-color 0.3s, color 0.3s;
     }
+
     body.dark {
       background-color: var(--bg-dark);
       color: var(--text-dark);
     }
+
+    /* Header padronizado */
     header {
       background: linear-gradient(to right, var(--foco), var(--estudo));
       padding: 20px;
       color: white;
       text-align: center;
       font-size: 1.6rem;
-      font-weight: bold;
+      font-weight: 600;
       position: relative;
     }
+
     .menu-toggle, .theme-toggle {
       position: absolute;
       top: 20px;
@@ -43,9 +56,17 @@
       border: none;
       color: white;
       cursor: pointer;
+      transition: opacity 0.3s;
     }
+
     .menu-toggle { left: 20px; }
     .theme-toggle { right: 20px; }
+
+    .menu-toggle:hover, .theme-toggle:hover {
+      opacity: 0.8;
+    }
+
+    /* Menu de navegação padronizado */
     nav {
       display: none;
       flex-direction: column;
@@ -56,62 +77,400 @@
       left: 10px;
       border-radius: 8px;
       padding: 10px;
-      z-index: 10;
+      z-index: 100;
+      min-width: 200px;
     }
+
+    body.dark nav {
+      background: rgba(40,40,40,0.95);
+    }
+
     nav a {
-      padding: 10px;
+      padding: 10px 15px;
       text-decoration: none;
       color: #333;
       font-weight: 500;
       border-radius: 5px;
-      transition: 0.3s;
+      transition: background-color 0.3s, color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
+    body.dark nav a {
+      color: #eee;
+    }
+
     nav a:hover {
       background: var(--foco);
       color: white;
     }
+
+    /* Conteúdo principal */
     main {
-      max-width: 700px;
-      margin: 60px auto;
-      padding: 20px;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    body.dark .dashboard-card {
+      background: #2e2e2e;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+    body.dark .dashboard-card:hover {
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    body.dark .card-header {
+      color: var(--text-dark);
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+    }
+
+    /* Relógio e modo atual */
+    .time-display {
       text-align: center;
+      margin-bottom: 30px;
     }
-    .hora {
-      font-size: 4rem;
-      font-weight: bold;
+
+    .current-time {
+      font-size: 3.5rem;
+      font-weight: 700;
       margin-bottom: 10px;
+      color: var(--text);
     }
-    .titulo {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
+
+    body.dark .current-time {
+      color: var(--text-dark);
     }
-    .tag {
+
+    .current-mode {
       display: inline-block;
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-size: 1rem;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      text-transform: capitalize;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .mode-message {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    body.dark .mode-message {
+      color: var(--text-dark);
+    }
+
+    /* Lista de próximos blocos */
+    .next-blocks {
+      list-style: none;
+    }
+
+    .block-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.05);
+      transition: background-color 0.3s;
+    }
+
+    body.dark .block-item {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .block-time {
+      font-weight: 600;
+      min-width: 80px;
+    }
+
+    .block-type {
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      font-weight: 500;
       color: white;
     }
-    .notificacao {
-      font-size: 1.2rem;
-      color: var(--text);
-      margin-top: 20px;
-      font-weight: bold;
+
+    .block-type.foco { background: var(--foco); }
+    .block-type.estudo { background: var(--estudo); }
+    .block-type.descanso { background: var(--descanso); color: var(--text); }
+    .block-type.alerta { background: var(--alerta); }
+
+    /* Lista de tarefas */
+    .task-list {
+      list-style: none;
     }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.05);
+      transition: background-color 0.3s;
+    }
+
+    body.dark .task-item {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .task-type-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .task-type-indicator.foco { background: var(--foco); }
+    .task-type-indicator.estudo { background: var(--estudo); }
+    .task-type-indicator.descanso { background: var(--descanso); }
+    .task-type-indicator.alerta { background: var(--alerta); }
+
+    /* Estatísticas rápidas */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.05);
+    }
+
+    body.dark .stat-item {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Links de ação */
+    .action-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .action-link {
+      padding: 8px 16px;
+      background: var(--foco);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+    }
+
+    .action-link:hover {
+      background: var(--estudo);
+      transform: translateY(-1px);
+    }
+
+    /* Mensagem de carregamento */
+    .loading-message {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+
+    body.dark .loading-message {
+      color: var(--text-dark);
+    }
+
+    /* Mensagem de login necessário */
+    .login-required {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    body.dark .login-required {
+      background: #2e2e2e;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .login-required h2 {
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    body.dark .login-required h2 {
+      color: var(--text-dark);
+    }
+
+    .login-required p {
+      margin-bottom: 25px;
+      color: var(--text);
+      opacity: 0.8;
+    }
+
+    body.dark .login-required p {
+      color: var(--text-dark);
+    }
+
+    .login-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .login-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .login-btn.primary {
+      background: var(--foco);
+      color: white;
+    }
+
+    .login-btn.secondary {
+      background: transparent;
+      color: var(--estudo);
+      border: 2px solid var(--estudo);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Footer */
     footer {
       text-align: center;
-      padding: 30px 0;
+      padding: 30px 20px;
       font-size: 0.9rem;
       color: #999;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      margin-top: 60px;
     }
+
+    body.dark footer {
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .current-time {
+        font-size: 2.5rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-links {
+        justify-content: center;
+      }
+
+      .login-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .login-btn {
+        width: 200px;
+      }
+    }
+
+    /* Animações */
+    .dashboard-card {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .dashboard-card:nth-child(2) { animation-delay: 0.1s; }
+    .dashboard-card:nth-child(3) { animation-delay: 0.2s; }
+    .dashboard-card:nth-child(4) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
   </style>
 </head>
 <body>
 
 <header>
-  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-  Hora de Produzir
-  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+  <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">☰</button>
+  <span id="headerTitle">Dashboard - FocusHue</span>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button>
 </header>
 
 <nav id="menu">
@@ -121,102 +480,425 @@
   <a href="config.html">⚙️ Configurações</a>
   <a href="estatisticas.html">📊 Estatísticas</a>
   <a href="notificacoes.html">🔔 Notificações</a>
-  <a href="login.html">🔐 Login</a>
+  <a href="#" onclick="logout()">🚪 Sair</a>
 </nav>
 
 <main>
-  <div class="hora" id="horarioAtual">--:--</div>
-  <div class="titulo">Hora de Produzir</div>
-  <div class="tag" id="modoAtual">Carregando...</div>
-  <div class="notificacao" id="mensagemNotificacao"></div>
+  <!-- Conteúdo para usuário logado -->
+  <div id="dashboardContent" style="display: none;">
+    
+    <!-- Relógio e modo atual -->
+    <div class="time-display">
+      <div class="current-time" id="currentTime">--:--</div>
+      <div class="current-mode" id="currentMode">Carregando...</div>
+      <div class="mode-message" id="modeMessage">Preparando seu ambiente de foco...</div>
+    </div>
+
+    <!-- Grid do dashboard -->
+    <div class="dashboard-grid">
+      
+      <!-- Próximos blocos da agenda -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <span class="card-icon">📅</span>
+          <span>Próximos Blocos</span>
+        </div>
+        <ul class="next-blocks" id="nextBlocks">
+          <li class="loading-message">Carregando agenda...</li>
+        </ul>
+        <div class="action-links">
+          <a href="agenda.html" class="action-link">Ver agenda completa</a>
+        </div>
+      </div>
+
+      <!-- Tarefas pendentes -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <span class="card-icon">✅</span>
+          <span>Tarefas Recentes</span>
+        </div>
+        <ul class="task-list" id="recentTasks">
+          <li class="loading-message">Carregando tarefas...</li>
+        </ul>
+        <div class="action-links">
+          <a href="tarefas.html" class="action-link">Ver todas as tarefas</a>
+        </div>
+      </div>
+
+      <!-- Estatísticas rápidas -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <span class="card-icon">📊</span>
+          <span>Estatísticas de Hoje</span>
+        </div>
+        <div class="stats-grid" id="todayStats">
+          <div class="stat-item">
+            <div class="stat-number" id="statFoco">0</div>
+            <div class="stat-label">Foco</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="statEstudo">0</div>
+            <div class="stat-label">Estudo</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="statDescanso">0</div>
+            <div class="stat-label">Descanso</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="statAlerta">0</div>
+            <div class="stat-label">Alerta</div>
+          </div>
+        </div>
+        <div class="action-links">
+          <a href="estatisticas.html" class="action-link">Ver estatísticas completas</a>
+        </div>
+      </div>
+
+      <!-- Acesso rápido -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <span class="card-icon">⚡</span>
+          <span>Acesso Rápido</span>
+        </div>
+        <div class="action-links">
+          <a href="agenda.html" class="action-link">📅 Agenda</a>
+          <a href="tarefas.html" class="action-link">✅ Tarefas</a>
+          <a href="paleta.html" class="action-link">🎨 Cores</a>
+          <a href="config.html" class="action-link">⚙️ Config</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mensagem para usuário não logado -->
+  <div id="loginRequired" class="login-required" style="display: none;">
+    <h2>Bem-vindo ao FocusHue™</h2>
+    <p>Para acessar seu dashboard personalizado, você precisa fazer login ou criar uma conta.</p>
+    <div class="login-buttons">
+      <a href="login.html" class="login-btn primary">Fazer Login</a>
+      <a href="cadastro.html" class="login-btn secondary">Criar Conta</a>
+    </div>
+  </div>
+
+  <!-- Mensagem de carregamento -->
+  <div id="loadingMessage" class="loading-message">
+    Carregando seu dashboard...
+  </div>
+
 </main>
 
 <footer>
   © 2025 FocusHue™ — Sistema Cromático de Foco.
 </footer>
 
-<audio id="alarme" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_9ca1f7b5c2.mp3?filename=alarm-103046.mp3" preload="auto"></audio>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
-  let ultimoModo = "";
+  // Configuração Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
+    authDomain: "focushue-16683.firebaseapp.com",
+    projectId: "focushue-16683",
+    storageBucket: "focushue-16683.appspot.com",
+    messagingSenderId: "485935414293",
+    appId: "1:485935414293:web:c7ead918246319e0d6a21c"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
+  let currentUser = null;
+  let updateInterval;
+
+  // Funções de UI
   function toggleMenu() {
     const menu = document.getElementById("menu");
     menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    
+    // Fecha o menu ao clicar fora
+    document.addEventListener('click', function closeMenu(e) {
+      if (!menu.contains(e.target) && !document.querySelector('.menu-toggle').contains(e.target)) {
+        menu.style.display = "none";
+        document.removeEventListener('click', closeMenu);
+      }
+    });
   }
 
   function toggleTheme() {
     document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    
+    const themeToggle = document.querySelector(".theme-toggle");
+    themeToggle.textContent = isDark ? "☀️" : "🌙";
   }
 
-  function atualizarHora() {
+  function carregarTema() {
+    const tema = localStorage.getItem("theme");
+    const themeToggle = document.querySelector(".theme-toggle");
+    
+    if (tema === "dark") {
+      document.body.classList.add("dark");
+      themeToggle.textContent = "☀️";
+    } else {
+      themeToggle.textContent = "🌙";
+    }
+  }
+
+  function carregarCoresSalvas() {
+    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) {
+        document.documentElement.style.setProperty(variable, corSalva);
+      }
+    });
+  }
+
+  // Função para atualizar o relógio
+  function atualizarRelogio() {
     const agora = new Date();
     const horas = agora.getHours().toString().padStart(2, '0');
     const minutos = agora.getMinutes().toString().padStart(2, '0');
     const horaAtual = `${horas}:${minutos}`;
-    document.getElementById("horarioAtual").textContent = horaAtual;
-    definirModoAtual(horaAtual);
+    
+    document.getElementById("currentTime").textContent = horaAtual;
+    return horaAtual;
   }
 
-  function definirModoAtual(horaAtual) {
-    const agenda = JSON.parse(localStorage.getItem("agenda-dia") || "[]");
-
-    let modoAtual = "produtividade";
-    for (let bloco of agenda) {
-      if (horaAtual >= bloco.inicio && horaAtual < bloco.fim) {
-        modoAtual = bloco.tipo;
-        break;
+  // Função para determinar o modo atual
+  async function determinarModoAtual() {
+    if (!currentUser) return;
+    
+    try {
+      const agendaDoc = await db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia").get();
+      
+      if (!agendaDoc.exists) {
+        document.getElementById("currentMode").textContent = "Livre";
+        document.getElementById("currentMode").style.backgroundColor = "#999";
+        document.getElementById("modeMessage").textContent = "Configure sua agenda para começar!";
+        return;
       }
+      
+      const blocos = agendaDoc.data().blocos || [];
+      const horaAtual = atualizarRelogio();
+      
+      let modoAtual = "livre";
+      let blocoAtual = null;
+      
+      for (let bloco of blocos) {
+        if (horaAtual >= bloco.inicio && horaAtual < bloco.fim) {
+          modoAtual = bloco.tipo;
+          blocoAtual = bloco;
+          break;
+        }
+      }
+      
+      const modeElement = document.getElementById("currentMode");
+      const messageElement = document.getElementById("modeMessage");
+      
+      modeElement.textContent = modoAtual.charAt(0).toUpperCase() + modoAtual.slice(1);
+      modeElement.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue(`--${modoAtual}`) || "#999";
+      
+      if (modoAtual === "livre") {
+        messageElement.textContent = "Momento livre - aproveite para relaxar!";
+      } else {
+        messageElement.textContent = `Agora é hora de ${modoAtual}! Mantenha o foco.`;
+        
+        if (blocoAtual && blocoAtual.fim) {
+          const [horaFim, minutoFim] = blocoAtual.fim.split(':');
+          messageElement.textContent += ` Termina às ${horaFim}:${minutoFim}.`;
+        }
+      }
+      
+    } catch (error) {
+      console.error("Erro ao determinar modo atual:", error);
     }
-
-    if (modoAtual !== ultimoModo) {
-      tocarAlarme();
-      mostrarNotificacao(modoAtual);
-      localStorage.setItem("led-status", modoAtual);
-      ultimoModo = modoAtual;
-    }
-
-    const nomeExibido = modoAtual.charAt(0).toUpperCase() + modoAtual.slice(1);
-    document.getElementById("modoAtual").textContent = nomeExibido;
-    document.getElementById("modoAtual").style.backgroundColor =
-      getComputedStyle(document.documentElement).getPropertyValue(`--${modoAtual}`);
-    document.getElementById("mensagemNotificacao").textContent = `Agora é hora de ${modoAtual}!`;
   }
 
-  function tocarAlarme() {
-    document.getElementById("alarme").play();
-  }
-
-  function mostrarNotificacao(modo) {
-    if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("FocusHue", { body: `Hora de ${modo}!` });
+  // Função para carregar próximos blocos
+  async function carregarProximosBlocos() {
+    if (!currentUser) return;
+    
+    try {
+      const agendaDoc = await db.collection("users").doc(currentUser.uid).collection("agenda").doc("dia").get();
+      const nextBlocksElement = document.getElementById("nextBlocks");
+      
+      if (!agendaDoc.exists) {
+        nextBlocksElement.innerHTML = '<li class="loading-message">Nenhum bloco configurado. <a href="agenda.html">Configure sua agenda</a></li>';
+        return;
+      }
+      
+      const blocos = agendaDoc.data().blocos || [];
+      const horaAtual = atualizarRelogio();
+      
+      // Filtra blocos futuros
+      const proximosBlocos = blocos
+        .filter(bloco => bloco.inicio > horaAtual)
+        .sort((a, b) => a.inicio.localeCompare(b.inicio))
+        .slice(0, 3);
+      
+      if (proximosBlocos.length === 0) {
+        nextBlocksElement.innerHTML = '<li class="loading-message">Nenhum bloco programado para hoje.</li>';
+        return;
+      }
+      
+      nextBlocksElement.innerHTML = proximosBlocos.map(bloco => `
+        <li class="block-item">
+          <span class="block-time">${bloco.inicio}</span>
+          <span class="block-type ${bloco.tipo}">${bloco.tipo.charAt(0).toUpperCase() + bloco.tipo.slice(1)}</span>
+        </li>
+      `).join('');
+      
+    } catch (error) {
+      console.error("Erro ao carregar próximos blocos:", error);
+      document.getElementById("nextBlocks").innerHTML = '<li class="loading-message">Erro ao carregar blocos.</li>';
     }
   }
 
-  function solicitarPermissaoNotificacao() {
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
+  // Função para carregar tarefas recentes
+  async function carregarTarefasRecentes() {
+    if (!currentUser) return;
+    
+    try {
+      const tarefasSnapshot = await db.collection("users").doc(currentUser.uid).collection("tarefas").limit(5).get();
+      const recentTasksElement = document.getElementById("recentTasks");
+      
+      if (tarefasSnapshot.empty) {
+        recentTasksElement.innerHTML = '<li class="loading-message">Nenhuma tarefa criada. <a href="tarefas.html">Adicione suas primeiras tarefas</a></li>';
+        return;
+      }
+      
+      const tarefas = [];
+      tarefasSnapshot.forEach(doc => {
+        tarefas.push({ id: doc.id, ...doc.data() });
+      });
+      
+      recentTasksElement.innerHTML = tarefas.map(tarefa => `
+        <li class="task-item">
+          <span class="task-type-indicator ${tarefa.tipo || 'foco'}"></span>
+          <span>${tarefa.titulo}</span>
+        </li>
+      `).join('');
+      
+    } catch (error) {
+      console.error("Erro ao carregar tarefas recentes:", error);
+      document.getElementById("recentTasks").innerHTML = '<li class="loading-message">Erro ao carregar tarefas.</li>';
     }
   }
 
-  function carregarPreferencias() {
-    const theme = localStorage.getItem("theme");
-    if (theme === "dark") document.body.classList.add("dark");
+  // Função para carregar estatísticas de hoje
+  async function carregarEstatisticasHoje() {
+    if (!currentUser) return;
+    
+    try {
+      const estatisticasDoc = await db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo").get();
+      
+      if (!estatisticasDoc.exists) {
+        // Valores padrão
+        document.getElementById("statFoco").textContent = "0";
+        document.getElementById("statEstudo").textContent = "0";
+        document.getElementById("statDescanso").textContent = "0";
+        document.getElementById("statAlerta").textContent = "0";
+        return;
+      }
+      
+      const dados = estatisticasDoc.data();
+      const hoje = dados.hoje || {};
+      
+      document.getElementById("statFoco").textContent = hoje.foco || 0;
+      document.getElementById("statEstudo").textContent = hoje.estudo || 0;
+      document.getElementById("statDescanso").textContent = hoje.descanso || 0;
+      document.getElementById("statAlerta").textContent = hoje.alerta || 0;
+      
+    } catch (error) {
+      console.error("Erro ao carregar estatísticas:", error);
+    }
+  }
 
-    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
-      const corSalva = localStorage.getItem(variable);
-      if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
+  // Função para carregar todos os dados do dashboard
+  async function carregarDashboard() {
+    if (!currentUser) return;
+    
+    await Promise.all([
+      determinarModoAtual(),
+      carregarProximosBlocos(),
+      carregarTarefasRecentes(),
+      carregarEstatisticasHoje()
+    ]);
+  }
+
+  // Função de logout
+  function logout() {
+    auth.signOut().then(() => {
+      console.log("Logout realizado com sucesso");
+      window.location.href = "index.html";
+    }).catch((error) => {
+      console.error("Erro no logout:", error);
     });
   }
 
-  window.addEventListener("DOMContentLoaded", () => {
-    carregarPreferencias();
-    solicitarPermissaoNotificacao();
-    atualizarHora();
-    setInterval(atualizarHora, 60000);
+  // Verificação de autenticação
+  auth.onAuthStateChanged(async (user) => {
+    const loadingMessage = document.getElementById("loadingMessage");
+    const dashboardContent = document.getElementById("dashboardContent");
+    const loginRequired = document.getElementById("loginRequired");
+    const headerTitle = document.getElementById("headerTitle");
+    
+    if (user) {
+      // Usuário logado
+      currentUser = user;
+      console.log("Usuário logado:", user.displayName || user.email);
+      
+      // Atualiza o título do header
+      headerTitle.textContent = `Olá, ${user.displayName || user.email.split('@')[0]}!`;
+      
+      // Mostra o dashboard
+      loadingMessage.style.display = "none";
+      loginRequired.style.display = "none";
+      dashboardContent.style.display = "block";
+      
+      // Carrega os dados
+      await carregarDashboard();
+      
+      // Configura atualização automática
+      updateInterval = setInterval(() => {
+        atualizarRelogio();
+        determinarModoAtual();
+      }, 60000); // Atualiza a cada minuto
+      
+    } else {
+      // Usuário não logado
+      currentUser = null;
+      
+      // Limpa interval se existir
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
+      
+      // Mostra tela de login
+      loadingMessage.style.display = "none";
+      dashboardContent.style.display = "none";
+      loginRequired.style.display = "block";
+      headerTitle.textContent = "Dashboard - FocusHue";
+    }
   });
+
+  // Inicialização
+  document.addEventListener('DOMContentLoaded', function() {
+    carregarTema();
+    carregarCoresSalvas();
+    atualizarRelogio();
+    
+    // Atualiza o relógio imediatamente e depois a cada segundo
+    setInterval(atualizarRelogio, 1000);
+  });
+
 </script>
 
 </body>
 </html>
+

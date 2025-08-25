@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Estatísticas da Sessão - FocusHue</title>
-  
+
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  
+
   <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+
   <style>
     :root {
       --estudo: #6BAED6;
@@ -108,7 +108,7 @@
       font-size: 0.9rem;
       color: #999;
     }
-    
+
     /* Estatísticas resumidas */
     .stats-cards {
       display: flex;
@@ -141,7 +141,7 @@
     .stat-card.foco { border-top: 4px solid var(--foco); }
     .stat-card.descanso { border-top: 4px solid var(--descanso); }
     .stat-card.alerta { border-top: 4px solid var(--alerta); }
-    
+
     /* Mensagem de usuário não logado */
     #mensagemLogin {
       text-align: center;
@@ -164,7 +164,7 @@
     .dark #mensagemLogin a {
       color: var(--foco);
     }
-    
+
     /* Mensagem de status */
     #statusMessage {
       text-align: center;
@@ -190,7 +190,7 @@
       background-color: rgba(239, 154, 154, 0.1);
       color: #ef9a9a;
     }
-    
+
     /* Loader */
     .loader {
       border: 5px solid #f3f3f3;
@@ -210,7 +210,7 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    
+
     /* Botão para simular dados */
     .simulate-btn {
       margin-top: 20px;
@@ -225,7 +225,7 @@
     .simulate-btn:hover {
       background-color: var(--estudo);
     }
-    
+
     /* Mensagem quando não há dados */
     .no-data {
       margin: 30px 0;
@@ -242,21 +242,6 @@
   </style>
 </head>
 <body>
-  <header>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    Estatísticas da Sessão
-    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-  </header>
-
-  <nav id="menu">
-    <a href="index.html">🏠 Início</a>
-    <a href="agenda.html">📅 Agenda</a>
-    <a href="tarefas.html">✅ Tarefas</a>
-    <a href="config.html">⚙️ Configurações</a>
-    <a href="estatisticas.html">📊 Estatísticas</a>
-    <a href="notificacoes.html">🔔 Notificações</a>
-    <a href="#" onclick="logout()">🚪 Sair</a>
-  </nav>
 
   <div id="statusMessage"></div>
 
@@ -269,15 +254,15 @@
         <option value="mes">Este Mês</option>
       </select>
     </div>
-    
+
     <div class="loader" id="loader"></div>
-    
+
     <div class="stats-cards" id="statsCards">
       <!-- Cards de estatísticas serão inseridos aqui -->
     </div>
-    
+
     <canvas id="graficoPizza" width="400" height="400"></canvas>
-    
+
     <div id="noDataMessage" style="display: none;" class="no-data">
       Não há dados de estatísticas para este período.
       <div>
@@ -295,6 +280,7 @@
     © 2025 FocusHue™ — Sistema Cromático de Foco.
   </footer>
 
+  <script src="menu.js"></script>
   <script>
     // Configuração Firebase
     const firebaseConfig = {
@@ -305,7 +291,7 @@
       messagingSenderId: "485935414293",
       appId: "1:485935414293:web:c7ead918246319e0d6a21c"
     };
-    
+
     // Inicialização do Firebase
     try {
       firebase.initializeApp(firebaseConfig);
@@ -314,13 +300,13 @@
       console.error("Erro ao inicializar Firebase:", error);
       mostrarMensagem("Erro ao inicializar o Firebase. Verifique sua conexão com a internet.", "error");
     }
-    
+
     const auth = firebase.auth();
     const db = firebase.firestore();
-    
+
     let currentUser = null;
     let grafico = null;
-    
+
     // Elementos da UI
     const estatisticasContainer = document.getElementById('estatisticasContainer');
     const mensagemLogin = document.getElementById('mensagemLogin');
@@ -329,12 +315,12 @@
     const noDataMessage = document.getElementById('noDataMessage');
     const statsCards = document.getElementById('statsCards');
     const ctx = document.getElementById('graficoPizza').getContext('2d');
-    
+
     // Constantes
     const labels = ["Estudo", "Foco", "Descanso", "Alerta"];
     const cores = ["#6BAED6", "#81C784", "#F4E06D", "#EF9A9A"];
     const tipos = ["estudo", "foco", "descanso", "alerta"];
-    
+
     // Dados padrão para simulação
     const dadosPadrao = {
       hoje: {
@@ -356,50 +342,40 @@
         alerta: 15
       }
     };
-    
+
     function carregarCoresSalvas() {
       ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
         const corSalva = localStorage.getItem(variable);
         if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
       });
-      
+
       // Carrega tema claro/escuro
       if (localStorage.getItem("theme") === "escuro" || localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark");
       }
     }
-    
-    function toggleMenu() {
-      const menu = document.getElementById("menu");
-      menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
-    }
 
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "escuro" : "claro");
-    }
-    
     function mostrarMensagem(mensagem, tipo) {
       statusMessage.textContent = mensagem;
       statusMessage.className = tipo; // 'success' ou 'error'
       statusMessage.style.display = 'block';
-      
+
       // Esconde a mensagem após 3 segundos
       setTimeout(() => {
         statusMessage.style.display = 'none';
       }, 3000);
     }
-    
+
     function mostrarLoader(mostrar = true) {
       loader.style.display = mostrar ? 'block' : 'none';
     }
-    
+
     function renderGrafico(dados) {
       if (grafico) grafico.destroy();
-      
+
       // Extrai os valores dos dados para o formato esperado pelo Chart.js
       const valores = tipos.map(tipo => dados[tipo] || 0);
-      
+
       grafico = new Chart(ctx, {
         type: 'pie',
         data: {
@@ -429,10 +405,10 @@
         }
       });
     }
-    
+
     function renderizarCardsEstatisticas(dados) {
       statsCards.innerHTML = '';
-      
+
       tipos.forEach((tipo, index) => {
         const valor = dados[tipo] || 0;
         const card = document.createElement('div');
@@ -445,21 +421,21 @@
         statsCards.appendChild(card);
       });
     }
-    
+
     async function carregarEstatisticas(periodo) {
       if (!currentUser) return;
-      
+
       mostrarLoader(true);
       noDataMessage.style.display = 'none';
-      
+
       try {
         const docRef = db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo");
         const doc = await docRef.get();
-        
+
         if (doc.exists && doc.data()[periodo]) {
           const dados = doc.data()[periodo];
           console.log(`Estatísticas de ${periodo} carregadas:`, dados);
-          
+
           renderGrafico(dados);
           renderizarCardsEstatisticas(dados);
         } else {
@@ -475,30 +451,30 @@
         mostrarLoader(false);
       }
     }
-    
+
     function filtrarDados() {
       const periodo = document.getElementById("periodo").value;
       carregarEstatisticas(periodo);
     }
-    
+
     async function simularDados() {
       if (!currentUser) return;
-      
+
       mostrarLoader(true);
-      
+
       try {
         const periodo = document.getElementById("periodo").value;
         const dados = dadosPadrao[periodo];
-        
+
         // Adiciona timestamp
         const dadosComTimestamp = {
           ...dados,
           ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
         };
-        
+
         // Salva no Firestore
         const docRef = db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo");
-        
+
         // Verifica se o documento já existe
         const doc = await docRef.get();
         if (doc.exists) {
@@ -512,13 +488,13 @@
             [periodo]: dadosComTimestamp
           });
         }
-        
+
         console.log(`Dados simulados para ${periodo} salvos com sucesso!`);
         mostrarMensagem("Dados de exemplo gerados com sucesso!", "success");
-        
+
         // Recarrega os dados
         carregarEstatisticas(periodo);
-        
+
       } catch (error) {
         console.error("Erro ao simular dados:", error);
         mostrarMensagem("Erro ao gerar dados de exemplo: " + error.message, "error");
@@ -526,15 +502,15 @@
         mostrarLoader(false);
       }
     }
-    
+
     // Função para registrar uma nova atividade
     async function registrarAtividade(tipo, duracao, inicio, fim) {
       if (!currentUser) return;
-      
+
       try {
         // Formata a data para YYYY-MM-DD
         const data = new Date(inicio).toISOString().split('T')[0];
-        
+
         // Cria o registro
         const registro = {
           tipo: tipo,
@@ -543,31 +519,31 @@
           fim: fim,
           data: data
         };
-        
+
         // Salva no Firestore
         await db.collection("users").doc(currentUser.uid).collection("estatisticas").collection("registros").add(registro);
-        
+
         console.log("Atividade registrada com sucesso:", registro);
-        
+
         // Atualiza as estatísticas resumidas
         await atualizarEstatisticasResumidas(tipo);
-        
+
       } catch (error) {
         console.error("Erro ao registrar atividade:", error);
       }
     }
-    
+
     // Função para atualizar as estatísticas resumidas
     async function atualizarEstatisticasResumidas(tipoAtualizado) {
       if (!currentUser) return;
-      
+
       try {
         const docRef = db.collection("users").doc(currentUser.uid).collection("estatisticas").doc("resumo");
         const doc = await docRef.get();
-        
+
         // Obtém os dados atuais ou cria um objeto vazio
         const dados = doc.exists ? doc.data() : {};
-        
+
         // Atualiza as estatísticas para cada período
         ['hoje', 'semana', 'mes'].forEach(periodo => {
           if (!dados[periodo]) {
@@ -579,32 +555,22 @@
               ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
             };
           }
-          
+
           // Incrementa o contador para o tipo atualizado
           dados[periodo][tipoAtualizado] = (dados[periodo][tipoAtualizado] || 0) + 1;
           dados[periodo].ultimaAtualizacao = firebase.firestore.FieldValue.serverTimestamp();
         });
-        
+
         // Salva as estatísticas atualizadas
         await docRef.set(dados);
-        
+
         console.log("Estatísticas resumidas atualizadas com sucesso!");
-        
+
       } catch (error) {
         console.error("Erro ao atualizar estatísticas resumidas:", error);
       }
     }
-    
-    function logout() {
-      auth.signOut().then(() => {
-        console.log("Usuário deslogado");
-        window.location.href = "login.html";
-      }).catch((error) => {
-        console.error("Erro ao fazer logout:", error);
-        alert("Erro ao fazer logout: " + error.message);
-      });
-    }
-    
+
     // Listener de autenticação
     auth.onAuthStateChanged(user => {
       if (user) {
@@ -620,7 +586,7 @@
         mensagemLogin.style.display = 'block';
       }
     });
-    
+
     // Inicialização da página
     window.addEventListener("DOMContentLoaded", () => {
       carregarCoresSalvas();

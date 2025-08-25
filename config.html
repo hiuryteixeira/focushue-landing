@@ -193,21 +193,6 @@
   </style>
 </head>
 <body>
-  <header>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    Configurações
-    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-  </header>
-
-  <nav id="menu">
-    <a href="index.html">🏠 Início</a>
-    <a href="agenda.html">📅 Agenda</a>
-    <a href="tarefas.html">✅ Tarefas</a>
-    <a href="config.html">⚙️ Configurações</a>
-    <a href="estatisticas.html">📊 Estatísticas</a>
-    <a href="notificacoes.html">🔔 Notificações</a>
-    <a href="#" onclick="logout()">🚪 Sair</a>
-  </nav>
 
   <main id="configContainer">
     <div id="statusMessage"></div>
@@ -259,6 +244,7 @@
     © 2025 FocusHue™ — Sistema Cromático de Foco.
   </footer>
 
+  <script src="menu.js"></script>
   <script>
     // Configuração Firebase
     const firebaseConfig = {
@@ -296,28 +282,6 @@
     const notifTerminoFoco = document.getElementById('notifTerminoFoco');
     const notifLembreteDescanso = document.getElementById('notifLembreteDescanso');
 
-    function toggleMenu() {
-      const menu = document.getElementById("menu");
-      menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      
-      // Salva a preferência no localStorage para uso imediato
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "escuro" : "claro");
-      
-      // Se o usuário estiver logado, atualiza a preferência no Firestore
-      if (currentUser) {
-        const tema = document.body.classList.contains("dark") ? "escuro" : "claro";
-        db.collection("users").doc(currentUser.uid).collection("config").doc("preferencias")
-          .set({ tema: tema }, { merge: true })
-          .catch(error => {
-            console.error("Erro ao salvar tema:", error);
-          });
-      }
-    }
-    
     function carregarCoresSalvas() {
       ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
         const corSalva = localStorage.getItem(variable);

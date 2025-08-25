@@ -174,22 +174,6 @@
 </head>
 <body>
 
-<header>
-  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-  Paleta de Cores
-  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-</header>
-
-<nav id="menu">
-  <a href="index.html">🏠 Início</a>
-  <a href="agenda.html">📅 Agenda</a>
-  <a href="tarefas.html">✅ Tarefas</a>
-  <a href="config.html">⚙️ Configurações</a>
-  <a href="estatisticas.html">📊 Estatísticas</a>
-  <a href="notificacoes.html">🔔 Notificações</a>
-  <a href="login.html">🔐 Login</a>
-</nav>
-
 <section class="circle-container">
   <span class="estudo">Estudo</span>
   <span class="foco">Foco</span>
@@ -224,16 +208,8 @@
   © 2025 FocusHue™ — Sistema Cromático de Foco.
 </footer>
 
+<script src="menu.js"></script>
 <script>
-  function toggleMenu() {
-    const menu = document.getElementById("menu");
-    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
-  }
-
-  function toggleTheme() {
-    document.body.classList.toggle("dark");
-  }
-
   function updateColor(variable, color) {
     document.documentElement.style.setProperty(variable, color);
     localStorage.setItem(variable, color);

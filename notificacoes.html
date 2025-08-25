@@ -311,22 +311,6 @@
 </head>
 <body>
 
-<header>
-  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-  Notificações
-  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-</header>
-
-<nav id="menu">
-  <a href="index.html">🏠 Início</a>
-  <a href="agenda.html">📅 Agenda</a>
-  <a href="tarefas.html">✅ Tarefas</a>
-  <a href="config.html">⚙️ Configurações</a>
-  <a href="estatisticas.html">📊 Estatísticas</a>
-  <a href="notificacoes.html">🔔 Notificações</a>
-  <a href="#" onclick="logout()">🚪 Sair</a>
-</nav>
-
 <div id="statusMessage"></div>
 
 <div id="notificacoesContainer">
@@ -356,6 +340,7 @@
   © 2025 FocusHue™ — Sistema Cromático de Foco.
 </footer>
 
+<script src="menu.js"></script>
 <script>
   // Configuração Firebase
   const firebaseConfig = {
@@ -396,21 +381,6 @@
         document.documentElement.style.setProperty(variable, corSalva);
       }
     });
-    
-    // Carrega tema claro/escuro
-    if (localStorage.getItem("theme") === "escuro" || localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-    }
-  }
-  
-  function toggleMenu() {
-    const menu = document.getElementById("menu");
-    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
-  }
-
-  function toggleTheme() {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "escuro" : "claro");
   }
   
   function mostrarMensagem(mensagem, tipo) {
@@ -544,16 +514,6 @@
       console.error("Erro ao listar notificações:", error);
       mostrarMensagem("Erro ao carregar notificações: " + error.message, "error");
     }
-  }
-  
-  function logout() {
-    auth.signOut().then(() => {
-      console.log("Usuário deslogado");
-      window.location.href = "login.html";
-    }).catch((error) => {
-      console.error("Erro ao fazer logout:", error);
-      alert("Erro ao fazer logout: " + error.message);
-    });
   }
   
   // Listener de autenticação

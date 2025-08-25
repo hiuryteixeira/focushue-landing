@@ -604,22 +604,6 @@
 </head>
 <body>
 
-<header>
-  <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">☰</button>
-  Agenda Integrada
-  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button>
-</header>
-
-<nav id="menu">
-  <a href="index.html">🏠 Início</a>
-  <a href="home.html">📊 Dashboard</a>
-  <a href="agenda.html">📅 Agenda</a>
-  <a href="tarefas.html">✅ Tarefas</a>
-  <a href="config.html">⚙️ Configurações</a>
-  <a href="estatisticas.html">📈 Estatísticas</a>
-  <a href="notificacoes.html">🔔 Notificações</a>
-  <a href="#" onclick="logout()">🚪 Sair</a>
-</nav>
 
 <!-- Conteúdo principal da agenda -->
 <section class="agenda-container" id="agendaContainer">
@@ -726,6 +710,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="menu.js"></script>
 
 <script>
   // Configuração Firebase
@@ -745,40 +730,6 @@
   let agendaIntervalo;
   let blocosAnteriores = [];
 
-  // --- Funções de UI e Tema ---
-  function toggleMenu() {
-    const menu = document.getElementById("menu");
-    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
-    
-    // Fecha o menu ao clicar fora
-    document.addEventListener('click', function closeMenu(e) {
-      if (!menu.contains(e.target) && !document.querySelector('.menu-toggle').contains(e.target)) {
-        menu.style.display = "none";
-        document.removeEventListener('click', closeMenu);
-      }
-    });
-  }
-
-  function toggleTheme() {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-    
-    // Atualiza o ícone do botão
-    const themeToggle = document.querySelector(".theme-toggle");
-    themeToggle.textContent = isDark ? "☀️" : "🌙";
-    
-    // Atualiza modais se estiverem abertos
-    const modais = document.querySelectorAll(".modal-content");
-    modais.forEach(modal => {
-      if (isDark) {
-        modal.classList.add("dark");
-      } else {
-        modal.classList.remove("dark");
-      }
-    });
-  }
-
   function carregarCoresSalvas() {
     // Carrega cores personalizadas
     ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
@@ -787,15 +738,6 @@
         document.documentElement.style.setProperty(variable, corSalva);
       }
     });
-    
-    // Carrega tema claro/escuro
-    const tema = localStorage.getItem("theme");
-    if (tema === "dark") {
-      document.body.classList.add("dark");
-      document.querySelector(".theme-toggle").textContent = "☀️";
-    } else {
-      document.querySelector(".theme-toggle").textContent = "🌙";
-    }
   }
 
   // --- Funções da Agenda ---

@@ -483,22 +483,6 @@
 </head>
 <body>
 
-<header>
-  <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">☰</button>
-  <span id="headerTitle">Dashboard - FocusHue</span>
-  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button>
-</header>
-
-<nav id="menu">
-  <a href="index.html">🏠 Início</a>
-  <a href="agenda.html">📅 Agenda</a>
-  <a href="tarefas.html">✅ Tarefas</a>
-  <a href="config.html">⚙️ Configurações</a>
-  <a href="estatisticas.html">📊 Estatísticas</a>
-  <a href="notificacoes.html">🔔 Notificações</a>
-  <a href="#" onclick="logout()">🚪 Sair</a>
-</nav>
-
 <main>
   <!-- Conteúdo para usuário logado -->
   <div id="dashboardContent" style="display: none;">
@@ -612,6 +596,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="menu.js"></script>
 
 <script>
   // Configuração Firebase
@@ -629,41 +614,6 @@
 
   let currentUser = null;
   let updateInterval;
-
-  // Funções de UI
-  function toggleMenu() {
-    const menu = document.getElementById("menu");
-    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
-    
-    // Fecha o menu ao clicar fora
-    document.addEventListener('click', function closeMenu(e) {
-      if (!menu.contains(e.target) && !document.querySelector('.menu-toggle').contains(e.target)) {
-        menu.style.display = "none";
-        document.removeEventListener('click', closeMenu);
-      }
-    });
-  }
-
-  function toggleTheme() {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-    
-    const themeToggle = document.querySelector(".theme-toggle");
-    themeToggle.textContent = isDark ? "☀️" : "🌙";
-  }
-
-  function carregarTema() {
-    const tema = localStorage.getItem("theme");
-    const themeToggle = document.querySelector(".theme-toggle");
-    
-    if (tema === "dark") {
-      document.body.classList.add("dark");
-      themeToggle.textContent = "☀️";
-    } else {
-      themeToggle.textContent = "🌙";
-    }
-  }
 
   function carregarCoresSalvas() {
     ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {

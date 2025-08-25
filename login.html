@@ -5,21 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - FocusHue</title>
   
-  <!-- PWA Meta Tags -->
-  <meta name="theme-color" content="#81C784">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="FocusHue">
-  <meta name="msapplication-TileColor" content="#81C784">
-  
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json">
-  
-  <!-- Apple Touch Icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-192x192.png">
-  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     /* Variáveis CSS padronizadas do FocusHue */
@@ -350,19 +335,8 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <script>
-    // Configuração Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
-      authDomain: "focushue-16683.firebaseapp.com",
-      projectId: "focushue-16683",
-      storageBucket: "focushue-16683.appspot.com",
-      messagingSenderId: "485935414293",
-      appId: "1:485935414293:web:c7ead918246319e0d6a21c"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
     const loginBox = document.getElementById("loginBox");
     const body = document.body;
     const themeToggle = document.querySelector('.theme-toggle');
@@ -522,20 +496,8 @@
       verificarUsuarioLogado();
     });
 
-    // PWA - Registro do Service Worker
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js')
-                .then(function(registration) {
-                    console.log('Service Worker registrado com sucesso:', registration.scope);
-                })
-                .catch(function(error) {
-                    console.log('Falha ao registrar Service Worker:', error);
-                });
-        });
-    }
-
   </script>
+  <script src="pwa-integration.js"></script>
 </body>
 </html>
 

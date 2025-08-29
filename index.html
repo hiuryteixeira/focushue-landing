@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FocusHue System™</title>
+    <title data-translate="focushue_system">FocusHue System™</title>
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#81C784">
@@ -256,79 +256,62 @@
 
 <header>
     <!-- Botão de tema adicionado -->
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema claro/escuro">🌙</button>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema claro/escuro" data-translate="theme_toggle_label">🌙</button>
     
-    <h1>O ambiente que te lembra quem você quer ser</h1>
-    <p>Transforme sua rotina com cores e estímulos visuais. Mais foco, menos esforço.</p>
-    <button class="cta-button" onclick="document.getElementById('form').scrollIntoView({ behavior: 'smooth' });">
+    <h1 data-translate="main_title">O ambiente que te lembra quem você quer ser</h1>
+    <p data-translate="main_subtitle">Transforme sua rotina com cores e estímulos visuais. Mais foco, menos esforço.</p>
+    <button class="cta-button" onclick="document.getElementById('form').scrollIntoView({ behavior: 'smooth' });" data-translate="cta_button">
         Quero ser o primeiro a testar
     </button>
 </header>
 
 <section>
-    <h2>🌀 O que é o FocusHue System™?</h2>
-    <p>Um sistema de foco pessoal que usa cores, sons e luzes para transformar o ambiente à sua volta em um lembrete constante das suas metas.</p>
+    <h2 data-translate="what_is_focushue">🌀 O que é o FocusHue System™?</h2>
+    <p data-translate="what_is_focushue_desc">Um sistema de foco pessoal que usa cores, sons e luzes para transformar o ambiente à sua volta em um lembrete constante das suas metas.</p>
 </section>
 
 <section class="benefits">
-    <h2>🔥 Benefícios</h2>
+    <h2 data-translate="benefits">🔥 Benefícios</h2>
     <ul>
-        <li>Ambientes que ajudam você a focar</li>
-        <li>Mais consistência sem esforço</li>
-        <li>Ideal para quem tem TDAH ou procrastina</li>
-        <li>Integração com Google, Spotify, luzes e mais</li>
-        <li>Funciona mesmo quando sua motivação falha</li>
+        <li data-translate="benefit_1">Ambientes que ajudam você a focar</li>
+        <li data-translate="benefit_2">Mais consistência sem esforço</li>
+        <li data-translate="benefit_3">Ideal para quem tem TDAH ou procrastina</li>
+        <li data-translate="benefit_4">Integração com Google, Spotify, luzes e mais</li>
+        <li data-translate="benefit_5">Funciona mesmo quando sua motivação falha</li>
     </ul>
 </section>
 
 <section class="steps">
-    <h2>📲 Como funciona?</h2>
+    <h2 data-translate="how_it_works">📲 Como funciona?</h2>
     <ol>
-        <li>Configure sua rotina no app ou navegador</li>
-        <li>Escolha as cores e metas de cada horário</li>
-        <li>O sistema cuida do resto: luzes, som, visual e avisos</li>
+        <li data-translate="step_1">Configure sua rotina no app ou navegador</li>
+        <li data-translate="step_2">Escolha as cores e metas de cada horário</li>
+        <li data-translate="step_3">O sistema cuida do resto: luzes, som, visual e avisos</li>
     </ol>
 </section>
 
 <section class="form-section" id="form">
-    <h2>📩 Cadastre-se</h2>
+    <h2 data-translate="signup_title">📩 Cadastre-se</h2>
     <div class="ml-embedded" data-form="C8xX0z"></div>
 </section>
 
 <footer>
-    <p>FocusHue System™ — Criado para quem quer mais do próprio tempo.</p>
-    <p><a href="#" onclick="alert('Em desenvolvimento')">Termos de uso</a> | <a href="#" onclick="alert('Em desenvolvimento')">Política de privacidade</a></p>
+    <p data-translate="footer_text">FocusHue System™ — Criado para quem quer mais do próprio tempo.</p>
+    <p><a href="#" onclick="alert('Em desenvolvimento')" data-translate="terms_of_use">Termos de uso</a> | <a href="#" onclick="alert('Em desenvolvimento')" data-translate="privacy_policy">Política de privacidade</a></p>
 </footer>
 
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<!-- My Scripts -->
+<script src="menu.js"></script>
+<script src="i18n.js"></script>
+
 <script>
-    // Sistema de tema claro/escuro padronizado
-    function toggleTheme() {
-        document.body.classList.toggle("dark");
-        const isDark = document.body.classList.contains("dark");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-        
-        // Atualiza o ícone do botão
-        const themeToggle = document.querySelector(".theme-toggle");
-        themeToggle.textContent = isDark ? "☀️" : "🌙";
-    }
-
-    // Carrega tema salvo
-    function carregarTema() {
-        const tema = localStorage.getItem("theme");
-        const themeToggle = document.querySelector(".theme-toggle");
-        
-        if (tema === "dark") {
-            document.body.classList.add("dark");
-            themeToggle.textContent = "☀️";
-        } else {
-            themeToggle.textContent = "🌙";
-        }
-    }
-
     // Inicialização
     document.addEventListener('DOMContentLoaded', function() {
-        carregarTema();
-        
         // Adiciona animação de entrada escalonada para as seções
         const sections = document.querySelectorAll('section');
         sections.forEach((section, index) => {
@@ -363,7 +346,7 @@
                         newWorker.addEventListener('statechange', function() {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                 // Nova versão disponível
-                                if (confirm('Nova versão do FocusHue disponível! Deseja atualizar?')) {
+                                if (confirm(translations[currentLanguage]?.update_available || 'Nova versão do FocusHue disponível! Deseja atualizar?')) {
                                     newWorker.postMessage({ type: 'SKIP_WAITING' });
                                     window.location.reload();
                                 }
@@ -393,6 +376,7 @@
         if (!document.getElementById('install-button')) {
             const installButton = document.createElement('button');
             installButton.id = 'install-button';
+            installButton.setAttribute('data-translate', 'install_app');
             installButton.textContent = '📱 Instalar App';
             installButton.style.cssText = `
                 position: fixed;
@@ -450,6 +434,7 @@
         
         // Mostra mensagem de sucesso
         const successMessage = document.createElement('div');
+        successMessage.setAttribute('data-translate', 'app_installed_success');
         successMessage.textContent = '✅ FocusHue instalado com sucesso!';
         successMessage.style.cssText = `
             position: fixed;
@@ -471,4 +456,3 @@
 
 </body>
 </html>
-

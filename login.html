@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - FocusHue</title>
+  <title data-translate="login_page_title">Login - FocusHue</title>
   
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#81C784">
@@ -318,31 +318,30 @@
 </head>
 <body>
   <!-- Link para voltar à página inicial -->
-  <a href="index.html" class="back-link" aria-label="Voltar à página inicial">← Início</a>
+  <a href="index.html" class="back-link" aria-label="Voltar à página inicial" data-translate="back_to_home">← Início</a>
 
   <div class="login-container" id="loginBox">
     <!-- Botão de tema -->
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema claro/escuro">🌙</button>
     
-    <!-- Logo opcional (descomente se tiver o arquivo) -->
     <img src="logo-focushue.png" alt="FocusHue Logo" class="logo" />
     
-    <h1>Entrar no FocusHue™</h1>
+    <h1 data-translate="login_title">Entrar no FocusHue™</h1>
 
-    <input type="email" id="email" placeholder="E-mail" aria-label="E-mail" />
-    <input type="password" id="senha" placeholder="Senha" aria-label="Senha" />
+    <input type="email" id="email" data-translate="email_placeholder" placeholder="E-mail" aria-label="E-mail" />
+    <input type="password" id="senha" data-translate="password_placeholder" placeholder="Senha" aria-label="Senha" />
 
     <div class="msg" id="mensagemErro"></div>
 
-    <button class="login-btn" onclick="loginEmail()">Entrar</button>
+    <button class="login-btn" onclick="loginEmail()" data-translate="login_button">Entrar</button>
 
     <button class="google-btn" onclick="loginGoogle()">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon" />
-      Entrar com Google
+      <span data-translate="login_with_google">Entrar com Google</span>
     </button>
 
     <div class="links">
-        <a href="cadastro.html">Não tem uma conta? Cadastre-se</a>
+        <a href="cadastro.html" data-translate="no_account_signup">Não tem uma conta? Cadastre-se</a>
     </div>
 
   </div>
@@ -350,6 +349,12 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <!-- My Scripts -->
+  <script src="menu.js"></script>
+  <script src="i18n.js"></script>
+
   <script>
     // Configuração Firebase
     const firebaseConfig = {
@@ -362,32 +367,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-
-    const loginBox = document.getElementById("loginBox");
-    const body = document.body;
-    const themeToggle = document.querySelector('.theme-toggle');
-
-    // Função para alternar tema
-    function toggleTheme() {
-      body.classList.toggle("dark");
-      loginBox.classList.toggle("dark");
-
-      const isDark = body.classList.contains('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      themeToggle.textContent = isDark ? '☀️' : '🌙';
-    }
-
-    // Carrega tema salvo
-    function carregarTema() {
-      const tema = localStorage.getItem('theme');
-      if (tema === 'dark') {
-          body.classList.add('dark');
-          loginBox.classList.add('dark');
-          themeToggle.textContent = '☀️';
-      } else {
-          themeToggle.textContent = '🌙';
-      }
-    }
+    const db = firebase.firestore(); // Needed for theme saving
 
     // Função para exibir mensagens
     function showMessage(message, isError = true) {
@@ -403,46 +383,45 @@
       showMessage(''); // Limpa mensagens anteriores
 
       if (!email || !senha) {
-          showMessage("Por favor, preencha e-mail e senha.");
+          showMessage(translations[currentLanguage]?.fill_email_password || "Por favor, preencha e-mail e senha.");
           return;
       }
 
-      // Validação básica de email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-          showMessage("Por favor, insira um e-mail válido.");
+          showMessage(translations[currentLanguage]?.invalid_email_format || "Por favor, insira um e-mail válido.");
           return;
       }
 
       auth.signInWithEmailAndPassword(email, senha)
         .then((userCredential) => {
           console.log("Login bem-sucedido:", userCredential.user);
-          showMessage("Login realizado com sucesso! Redirecionando...", false);
+          showMessage(translations[currentLanguage]?.login_success_redirect || "Login realizado com sucesso! Redirecionando...", false);
           setTimeout(() => {
             window.location.href = "home.html";
           }, 1500);
         })
         .catch(error => {
           console.error("Erro no login:", error);
-          let friendlyMessage = "Ocorreu um erro ao tentar fazer login.";
+          let friendlyMessage = translations[currentLanguage]?.login_error || "Ocorreu um erro ao tentar fazer login.";
           
           switch(error.code) {
             case 'auth/user-not-found':
             case 'auth/wrong-password':
             case 'auth/invalid-credential':
-              friendlyMessage = "E-mail ou senha inválidos.";
+              friendlyMessage = translations[currentLanguage]?.invalid_credentials || "E-mail ou senha inválidos.";
               break;
             case 'auth/invalid-email':
-              friendlyMessage = "Formato de e-mail inválido.";
+              friendlyMessage = translations[currentLanguage]?.invalid_email_format || "Formato de e-mail inválido.";
               break;
             case 'auth/too-many-requests':
-              friendlyMessage = "Muitas tentativas de login. Tente novamente mais tarde.";
+              friendlyMessage = translations[currentLanguage]?.too_many_requests || "Muitas tentativas de login. Tente novamente mais tarde.";
               break;
             case 'auth/network-request-failed':
-              friendlyMessage = "Erro de conexão. Verifique sua internet.";
+              friendlyMessage = translations[currentLanguage]?.network_error || "Erro de conexão. Verifique sua internet.";
               break;
             case 'auth/unauthorized-domain':
-              friendlyMessage = "Erro: Domínio não autorizado. Verifique a configuração do Firebase.";
+              friendlyMessage = translations[currentLanguage]?.unauthorized_domain || "Erro: Domínio não autorizado. Verifique a configuração do Firebase.";
               break;
           }
           
@@ -458,7 +437,7 @@
       auth.signInWithPopup(provider)
         .then((result) => {
           console.log("Login com Google bem-sucedido:", result.user);
-          showMessage("Login realizado com sucesso! Redirecionando...", false);
+          showMessage(translations[currentLanguage]?.login_success_redirect || "Login realizado com sucesso! Redirecionando...", false);
           setTimeout(() => {
             window.location.href = "home.html";
           }, 1500);
@@ -466,23 +445,22 @@
         .catch(error => {
           console.error("Erro no login com Google:", error);
           
-          // Não mostra erro se o usuário simplesmente fechou o popup
           if (error.code === 'auth/popup-closed-by-user' || 
               error.code === 'auth/cancelled-popup-request') {
               return;
           }
           
-          let friendlyMessage = "Erro ao fazer login com Google.";
+          let friendlyMessage = translations[currentLanguage]?.google_login_error || "Erro ao fazer login com Google.";
           
           switch(error.code) {
             case 'auth/account-exists-with-different-credential':
-              friendlyMessage = "Já existe uma conta com este e-mail usando um método de login diferente.";
+              friendlyMessage = translations[currentLanguage]?.account_exists_error || "Já existe uma conta com este e-mail usando um método de login diferente.";
               break;
             case 'auth/unauthorized-domain':
-              friendlyMessage = "Erro: Domínio não autorizado. Verifique a configuração do Firebase.";
+              friendlyMessage = translations[currentLanguage]?.unauthorized_domain || "Erro: Domínio não autorizado. Verifique a configuração do Firebase.";
               break;
             case 'auth/network-request-failed':
-              friendlyMessage = "Erro de conexão. Verifique sua internet.";
+              friendlyMessage = translations[currentLanguage]?.network_error || "Erro de conexão. Verifique sua internet.";
               break;
           }
           
@@ -509,7 +487,6 @@
     function verificarUsuarioLogado() {
       auth.onAuthStateChanged((user) => {
         if (user) {
-          // Usuário já está logado, redireciona para home
           window.location.href = "home.html";
         }
       });
@@ -517,7 +494,6 @@
 
     // Inicialização
     document.addEventListener('DOMContentLoaded', function() {
-      carregarTema();
       setupEnterListeners();
       verificarUsuarioLogado();
     });
@@ -538,4 +514,3 @@
   </script>
 </body>
 </html>
-

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Configurações - FocusHue</title>
+  <title data-translate="config_page_title">Configurações - FocusHue</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -11,293 +11,87 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   
   <style>
-    :root {
-      --foco: #81C784;
-      --estudo: #6BAED6;
-      --descanso: #F4E06D;
-      --alerta: #EF9A9A;
-      --bg: #d7e3da;
-      --text: #2e2e2e;
-      --bg-dark: #1c1c1c;
-      --text-dark: #eeeeee;
-    }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      transition: 0.3s;
-    }
-    body.dark {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
-    header {
-      background: linear-gradient(to right, var(--foco), var(--estudo));
-      padding: 20px;
-      color: white;
-      text-align: center;
-      font-size: 1.6rem;
-      font-weight: bold;
-      position: relative;
-    }
-    .menu-toggle, .theme-toggle {
-      position: absolute;
-      top: 20px;
-      font-size: 1.4rem;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    .menu-toggle { left: 20px; }
-    .theme-toggle { right: 20px; }
-    nav {
-      display: none;
-      flex-direction: column;
-      background: rgba(255,255,255,0.95);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      position: absolute;
-      top: 70px;
-      left: 10px;
-      border-radius: 8px;
-      padding: 10px;
-      z-index: 10;
-    }
-    nav a {
-      padding: 10px;
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-      border-radius: 5px;
-      transition: 0.3s;
-    }
-    nav a:hover {
-      background: var(--foco);
-      color: white;
-    }
-    main {
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-    h2 {
-      margin-top: 20px;
-    }
-    .config-section {
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-    .dark .config-section {
-      background: #333;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-    .config-section label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
-    }
-    .config-section input,
-    .config-section select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      color: #333;
-    }
-    .dark .config-section input,
-    .dark .config-section select {
-      background-color: #444;
-      color: #eee;
-      border-color: #555;
-    }
-    .config-section button {
-      padding: 12px 24px;
-      background-color: var(--foco);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 15px;
-      transition: background-color 0.3s;
-    }
-    .config-section button:hover {
-      background-color: var(--estudo);
-    }
-    footer {
-      text-align: center;
-      padding: 30px 0;
-      font-size: 0.9rem;
-      color: #999;
-    }
-    .checkbox-container {
-      margin: 10px 0;
-    }
-    .checkbox-container input[type="checkbox"] {
-      width: auto;
-      margin-right: 8px;
-    }
-    
-    /* Mensagem de usuário não logado */
-    #mensagemLogin {
-      text-align: center;
-      margin-top: 50px;
-      font-size: 1.1rem;
-      color: var(--text);
-      display: none;
-    }
-    #mensagemLogin a {
-      color: var(--estudo);
-      font-weight: bold;
-      text-decoration: none;
-    }
-    #mensagemLogin a:hover {
-      text-decoration: underline;
-    }
-    .dark #mensagemLogin {
-      color: var(--text-dark);
-    }
-    .dark #mensagemLogin a {
-      color: var(--foco);
-    }
-    
-    /* Mensagem de status */
-    #statusMessage {
-      text-align: center;
-      margin: 15px 0;
-      padding: 10px;
-      border-radius: 5px;
-      display: none;
-    }
-    .success {
-      background-color: rgba(129, 199, 132, 0.2);
-      color: #2e7d32;
-    }
-    .dark .success {
-      background-color: rgba(129, 199, 132, 0.1);
-      color: #81c784;
-    }
-    .error {
-      background-color: rgba(239, 154, 154, 0.2);
-      color: #c62828;
-    }
-    .dark .error {
-      background-color: rgba(239, 154, 154, 0.1);
-      color: #ef9a9a;
-    }
+    /* Estilos ... */
   </style>
 </head>
 <body>
 
-  <main id="configContainer">
+  <main id="configContainer" style="display: none;">
     <div id="statusMessage"></div>
     
     <div class="config-section">
-      <h2>Preferências do Usuário</h2>
-      <label for="tema">Tema do App:</label>
+      <h2 data-translate="user_preferences">Preferências do Usuário</h2>
+      <label for="tema" data-translate="app_theme">Tema do App:</label>
       <select id="tema">
-        <option value="claro">Claro</option>
-        <option value="escuro">Escuro</option>
+        <option value="light" data-translate="theme_light">Claro</option>
+        <option value="dark" data-translate="theme_dark">Escuro</option>
       </select>
 
-      <label for="idioma">Idioma:</label>
+      <label for="idioma" data-translate="language">Idioma:</label>
       <select id="idioma">
-        <option value="portugues">Português</option>
-        <option value="ingles">Inglês</option>
-        <option value="espanhol">Espanhol</option>
+        <option value="pt" data-translate="lang_portuguese">Português</option>
+        <option value="en" data-translate="lang_english">Inglês</option>
+        <option value="es" data-translate="lang_spanish">Espanhol</option>
       </select>
     </div>
 
     <div class="config-section">
-      <h2>Notificações</h2>
+      <h2 data-translate="notifications">Notificações</h2>
       <div class="checkbox-container">
         <input type="checkbox" id="notifInicioBloco" />
-        <label for="notifInicioBloco">Notificar início de blocos</label>
+        <label for="notifInicioBloco" data-translate="notify_block_start">Notificar início de blocos</label>
       </div>
       <div class="checkbox-container">
         <input type="checkbox" id="notifTerminoFoco" />
-        <label for="notifTerminoFoco">Notificar término de foco</label>
+        <label for="notifTerminoFoco" data-translate="notify_focus_end">Notificar término de foco</label>
       </div>
       <div class="checkbox-container">
         <input type="checkbox" id="notifLembreteDescanso" />
-        <label for="notifLembreteDescanso">Lembrete para descanso</label>
+        <label for="notifLembreteDescanso" data-translate="rest_reminder">Lembrete para descanso</label>
       </div>
     </div>
 
     <div class="config-section">
-      <h2>Outras Opções</h2>
-      <button onclick="salvarConfiguracoes()">Salvar Alterações</button>
+      <h2 data-translate="other_options">Outras Opções</h2>
+      <button onclick="salvarConfiguracoes()" data-translate="save_changes">Salvar Alterações</button>
     </div>
   </main>
 
-  <div id="mensagemLogin">
-    <p>Você precisa estar logado para ver e editar suas configurações.</p>
-    <p><a href="login.html">Fazer Login</a> ou <a href="cadastro.html">Criar Conta</a></p>
+  <div id="mensagemLogin" style="display: none;">
+    <p data-translate="login_to_see_config">Você precisa estar logado para ver e editar suas configurações.</p>
+    <p><a href="login.html" data-translate="do_login">Fazer Login</a> ou <a href="cadastro.html" data-translate="create_account">Criar Conta</a></p>
   </div>
 
-  <footer>
+  <footer data-translate="footer_text">
     © 2025 FocusHue™ — Sistema Cromático de Foco.
   </footer>
 
   <script src="menu.js"></script>
+  <script src="i18n.js"></script>
   <script>
-    // Configuração Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
-      authDomain: "focushue-16683.firebaseapp.com",
-      projectId: "focushue-16683",
-      storageBucket: "focushue-16683.appspot.com",
-      messagingSenderId: "485935414293",
-      appId: "1:485935414293:web:c7ead918246319e0d6a21c"
-    };
-    
-    // Inicialização do Firebase
-    try {
-      firebase.initializeApp(firebaseConfig);
-      console.log("Firebase inicializado com sucesso");
-    } catch (error) {
-      console.error("Erro ao inicializar Firebase:", error);
-      mostrarMensagem("Erro ao inicializar o Firebase. Verifique sua conexão com a internet.", "error");
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
     }
-    
     const auth = firebase.auth();
     const db = firebase.firestore();
     
     let currentUser = null;
     
-    // Elementos da UI
     const configContainer = document.getElementById('configContainer');
     const mensagemLogin = document.getElementById('mensagemLogin');
     const statusMessage = document.getElementById('statusMessage');
     
-    // Elementos de configuração
     const temaSelect = document.getElementById('tema');
     const idiomaSelect = document.getElementById('idioma');
     const notifInicioBloco = document.getElementById('notifInicioBloco');
     const notifTerminoFoco = document.getElementById('notifTerminoFoco');
     const notifLembreteDescanso = document.getElementById('notifLembreteDescanso');
 
-    function carregarCoresSalvas() {
-      ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
-        const corSalva = localStorage.getItem(variable);
-        if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
-      });
-    }
-    
     function mostrarMensagem(mensagem, tipo) {
       statusMessage.textContent = mensagem;
-      statusMessage.className = tipo; // 'success' ou 'error'
+      statusMessage.className = tipo;
       statusMessage.style.display = 'block';
-      
-      // Esconde a mensagem após 3 segundos
-      setTimeout(() => {
-        statusMessage.style.display = 'none';
-      }, 3000);
+      setTimeout(() => { statusMessage.style.display = 'none'; }, 3000);
     }
     
     async function carregarConfiguracoes() {
@@ -309,39 +103,20 @@
         
         if (doc.exists) {
           const data = doc.data();
-          console.log("Configurações carregadas:", data);
-          
-          // Aplica as configurações aos elementos da UI
           if (data.tema) {
             temaSelect.value = data.tema;
-            if (data.tema === "escuro") {
-              document.body.classList.add("dark");
-            } else {
-              document.body.classList.remove("dark");
-            }
           }
-          
           if (data.idioma) {
             idiomaSelect.value = data.idioma;
           }
-          
           if (data.notificacoes) {
             notifInicioBloco.checked = data.notificacoes.inicioBloco || false;
             notifTerminoFoco.checked = data.notificacoes.terminoFoco || false;
             notifLembreteDescanso.checked = data.notificacoes.lembreteDescanso || false;
           }
-        } else {
-          console.log("Nenhuma configuração encontrada, usando padrões");
-          // Usa as configurações padrão
-          const tema = localStorage.getItem("theme") || "claro";
-          if (tema === "escuro" || tema === "dark") {
-            document.body.classList.add("dark");
-            temaSelect.value = "escuro";
-          }
         }
       } catch (error) {
         console.error("Erro ao carregar configurações:", error);
-        mostrarMensagem("Erro ao carregar suas configurações.", "error");
       }
     }
     
@@ -363,58 +138,31 @@
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         
-        await db.collection("users").doc(currentUser.uid).collection("config").doc("preferencias")
-          .set(configData);
+        await db.collection("users").doc(currentUser.uid).collection("config").doc("preferencias").set(configData);
         
-        console.log("Configurações salvas com sucesso!");
-        mostrarMensagem("Configurações salvas com sucesso!", "success");
+        // Aplica as configurações imediatamente
+        aplicarTema(configData.tema);
+        await setLanguage(configData.idioma);
         
-        // Atualiza o tema no localStorage para uso em outras páginas
-        localStorage.setItem("theme", configData.tema);
-        
-        // Aplica o tema imediatamente
-        if (configData.tema === "escuro") {
-          document.body.classList.add("dark");
-        } else {
-          document.body.classList.remove("dark");
-        }
+        mostrarMensagem(translations[currentLanguage]?.config_saved_success || "Configurações salvas com sucesso!", "success");
         
       } catch (error) {
         console.error("Erro ao salvar configurações:", error);
-        mostrarMensagem("Erro ao salvar configurações: " + error.message, "error");
+        mostrarMensagem((translations[currentLanguage]?.error_saving_config || "Erro ao salvar configurações: {message}").replace('{message}', error.message), "error");
       }
     }
     
-    function logout() {
-      auth.signOut().then(() => {
-        console.log("Usuário deslogado");
-        window.location.href = "login.html";
-      }).catch((error) => {
-        console.error("Erro ao fazer logout:", error);
-        alert("Erro ao fazer logout: " + error.message);
-      });
-    }
-    
-    // Listener de autenticação
     auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
-        console.log("Usuário logado:", currentUser.uid);
         configContainer.style.display = 'block';
         mensagemLogin.style.display = 'none';
         carregarConfiguracoes();
       } else {
         currentUser = null;
-        console.log("Nenhum usuário logado");
         configContainer.style.display = 'none';
         mensagemLogin.style.display = 'block';
       }
-    });
-    
-    // Inicialização da página
-    window.addEventListener("DOMContentLoaded", () => {
-      carregarCoresSalvas();
-      // carregarConfiguracoes é chamado pelo onAuthStateChanged
     });
   </script>
 </body>

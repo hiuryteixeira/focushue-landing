@@ -140,10 +140,26 @@ function toggleMenu() {
     }
 }
 
+async function salvarTemaNoFirestore(tema) {
+    const user = firebase.auth().currentUser;
+    if (user && db) {
+        try {
+            const configRef = db.collection("users").doc(user.uid).collection("config").doc("preferencias");
+            await configRef.set({ tema: tema }, { merge: true });
+            console.log("Tema salvo no Firestore.");
+        } catch (error) {
+            console.error("Erro ao salvar tema no Firestore:", error);
+        }
+    }
+}
+
 function toggleTheme() {
     document.body.classList.toggle("dark");
     const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
+    const newTheme = isDark ? "dark" : "light";
+
+    localStorage.setItem("theme", newTheme);
+    salvarTemaNoFirestore(newTheme);
 
     const themeToggle = document.querySelector(".theme-toggle");
     if (themeToggle) {
@@ -153,28 +169,70 @@ function toggleTheme() {
     // Para compatibilidade com a página de login
     const loginBox = document.getElementById("loginBox");
     if(loginBox) {
-        loginBox.classList.toggle("dark");
+        if(isDark) loginBox.classList.add("dark");
+        else loginBox.classList.remove("dark");
     }
 }
 
-function carregarTema() {
-    const tema = localStorage.getItem("theme");
+function aplicarTema(tema) {
+    const isDark = tema === 'dark';
     const themeToggle = document.querySelector(".theme-toggle");
 
-    if (tema === "dark") {
+    if (isDark) {
         document.body.classList.add("dark");
         if (themeToggle) themeToggle.textContent = "☀️";
-
-        const loginBox = document.getElementById("loginBox");
-        if(loginBox) loginBox.classList.add("dark");
-
     } else {
+        document.body.classList.remove("dark");
         if (themeToggle) themeToggle.textContent = "🌙";
     }
+
+    // Para compatibilidade com a página de login
+    const loginBox = document.getElementById("loginBox");
+    if (loginBox) {
+        if (isDark) loginBox.classList.add("dark");
+        else loginBox.classList.remove("dark");
+    }
+}
+
+async function carregarTema() {
+    // Tenta carregar o tema do localStorage primeiro para uma renderização rápida
+    const temaLocal = localStorage.getItem("theme") || 'light';
+    aplicarTema(temaLocal);
+
+    // Ouve o estado de autenticação para carregar do Firestore
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user && db) {
+            try {
+                const configRef = db.collection("users").doc(user.uid).collection("config").doc("preferencias");
+                const doc = await configRef.get();
+                if (doc.exists && doc.data().tema) {
+                    const temaFirestore = doc.data().tema;
+                    console.log("Tema carregado do Firestore:", temaFirestore);
+                    if (temaFirestore !== temaLocal) {
+                        aplicarTema(temaFirestore);
+                        localStorage.setItem("theme", temaFirestore);
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao carregar tema do Firestore:", error);
+            }
+        }
+    });
+}
+
+function carregarCoresSalvas() {
+    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
+      const corSalva = localStorage.getItem(variable);
+      if (corSalva) {
+        document.documentElement.style.setProperty(variable, corSalva);
+      }
+    });
 }
 
 // Carrega o tema na inicialização do script
 carregarTema();
+// Carrega as cores na inicialização do script
+carregarCoresSalvas();
 
 // Logout function - precisa do Firebase Auth
 function logout() {

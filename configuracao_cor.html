@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Configuração de Cor | FocusHue™</title>
+  <title data-translate="palette_page_title">Configuração de Cor | FocusHue™</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
@@ -91,34 +91,35 @@
 <body>
 
   <section class="circle-container">
-    <span class="estudo">Estudo</span>
-    <span class="foco">Foco</span>
-    <span class="descanso">Descanso</span>
-    <span class="alerta">Alerta</span>
+    <span class="estudo" data-translate="label_estudo">Estudo</span>
+    <span class="foco" data-translate="label_foco">Foco</span>
+    <span class="descanso" data-translate="label_descanso">Descanso</span>
+    <span class="alerta" data-translate="label_alerta">Alerta</span>
   </section>
 
   <section class="color-pickers">
     <div class="color-card">
-      <label for="color-estudo">Cor do Estudo</label>
+      <label for="color-estudo" data-translate="color_study">Cor do Estudo</label>
       <input type="color" id="color-estudo" value="#6BAED6" onchange="updateColor('--estudo', this.value)">
     </div>
     <div class="color-card">
-      <label for="color-foco">Cor do Foco</label>
+      <label for="color-foco" data-translate="color_focus">Cor do Foco</label>
       <input type="color" id="color-foco" value="#81C784" onchange="updateColor('--foco', this.value)">
     </div>
     <div class="color-card">
-      <label for="color-descanso">Cor do Descanso</label>
+      <label for="color-descanso" data-translate="color_rest">Cor do Descanso</label>
       <input type="color" id="color-descanso" value="#F4E06D" onchange="updateColor('--descanso', this.value)">
     </div>
     <div class="color-card">
-      <label for="color-alerta">Cor do Alerta</label>
+      <label for="color-alerta" data-translate="color_alert">Cor do Alerta</label>
       <input type="color" id="color-alerta" value="#EF9A9A" onchange="updateColor('--alerta', this.value)">
     </div>
   </section>
 
-  <footer>FocusHue™ – Personalize seu ritmo. Viva sua cor.</footer>
+  <footer data-translate="footer_text">FocusHue™ – Personalize seu ritmo. Viva sua cor.</footer>
 
   <script src="menu.js"></script>
+  <script src="i18n.js"></script>
   <script>
     function updateColor(variable, color) {
       document.documentElement.style.setProperty(variable, color);

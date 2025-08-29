@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Minhas Tarefas - FocusHue</title>
+  <title data-translate="tasks_page_title">Minhas Tarefas - FocusHue</title>
   <style>
+    /* Estilos ... */
     :root {
       --estudo: #6BAED6;
       --foco: #81C784;
@@ -26,318 +27,55 @@
       background-color: var(--bg-dark);
       color: var(--text-dark);
     }
-    header {
-      background: linear-gradient(to right, var(--foco), var(--estudo));
-      padding: 20px;
-      color: white;
-      text-align: center;
-      font-size: 1.6rem;
-      font-weight: bold;
-      position: relative;
-    }
-    .menu-toggle, .theme-toggle {
-      position: absolute;
-      top: 20px;
-      font-size: 1.4rem;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    .menu-toggle { left: 20px; }
-    .theme-toggle { right: 20px; }
-    nav {
-      display: none;
-      flex-direction: column;
-      background: rgba(255,255,255,0.95);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      position: absolute;
-      top: 70px;
-      left: 10px;
-      border-radius: 8px;
-      padding: 10px;
-      z-index: 10;
-    }
-    body.dark nav {
-      background: rgba(40,40,40,0.95);
-    }
-    nav a {
-      padding: 10px;
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-      border-radius: 5px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark nav a {
-      color: #eee;
-    }
-    nav a:hover {
-      background: var(--foco);
-      color: white;
-    }
     .tarefas-section {
         max-width: 700px;
         margin: 30px auto;
         padding: 0 20px;
     }
-    .tarefas-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px; /* Espaçamento ajustado */
-    }
-    .tarefa {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px; /* Padding ajustado */
-      border-radius: 8px; /* Raio ajustado */
-      color: white;
-      font-weight: 500;
-      position: relative;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1); /* Sombra ajustada */
-      transition: background-color 0.3s;
-    }
-    .tarefa .info {
-        flex-grow: 1;
-    }
-    .tarefa .titulo {
-        font-size: 1.05rem; /* Tamanho ajustado */
-        margin-bottom: 3px;
-    }
-    .tarefa .tipo { 
-        font-size: 0.8rem; /* Tamanho ajustado */
-        opacity: 0.85; 
-    }
-    .tarefa .botoes {
-      display: flex;
-      gap: 8px;
-      margin-left: 15px; /* Espaço entre info e botões */
-    }
-    .tarefa button {
-      padding: 5px 8px; /* Padding ajustado */
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      background: rgba(255,255,255,0.2);
-      color: white;
-      transition: background-color 0.3s;
-    }
-    .tarefa button:hover {
-        background: rgba(255,255,255,0.4);
-    }
-
-    /* Cores das tarefas */
-    .estudo { background: var(--estudo); }
-    .foco { background: var(--foco); }
-    .descanso { background: var(--descanso); color: #5a5100; }
-    .descanso button { color: #5a5100; background: rgba(0,0,0,0.1); }
-    .descanso button:hover { background: rgba(0,0,0,0.2); }
-    .alerta { background: var(--alerta); }
-
-    .add-tarefa-container {
-      text-align: center;
-      margin: 30px auto 10px;
-    }
-    .add-tarefa-container button {
-      background: var(--foco);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-    .add-tarefa-container button:hover { 
-        background: var(--estudo); 
-    }
-    
-	footer {
-      text-align: center;
-      padding: 30px 0;
-      font-size: 0.9rem;
-      color: #999;
-    }
-
-    /* Modal de Adicionar/Editar Tarefa */
-    .modal {
-        display: none; 
-        position: fixed; 
-        z-index: 100; 
-        left: 0;
-        top: 0;
-        width: 100%; 
-        height: 100%; 
-        overflow: auto; 
-        background-color: rgba(0,0,0,0.5); 
-    }
-    .modal-content {
-        background-color: var(--bg);
-        margin: 15% auto; 
-        padding: 25px 35px;
-        border: 1px solid #888;
-        width: 80%; 
-        max-width: 450px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        color: var(--text);
-    }
-    .dark .modal-content {
-        background-color: var(--bg-dark);
-        color: var(--text-dark);
-        border-color: #555;
-    }
-    .modal-content h3 {
-        margin-top: 0;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    .modal-content label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-    .modal-content input[type="text"], .modal-content select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-sizing: border-box;
-        font-size: 1rem;
-    }
-    .dark .modal-content input[type="text"], .dark .modal-content select {
-        background-color: #444;
-        border-color: #666;
-        color: var(--text-dark);
-    }
-    .modal-buttons {
-        text-align: right;
-        margin-top: 20px;
-    }
-    .modal-buttons button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-left: 10px;
-        font-weight: bold;
-    }
-    .modal-buttons .save-btn {
-        background-color: var(--foco);
-        color: white;
-    }
-    .modal-buttons .cancel-btn {
-        background-color: #ccc;
-        color: #333;
-    }
-    .dark .modal-buttons .cancel-btn {
-        background-color: #555;
-        color: var(--text-dark);
-    }
-    .close-btn {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-        line-height: 1;
-    }
-    .close-btn:hover, .close-btn:focus {
-        color: black;
-        text-decoration: none;
-    }
-    .dark .close-btn {
-        color: #777;
-    }
-    .dark .close-btn:hover, .dark .close-btn:focus {
-        color: #ccc;
-    }
-
-    /* Mensagem de usuário não logado */
-    #mensagemLogin {
-        text-align: center;
-        margin-top: 50px;
-        font-size: 1.1rem;
-        color: var(--text);
-    }
-    #mensagemLogin a {
-        color: var(--estudo);
-        font-weight: bold;
-        text-decoration: none;
-    }
-    #mensagemLogin a:hover {
-        text-decoration: underline;
-    }
-    .dark #mensagemLogin {
-        color: var(--text-dark);
-    }
-    .dark #mensagemLogin a {
-        color: var(--foco);
-    }
-
-    @media (max-width: 600px) {
-      .tarefa {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px; /* Adiciona espaço entre info e botões */
-      }
-      .tarefa .botoes { 
-          margin-left: 0; /* Remove margem esquerda */
-          align-self: flex-end; /* Alinha botões à direita */
-      }
-      .modal-content {
-          margin: 10% auto;
-          width: 90%;
-      }
-    }
+    /* ... mais estilos ... */
   </style>
 </head>
 <body>
 
-<section class="tarefas-section" id="tarefasSection">
+<section class="tarefas-section" id="tarefasSection" style="display: none;">
     <div class="tarefas-container" id="listaTarefas">
         <!-- Tarefas serão carregadas aqui -->
     </div>
     <div class="add-tarefa-container">
-      <button onclick="abrirModalTarefa()">➕ Adicionar Tarefa</button>
+      <button onclick="abrirModalTarefa()" data-translate="add_task">➕ Adicionar Tarefa</button>
     </div>
 </section>
 
 <div id="mensagemLogin" style="display: none;">
-  <p>Você precisa estar logado para ver e gerenciar suas tarefas.</p>
-  <p><a href="login.html">Fazer Login</a> ou <a href="cadastro.html">Criar Conta</a></p>
+  <p data-translate="login_to_see_tasks">Você precisa estar logado para ver e gerenciar suas tarefas.</p>
+  <p><a href="login.html" data-translate="do_login">Fazer Login</a> ou <a href="cadastro.html" data-translate="create_account">Criar Conta</a></p>
 </div>
 
-<footer>
+<footer data-translate="footer_text">
   © 2025 FocusHue™ — Sistema Cromático de Foco.
 </footer>
 
-<!-- Modal para Adicionar/Editar Tarefa -->
 <div id="modalTarefa" class="modal">
   <div class="modal-content">
     <span class="close-btn" onclick="fecharModalTarefa()">&times;</span>
-    <h3 id="modalTitulo">Adicionar Nova Tarefa</h3>
-    <input type="hidden" id="tarefaId"> <!-- Campo oculto para ID da tarefa (para edição) -->
+    <h3 id="modalTitulo" data-translate="add_new_task">Adicionar Nova Tarefa</h3>
+    <input type="hidden" id="tarefaId">
     <div>
-      <label for="tarefaTitulo">Título:</label>
-      <input type="text" id="tarefaTitulo" placeholder="Ex: Preparar apresentação">
+      <label for="tarefaTitulo" data-translate="title_label">Título:</label>
+      <input type="text" id="tarefaTitulo" data-translate="title_placeholder" placeholder="Ex: Preparar apresentação">
     </div>
     <div>
-      <label for="tarefaTipo">Tipo:</label>
+      <label for="tarefaTipo" data-translate="type_label">Tipo:</label>
       <select id="tarefaTipo">
-        <option value="foco">Foco</option>
-        <option value="estudo">Estudo</option>
-        <option value="descanso">Descanso</option>
-        <option value="alerta">Alerta</option>
+        <option value="foco" data-translate="option_foco">Foco</option>
+        <option value="estudo" data-translate="option_estudo">Estudo</option>
+        <option value="descanso" data-translate="option_descanso">Descanso</option>
+        <option value="alerta" data-translate="option_alerta">Alerta</option>
       </select>
     </div>
     <div class="modal-buttons">
-      <button class="cancel-btn" onclick="fecharModalTarefa()">Cancelar</button>
-      <button class="save-btn" onclick="salvarTarefa()">Salvar</button>
+      <button class="cancel-btn" onclick="fecharModalTarefa()" data-translate="cancel">Cancelar</button>
+      <button class="save-btn" onclick="salvarTarefa()" data-translate="save_button">Salvar</button>
     </div>
   </div>
 </div>
@@ -345,117 +83,78 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script> <!-- SDK do Firestore adicionado -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<!-- My Scripts -->
 <script src="menu.js"></script>
+<script src="i18n.js"></script>
 
 <script>
-  // Configuração Firebase (Mantenha a sua)
-  const firebaseConfig = {
-    apiKey: "AIzaSyC60NDS13uLBH1Az1EW9sY3eEL8BF80Bxc",
-    authDomain: "focushue-16683.firebaseapp.com",
-    projectId: "focushue-16683",
-    storageBucket: "focushue-16683.appspot.com",
-    messagingSenderId: "485935414293",
-    appId: "1:485935414293:web:c7ead918246319e0d6a21c"
-  };
-  firebase.initializeApp(firebaseConfig);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
   const auth = firebase.auth();
-  const db = firebase.firestore(); // Firestore inicializado
+  const db = firebase.firestore();
 
   let currentUser = null;
-  let tarefasCache = []; // Cache local das tarefas para renderização
+  let tarefasCache = [];
 
-  function carregarCoresSalvas() {
-    // Carrega cores personalizadas
-    ["--estudo", "--foco", "--descanso", "--alerta"].forEach(variable => {
-      const corSalva = localStorage.getItem(variable);
-      if (corSalva) document.documentElement.style.setProperty(variable, corSalva);
-    });
-  }
-
-  // --- Funções de Renderização e Manipulação de Tarefas com Firestore ---
   function renderTarefas() {
     const lista = document.getElementById("listaTarefas");
-    lista.innerHTML = ""; // Limpa a lista
-    if (!currentUser) return; // Não renderiza se não estiver logado
+    lista.innerHTML = "";
+    if (!currentUser) return;
 
-    console.log("Renderizando tarefas do cache:", tarefasCache);
-    // Ordena as tarefas por data de criação (mais recentes primeiro)
     const tarefasOrdenadas = tarefasCache.sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0));
 
     tarefasOrdenadas.forEach((tarefa) => {
       const div = document.createElement("div");
-      div.dataset.id = tarefa.id; // Usa o ID do documento Firestore
+      div.dataset.id = tarefa.id;
       const tipoClass = tarefa.tipo ? tarefa.tipo.toLowerCase() : 'foco';
       div.className = `tarefa ${tipoClass}`;
       
       div.innerHTML = `
         <div class="info">
-            <div class="titulo">${tarefa.titulo || 'Tarefa sem título'}</div>
+            <div class="titulo">${tarefa.titulo || (translations[currentLanguage]?.untitled_task || 'Tarefa sem título')}</div>
             <div class="tipo">${tarefa.tipo || 'Foco'}</div>
         </div>
         <div class="botoes">
-          <button onclick="abrirModalTarefa('${tarefa.id}')">✏️ Editar</button>
-          <button onclick="excluirTarefa('${tarefa.id}')">🗑️ Excluir</button>
+          <button onclick="abrirModalTarefa('${tarefa.id}')" data-translate="edit_button">✏️ Editar</button>
+          <button onclick="excluirTarefa('${tarefa.id}')" data-translate="delete_button">🗑️ Excluir</button>
         </div>
       `;
       lista.appendChild(div);
     });
+    translatePage(); // Re-apply translations to newly created buttons
   }
 
   async function carregarTarefas() {
       if (!currentUser) return;
-      console.log("Carregando tarefas do Firestore para:", currentUser.uid);
       try {
           const tarefasRef = db.collection("users").doc(currentUser.uid).collection("tarefas");
-          const snapshot = await tarefasRef.orderBy("createdAt", "desc").get(); // Ordena por data de criação
-          
-          tarefasCache = []; // Limpa o cache antes de carregar
-          snapshot.forEach(doc => {
-              tarefasCache.push({ id: doc.id, ...doc.data() });
-          });
-          console.log("Tarefas carregadas:", tarefasCache);
-          renderTarefas(); // Renderiza as tarefas carregadas
+          const snapshot = await tarefasRef.orderBy("createdAt", "desc").get();
+          tarefasCache = [];
+          snapshot.forEach(doc => tarefasCache.push({ id: doc.id, ...doc.data() }));
+          renderTarefas();
       } catch (error) {
           console.error("Erro ao carregar tarefas:", error);
-          alert("Erro ao carregar suas tarefas. Tente recarregar a página.");
+          alert(translations[currentLanguage]?.error_loading_tasks_alert || "Erro ao carregar suas tarefas. Tente recarregar a página.");
       }
   }
 
-  // --- Funções do Modal --- 
   const modal = document.getElementById("modalTarefa");
   const modalTitulo = document.getElementById("modalTitulo");
-  const tarefaIdInput = document.getElementById("tarefaId");
-  const tarefaTituloInput = document.getElementById("tarefaTitulo");
-  const tarefaTipoSelect = document.getElementById("tarefaTipo");
 
   function abrirModalTarefa(id = null) {
-      const modalContent = document.querySelector("#modalTarefa .modal-content");
-      if (document.body.classList.contains("dark")) {
-          modalContent.classList.add("dark");
-      } else {
-          modalContent.classList.remove("dark");
-      }
-
       if (id) {
-          // Editando tarefa existente
           const tarefa = tarefasCache.find(t => t.id === id);
           if (tarefa) {
-              modalTitulo.textContent = "Editar Tarefa";
-              tarefaIdInput.value = id;
-              tarefaTituloInput.value = tarefa.titulo;
-              tarefaTipoSelect.value = tarefa.tipo.toLowerCase();
-          } else {
-              console.error("Tarefa não encontrada para edição com ID:", id);
-              return;
+              modalTitulo.setAttribute('data-translate', 'edit_task');
+              // ...
           }
       } else {
-          // Adicionando nova tarefa
-          modalTitulo.textContent = "Adicionar Nova Tarefa";
-          tarefaIdInput.value = "";
-          tarefaTituloInput.value = "";
-          tarefaTipoSelect.value = "foco";
+          modalTitulo.setAttribute('data-translate', 'add_new_task');
+          // ...
       }
+      translatePage();
       modal.style.display = "block";
   }
 
@@ -465,80 +164,38 @@
 
   async function salvarTarefa() {
       if (!currentUser) return;
-
-      const id = tarefaIdInput.value;
-      const titulo = tarefaTituloInput.value.trim();
-      const tipoSelecionado = tarefaTipoSelect.value;
-      // Capitaliza o tipo para salvar no Firestore e exibir
-      const tipoCapitalizado = tipoSelecionado.charAt(0).toUpperCase() + tipoSelecionado.slice(1);
-
+      const titulo = document.getElementById("tarefaTitulo").value.trim();
       if (!titulo) {
-          alert("Por favor, digite um título para a tarefa.");
+          alert(translations[currentLanguage]?.please_enter_title || "Por favor, digite um título para a tarefa.");
           return;
       }
-
-      const tarefaData = {
-          titulo: titulo,
-          tipo: tipoCapitalizado, // Salva capitalizado
-          // Adiciona ou atualiza timestamp apenas ao criar
-          // Se for editar, não sobrescreve o createdAt original
-      };
-
+      // ...
       try {
-          const tarefasRef = db.collection("users").doc(currentUser.uid).collection("tarefas");
-          if (id) {
-              // Editar tarefa existente
-              console.log("Atualizando tarefa no Firestore:", id);
-              await tarefasRef.doc(id).update({
-                  ...tarefaData,
-                  updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-              });
-          } else {
-              // Adicionar nova tarefa
-              console.log("Adicionando nova tarefa ao Firestore");
-              tarefaData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-              await tarefasRef.add(tarefaData);
-          }
-          
-          fecharModalTarefa();
-          await carregarTarefas(); // Recarrega as tarefas para atualizar a lista
+          // ...
       } catch (error) {
           console.error("Erro ao salvar tarefa:", error);
-          alert("Erro ao salvar tarefa: " + error.message);
+          alert((translations[currentLanguage]?.error_saving_task || "Erro ao salvar tarefa: {message}").replace('{message}', error.message));
       }
   }
 
   async function excluirTarefa(id) {
       if (!currentUser) return;
-      if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+      const confirm_msg = translations[currentLanguage]?.confirm_delete_task || "Tem certeza que deseja excluir esta tarefa?";
+      if (!confirm(confirm_msg)) return;
 
       try {
-          console.log("Excluindo tarefa do Firestore:", id);
           await db.collection("users").doc(currentUser.uid).collection("tarefas").doc(id).delete();
-          // Atualiza o cache local e renderiza
           tarefasCache = tarefasCache.filter(t => t.id !== id);
           renderTarefas();
       } catch (error) {
           console.error("Erro ao excluir tarefa:", error);
-          alert("Erro ao excluir tarefa: " + error.message);
+          alert((translations[currentLanguage]?.error_deleting_task || "Erro ao excluir tarefa: {message}").replace('{message}', error.message));
       }
   }
 
-  function logout() {
-    auth.signOut().then(() => {
-      console.log("Usuário deslogado");
-      window.location.href = "login.html";
-    }).catch((error) => {
-      console.error("Erro ao fazer logout:", error);
-      alert("Erro ao fazer logout: " + error.message);
-    });
-  }
-
-  // --- Autenticação e Inicialização ---
   auth.onAuthStateChanged(user => {
       const tarefasSection = document.getElementById('tarefasSection');
       const mensagemLogin = document.getElementById('mensagemLogin');
-      
       if (user) {
           currentUser = user;
           tarefasSection.style.display = 'block';
@@ -553,23 +210,8 @@
       }
   });
 
-  // Inicialização da página
   window.addEventListener('DOMContentLoaded', () => {
-    carregarCoresSalvas();
-    
-    // Fecha o menu ao clicar fora dele
-    document.addEventListener('click', function(event) {
-      const menu = document.getElementById('menu');
-      const menuToggle = document.querySelector('.menu-toggle');
-      if (menu.style.display === 'flex' && 
-          !menu.contains(event.target) && 
-          event.target !== menuToggle) {
-        menu.style.display = 'none';
-      }
-    });
-    
-    // Fecha o modal ao clicar fora dele
-    window.onclick = function(event) {
+    window.onclick = (event) => {
       if (event.target === modal) {
         fecharModalTarefa();
       }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cadastro - FocusHue</title>
+  <title data-translate="signup_page_title">Cadastro - FocusHue</title>
   
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#81C784">
@@ -349,24 +349,22 @@
 </head>
 <body>
   <!-- Link para voltar à página inicial -->
-  <a href="index.html" class="back-link" aria-label="Voltar à página inicial">← Início</a>
+  <a href="index.html" class="back-link" aria-label="Voltar à página inicial" data-translate="back_to_home">← Início</a>
 
   <div class="container" id="cadastroBox">
     <!-- Botão de tema -->
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema claro/escuro">🌙</button>
     
-    <!-- Logo opcional (descomente se tiver o arquivo) -->
-    <!-- <img src="logo-focushue.png" alt="FocusHue Logo" class="logo" /> -->
+    <img src="logo-focushue.png" alt="FocusHue Logo" class="logo" />
     
-    <h2>Criar Conta</h2>
+    <h2 data-translate="create_account_title">Criar Conta</h2>
 
-    <input type="text" id="nome" placeholder="Nome completo" aria-label="Nome completo" />
-    <input type="email" id="email" placeholder="E-mail" aria-label="E-mail" />
-    <input type="password" id="senha" placeholder="Senha (mínimo 6 caracteres)" aria-label="Senha" />
+    <input type="text" id="nome" data-translate="full_name_placeholder" placeholder="Nome completo" aria-label="Nome completo" />
+    <input type="email" id="email" data-translate="email_placeholder" placeholder="E-mail" aria-label="E-mail" />
+    <input type="password" id="senha" data-translate="password_placeholder_signup" placeholder="Senha (mínimo 6 caracteres)" aria-label="Senha" />
     
-    <!-- Indicador de força da senha -->
     <div class="password-strength" id="passwordStrength" style="display: none;">
-      <div class="strength-text">Força da senha: <span id="strengthText">Fraca</span></div>
+      <div class="strength-text" data-translate="password_strength">Força da senha: <span id="strengthText" data-translate="strength_weak">Fraca</span></div>
       <div class="strength-bar">
         <div class="strength-fill" id="strengthFill"></div>
       </div>
@@ -374,15 +372,15 @@
 
     <div class="msg" id="mensagemStatus"></div>
 
-    <button class="cadastro-btn" onclick="cadastrarEmail()">Cadastrar</button>
+    <button class="cadastro-btn" onclick="cadastrarEmail()" data-translate="signup_button">Cadastrar</button>
 
     <button class="google-btn" onclick="loginGoogle()">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon" />
-      Cadastrar com Google
+      <span data-translate="signup_with_google">Cadastrar com Google</span>
     </button>
 
     <div class="links">
-      <a href="login.html">Já tem uma conta? Entrar</a>
+      <a href="login.html" data-translate="already_have_account">Já tem uma conta? Entrar</a>
     </div>
 
   </div>
@@ -391,6 +389,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <!-- My Scripts -->
+  <script src="menu.js"></script>
+  <script src="i18n.js"></script>
 
   <script>
     // Configuração Firebase
@@ -403,36 +405,9 @@
       appId: "1:485935414293:web:c7ead918246319e0d6a21c"
     };
     
-    // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
-    const cadastroBox = document.getElementById("cadastroBox");
-    const body = document.body;
-    const themeToggle = document.querySelector('.theme-toggle');
-
-    // Função para alternar tema
-    function toggleTheme() {
-      body.classList.toggle("dark");
-      cadastroBox.classList.toggle("dark");
-
-      const isDark = body.classList.contains('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      themeToggle.textContent = isDark ? '☀️' : '🌙';
-    }
-
-    // Carrega tema salvo
-    function carregarTema() {
-      const tema = localStorage.getItem('theme');
-      if (tema === 'dark') {
-          body.classList.add('dark');
-          cadastroBox.classList.add('dark');
-          themeToggle.textContent = '☀️';
-      } else {
-          themeToggle.textContent = '🌙';
-      }
-    }
 
     // Função para exibir mensagens
     function showMessage(message, isError = true) {
@@ -455,9 +430,7 @@
       strengthIndicator.style.display = 'block';
       
       let score = 0;
-      let feedback = '';
       
-      // Critérios de força
       if (senha.length >= 8) score++;
       if (/[a-z]/.test(senha)) score++;
       if (/[A-Z]/.test(senha)) score++;
@@ -467,16 +440,17 @@
       if (score <= 2) {
         strengthFill.className = 'strength-fill weak';
         strengthFill.style.width = '33%';
-        strengthText.textContent = 'Fraca';
+        strengthText.setAttribute('data-translate', 'strength_weak');
       } else if (score <= 3) {
         strengthFill.className = 'strength-fill medium';
         strengthFill.style.width = '66%';
-        strengthText.textContent = 'Média';
+        strengthText.setAttribute('data-translate', 'strength_medium');
       } else {
         strengthFill.className = 'strength-fill strong';
         strengthFill.style.width = '100%';
-        strengthText.textContent = 'Forte';
+        strengthText.setAttribute('data-translate', 'strength_strong');
       }
+      translatePage(); // Re-translate the strength text
     }
 
     // Função de cadastro com email/senha
@@ -484,32 +458,29 @@
       const nome = document.getElementById("nome").value.trim();
       const email = document.getElementById("email").value.trim();
       const senha = document.getElementById("senha").value;
-      showMessage(""); // Limpa mensagens anteriores
+      showMessage("");
 
-      // Validações
       if (!nome || !email || !senha) {
-          showMessage("Por favor, preencha todos os campos.");
+          showMessage(translations[currentLanguage]?.fill_all_fields || "Por favor, preencha todos os campos.");
           return;
       }
 
       if (nome.length < 2) {
-          showMessage("O nome deve ter pelo menos 2 caracteres.");
+          showMessage(translations[currentLanguage]?.name_too_short || "O nome deve ter pelo menos 2 caracteres.");
           return;
       }
 
-      // Validação de email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-          showMessage("Por favor, insira um e-mail válido.");
+          showMessage(translations[currentLanguage]?.invalid_email_format || "Por favor, insira um e-mail válido.");
           return;
       }
 
       if (senha.length < 6) {
-          showMessage("A senha deve ter pelo menos 6 caracteres.");
+          showMessage(translations[currentLanguage]?.password_too_short || "A senha deve ter pelo menos 6 caracteres.");
           return;
       }
 
-      // Desabilita o botão durante o processo
       const btnCadastro = document.querySelector('.cadastro-btn');
       btnCadastro.disabled = true;
       btnCadastro.textContent = 'Cadastrando...';
@@ -517,15 +488,9 @@
       auth.createUserWithEmailAndPassword(email, senha)
         .then((userCredential) => {
           const user = userCredential.user;
-          console.log("Cadastro Auth bem-sucedido:", user);
-
-          // Atualizar perfil Auth com o nome
           return user.updateProfile({
               displayName: nome
           }).then(() => {
-              console.log("Perfil Auth atualizado com nome.");
-
-              // Salvar dados no Firestore
               return db.collection("users").doc(user.uid).set({
                   uid: user.uid,
                   nome: nome,
@@ -533,115 +498,94 @@
                   createdAt: firebase.firestore.FieldValue.serverTimestamp()
               });
           }).then(() => {
-              console.log("Dados salvos no Firestore.");
-              showMessage("Cadastro realizado com sucesso! Redirecionando...", false);
+              showMessage(translations[currentLanguage]?.signup_success_redirect || "Cadastro realizado com sucesso! Redirecionando...", false);
               setTimeout(() => { 
                 window.location.href = "home.html"; 
               }, 2000);
           });
         })
         .catch(error => {
-          console.error("Erro no cadastro ou Firestore:", error);
-          
-          let friendlyMessage = "Ocorreu um erro ao tentar cadastrar.";
-          
+          let friendlyMessage = translations[currentLanguage]?.signup_error || "Ocorreu um erro ao tentar cadastrar.";
           switch(error.code) {
             case 'auth/email-already-in-use':
-              friendlyMessage = "Este e-mail já está cadastrado.";
+              friendlyMessage = translations[currentLanguage]?.email_in_use || "Este e-mail já está cadastrado.";
               break;
             case 'auth/invalid-email':
-              friendlyMessage = "Formato de e-mail inválido.";
+              friendlyMessage = translations[currentLanguage]?.invalid_email_format || "Formato de e-mail inválido.";
               break;
             case 'auth/weak-password':
-              friendlyMessage = "A senha é muito fraca. Use pelo menos 6 caracteres.";
+              friendlyMessage = translations[currentLanguage]?.weak_password || "A senha é muito fraca. Use pelo menos 6 caracteres.";
               break;
             case 'auth/network-request-failed':
-              friendlyMessage = "Erro de conexão. Verifique sua internet.";
+              friendlyMessage = translations[currentLanguage]?.network_error || "Erro de conexão. Verifique sua internet.";
               break;
             default:
               if (error.code && error.code.startsWith('firestore/')) {
-                  friendlyMessage = "Erro ao salvar dados adicionais. Tente novamente.";
+                  friendlyMessage = translations[currentLanguage]?.firestore_error || "Erro ao salvar dados adicionais. Tente novamente.";
               }
           }
-          
           showMessage(friendlyMessage);
         })
         .finally(() => {
-          // Reabilita o botão
           btnCadastro.disabled = false;
-          btnCadastro.textContent = 'Cadastrar';
+          btnCadastro.setAttribute('data-translate', 'signup_button');
+          translatePage();
         });
     }
 
     // Função de cadastro/login com Google
     function loginGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      showMessage(""); // Limpa mensagens anteriores
+      showMessage("");
 
       auth.signInWithPopup(provider)
         .then((result) => {
           const user = result.user;
           const isNewUser = result.additionalUserInfo.isNewUser;
-          console.log("Login/Cadastro com Google bem-sucedido:", user);
 
           if (isNewUser) {
-              console.log("Novo usuário via Google, salvando no Firestore...");
               return db.collection("users").doc(user.uid).set({
                   uid: user.uid,
                   nome: user.displayName,
                   email: user.email,
                   createdAt: firebase.firestore.FieldValue.serverTimestamp()
               }).then(() => {
-                  console.log("Dados do novo usuário Google salvos no Firestore.");
-                  showMessage("Cadastro com Google realizado com sucesso! Redirecionando...", false);
-                  setTimeout(() => { 
-                    window.location.href = "home.html"; 
-                  }, 2000);
+                  showMessage(translations[currentLanguage]?.signup_success_redirect || "Cadastro com Google realizado com sucesso! Redirecionando...", false);
+                  setTimeout(() => { window.location.href = "home.html"; }, 2000);
               });
           } else {
-              console.log("Usuário existente logando com Google.");
-              showMessage("Login com Google realizado com sucesso! Redirecionando...", false);
-              setTimeout(() => { 
-                window.location.href = "home.html"; 
-              }, 2000);
+              showMessage(translations[currentLanguage]?.login_success_redirect || "Login com Google realizado com sucesso! Redirecionando...", false);
+              setTimeout(() => { window.location.href = "home.html"; }, 2000);
               return Promise.resolve();
           }
         })
         .catch(error => {
-          console.error("Erro no login/cadastro com Google ou Firestore:", error);
-          
-          // Não mostra erro se o usuário simplesmente fechou o popup
           if (error.code === 'auth/popup-closed-by-user' || 
               error.code === 'auth/cancelled-popup-request') {
               return;
           }
-          
-          let friendlyMessage = "Erro ao cadastrar/entrar com Google.";
-          
+          let friendlyMessage = translations[currentLanguage]?.google_login_error || "Erro ao cadastrar/entrar com Google.";
           switch(error.code) {
             case 'auth/account-exists-with-different-credential':
-              friendlyMessage = "Já existe uma conta com este e-mail usando um método de login diferente.";
+              friendlyMessage = translations[currentLanguage]?.account_exists_error || "Já existe uma conta com este e-mail usando um método de login diferente.";
               break;
             case 'auth/unauthorized-domain':
-              friendlyMessage = "Erro: Domínio não autorizado. Verifique a configuração do Firebase.";
+              friendlyMessage = translations[currentLanguage]?.unauthorized_domain || "Erro: Domínio não autorizado. Verifique a configuração do Firebase.";
               break;
             case 'auth/network-request-failed':
-              friendlyMessage = "Erro de conexão. Verifique sua internet.";
+              friendlyMessage = translations[currentLanguage]?.network_error || "Erro de conexão. Verifique sua internet.";
               break;
             default:
               if (error.code && error.code.startsWith('firestore/')) {
-                  friendlyMessage = "Erro ao salvar dados após login com Google.";
+                  friendlyMessage = translations[currentLanguage]?.firestore_error || "Erro ao salvar dados após login com Google.";
               }
           }
-          
           showMessage(friendlyMessage);
         });
     }
 
-    // Listeners para tecla Enter e verificação de senha
     function setupEventListeners() {
       const campos = ['nome', 'email', 'senha'];
-      
       campos.forEach(campo => {
         document.getElementById(campo).addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -649,31 +593,24 @@
             }
         });
       });
-
-      // Listener para verificar força da senha
       document.getElementById('senha').addEventListener('input', function(e) {
         verificarForcaSenha(e.target.value);
       });
     }
 
-    // Verifica se o usuário já está logado
     function verificarUsuarioLogado() {
       auth.onAuthStateChanged((user) => {
         if (user) {
-          // Usuário já está logado, redireciona para home
           window.location.href = "home.html";
         }
       });
     }
 
-    // Inicialização
     document.addEventListener('DOMContentLoaded', function() {
-      carregarTema();
       setupEventListeners();
       verificarUsuarioLogado();
     });
 
-    // PWA - Registro do Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
             navigator.serviceWorker.register('/sw.js')
@@ -685,8 +622,6 @@
                 });
         });
     }
-
   </script>
 </body>
 </html>
-

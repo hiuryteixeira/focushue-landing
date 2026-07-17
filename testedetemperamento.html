@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Temperamento Interativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <!-- HERO SECTION -->
+    <header class="relative bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white overflow-hidden py-16 px-4">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent)]"></div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <span class="bg-indigo-500/20 text-indigo-300 text-sm font-semibold tracking-wider uppercase px-4 py-1.5 rounded-full border border-indigo-500/30">
+                Mapeamento Comportamental Humano
+            </span>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mt-6 mb-4">
+                Descubra o Seu <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-indigo-400">Temperamento</span>
+            </h1>
+            <p class="text-base md:text-lg text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
+                Descubra sua essência biológica através de dois eixos simples de reação e valide suas tendências com o mapeamento completo de comportamento.
+            </p>
+        </div>
+    </header>
+
+    <!-- SIMULADOR INTERATIVO DOS EIXOS -->
+    <section id="introducao" class="py-12 px-4 max-w-4xl mx-auto">
+        <div class="text-center mb-10">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Passo 1: Pré-visualização pelos Eixos</h2>
+            <p class="text-slate-600 mt-2 text-sm md:text-base">Clique em uma opção de cada coluna para simular seu elemento dominante instantaneamente.</p>
+        </div>
+
+        <!-- Painel Interativo Baseado nos Eixos Clínicos -->
+        <div class="bg-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden mb-8">
+            <div class="absolute inset-0 bg-gradient-to-tr from-amber-500/5 via-transparent to-transparent"></div>
+            
+            <div class="grid md:grid-cols-2 gap-8 relative z-10">
+                
+                <!-- Coluna 1: Reação -->
+                <div>
+                    <h3 class="text-amber-400 font-bold text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span>⚡</span> VELOCIDADE DA REAÇÃO BIOLÓGICA
+                    </h3>
+                    <div class="space-y-3">
+                        <button onclick="selectEixo('reacao', 'rapida')" id="btn-reacao-rapida" class="w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-amber-500 transition-all group">
+                            <div class="font-bold text-lg text-amber-500 uppercase tracking-wide group-hover:text-amber-400">Reação Rápida</div>
+                            <p class="text-xs text-slate-400 mt-1 font-light">Você responde na hora, toma atitudes sem conseguir segurar o primeiro impulso ou fala antes de pensar.</p>
+                        </button>
+                        <button onclick="selectEixo('reacao', 'lenta')" id="btn-reacao-lenta" class="w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-slate-400 transition-all group">
+                            <div class="font-bold text-lg text-white uppercase tracking-wide group-hover:text-slate-200">Reação Lenta</div>
+                            <p class="text-xs text-slate-400 mt-1 font-light">Você processa o ambiente primeiro, segura a reação imediata, pondera internamente e age com cautela.</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Impacto -->
+                <div>
+                    <h3 class="text-indigo-400 font-bold text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span>⛰️</span> DURABILIDADE DO IMPACTO
+                    </h3>
+                    <div class="space-y-3">
+                        <button onclick="selectEixo('impacto', 'ficam')" id="btn-impacto-ficam" class="w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-amber-500 transition-all group">
+                            <div class="font-bold text-lg text-orange-400 uppercase tracking-wide group-hover:text-orange-300">As Coisas Ficam</div>
+                            <p class="text-xs text-slate-400 mt-1 font-light">O impacto entra e se fixa profundamente. Você rumina os fatos, lembrando do que aconteceu ou do que devia ter dito.</p>
+                        </button>
+                        <button onclick="selectEixo('impacto', 'passam')" id="btn-impacto-passam" class="w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-slate-400 transition-all group">
+                            <div class="font-bold text-lg text-white uppercase tracking-wide group-hover:text-slate-200">As Coisas Passam</div>
+                            <p class="text-xs text-slate-400 mt-1 font-light">Gera uma reação imediata, mas logo sai de você. Não guarda mágoas por muito tempo e muda de foco rapidamente.</p>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Painel de Feedback da Combinação -->
+            <div id="eixos-resultado" class="mt-8 pt-6 border-t border-slate-800 text-center hidden transition-all">
+                <p class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Sua tendência dominante estimada:</p>
+                <div class="text-2xl md:text-3xl font-extrabold mt-1 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400" id="txt-estimativa">
+                    -
+                </div>
+                <p class="text-xs text-slate-400 mt-2 max-w-md mx-auto font-light" id="txt-desc-estimativa"></p>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="#teste-section" class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+                Agora, faça o teste de 32 perguntas abaixo para validar ⬇️
+            </a>
+        </div>
+    </section>
+
+    <!-- O TESTE INTERATIVO COMPLETO -->
+    <section id="teste-section" class="py-12 bg-slate-100 px-4">
+        <div class="max-w-3xl mx-auto">
+            
+            <!-- Instruções -->
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-2xl mb-8 shadow-sm">
+                <h3 class="text-amber-800 font-bold flex items-center gap-2 text-sm md:text-base mb-1">
+                    ⚠️ Importante para o teste de validação:
+                </h3>
+                <p class="text-xs md:text-sm text-amber-900 leading-relaxed font-light">
+                    Marque as caixas abaixo pensando em como você funcionava na faixa dos <strong>18 aos 20 anos</strong> de idade de maneira sincera.
+                </p>
+            </div>
+
+            <!-- Formulário de Questões -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border border-slate-200/60">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                    <h3 class="font-bold text-lg md:text-xl text-slate-900">Selecione o que se aplica a você:</h3>
+                    <span id="counter" class="text-xs font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-full">0 selecionadas</span>
+                </div>
+
+                <form id="quizForm" class="space-y-3">
+                    <div id="questionsContainer" class="space-y-3"></div>
+
+                    <div class="pt-6 text-center">
+                        <button type="button" onclick="calcularResultado()" class="w-full md:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-base px-10 py-4 rounded-xl shadow-lg shadow-emerald-600/10 transition-all duration-200">
+                            Gerar Diagnóstico de Temperamento Completo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- DASHBOARD DE RESULTADOS -->
+    <section id="resultado-section" class="py-16 px-4 max-w-4xl mx-auto hidden scroll-mt-6">
+        <div class="bg-white rounded-3xl p-6 md:p-12 shadow-xl border border-indigo-100">
+            <div class="text-center mb-10">
+                <span class="text-emerald-600 font-bold uppercase tracking-widest text-xs bg-emerald-50 px-4 py-1.5 rounded-full">Resultado Analisado</span>
+                <h2 class="text-3xl font-extrabold text-slate-900 mt-3">Seu Mapa de Temperamento</h2>
+            </div>
+
+            <div class="space-y-4 mb-10 max-w-xl mx-auto">
+                <div>
+                    <div class="flex justify-between text-sm font-semibold mb-1">
+                        <span class="text-orange-600">🔥 Colérico</span>
+                        <span id="score-colerico">0 pts</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden">
+                        <div id="bar-colerico" class="bg-gradient-to-r from-orange-500 to-orange-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm font-semibold mb-1">
+                        <span class="text-sky-600">💨 Sanguíneo</span>
+                        <span id="score-sanguineo">0 pts</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden">
+                        <div id="bar-sanguineo" class="bg-gradient-to-r from-sky-400 to-sky-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm font-semibold mb-1">
+                        <span class="text-amber-700">🍂 Melancólico</span>
+                        <span id="score-melancolico">0 pts</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden">
+                        <div id="bar-melancolico" class="bg-gradient-to-r from-amber-600 to-amber-700 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm font-semibold mb-1">
+                        <span class="text-teal-600">❄️ Fleumático</span>
+                        <span id="score-fleumatico">0 pts</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden">
+                        <div id="bar-fleumatico" class="bg-gradient-to-r from-teal-500 to-teal-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-10">
+                <div class="p-6 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-500">Principal (Dominante)</span>
+                    <h3 class="text-2xl font-bold text-slate-900 mt-1" id="resumo-dominante">-</h3>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Secundário (Subdominante)</span>
+                    <h3 class="text-2xl font-bold text-slate-900 mt-1" id="resumo-subdominante">-</h3>
+                </div>
+            </div>
+
+            <div id="detalhes-perfis" class="space-y-6 border-t border-slate-100 pt-8 mb-10"></div>
+
+            <!-- FORMULÁRIO DE ENVIO POR E-MAIL -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 max-w-xl mx-auto mb-8">
+                <h3 class="font-bold text-lg text-slate-900 text-center mb-2 flex items-center justify-center gap-2">
+                    ✉️ Deseja salvar seu resultado?
+                </h3>
+                <p class="text-slate-600 text-xs text-center mb-6 font-light">Insira seus dados abaixo para enviar o relatório detalhado do seu perfil diretamente para sua caixa de entrada.</p>
+                
+                <form id="emailCaptureForm" onsubmit="enviarEmail(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seu Nome</label>
+                        <input type="text" required id="user-name" placeholder="Ex: Nome Completo" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seu Melhor E-mail</label>
+                        <input type="email" required id="user-email" placeholder="nome@provedor.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-white">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md transition-all text-sm">
+                        Enviar Meu Perfil por E-mail
+                    </button>
+                </form>
+                <div id="form-feedback" class="text-center mt-3 text-sm font-medium text-emerald-600 hidden"></div>
+            </div>
+
+            <div class="text-center mt-8">
+                <button onclick="reiniciarTeste()" class="text-sm font-medium text-slate-500 hover:text-slate-800 underline transition-colors">
+                    Resetar e Voltar ao Início
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-900 text-slate-500 py-8 text-center text-xs border-t border-slate-800">
+        <p>© 2026 Mapeamento Prático de Temperamentos Humanos.</p>
+    </footer>
+
+    <!-- LÓGICA DE INTERAÇÃO -->
+    <script>
+        let selecoesEixos = { reacao: null, impacto: null };
+
+        const estimativas = {
+            "rapida-ficam": { nome: "🔥 COLÉRICO (Elemento Fogo)", desc: "Você tende a ser uma pessoa focada, decidida, de liderança forte e que se move intensamente para a ação, mas precisa cuidar para não ser dominador ou impaciente." },
+            "rapida-passam": { nome: "💨 SANGUÍNEO (Elemento Ar)", desc: "Sua tendência natural é a comunicação, a extroversão, o otimismo e a sociabilidade, precisando de atenção com o foco e a constância nas rotinas de longo prazo." },
+            "lenta-ficam": { nome: "🍂 MELANCÓLICO (Elemento Terra)", desc: "Você tende a ser profundo, extremamente analítico, perfeccionista, artístico e muito leal, precisando monitorar os níveis de autocrítica excessiva." },
+            "lenta-passam": { nome: "❄️ FLEUMÁTICO (Elemento Água)", desc: "Sua marca é a calma estável, a diplomacia, a paciência e a confiabilidade. Seu desafio reside em tomar decisões difíceis e evitar a inércia." }
+        };
+
+        function selectEixo(categoria, valor) {
+            selecoesEixos[categoria] = valor;
+            
+            if (categoria === 'reacao') {
+                document.getElementById('btn-reacao-rapida').className = valor === 'rapida' ? 'w-full text-left p-4 rounded-xl border-2 border-amber-500 bg-amber-500/10 transition-all' : 'w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-all';
+                document.getElementById('btn-reacao-lenta').className = valor === 'lenta' ? 'w-full text-left p-4 rounded-xl border-2 border-slate-400 bg-slate-700/50 transition-all' : 'w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-all';
+            } else {
+                document.getElementById('btn-impacto-ficam').className = valor === 'ficam' ? 'w-full text-left p-4 rounded-xl border-2 border-amber-500 bg-amber-500/10 transition-all' : 'w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-all';
+                document.getElementById('btn-impacto-passam').className = valor === 'passam' ? 'w-full text-left p-4 rounded-xl border-2 border-slate-400 bg-slate-700/50 transition-all' : 'w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-all';
+            }
+
+            if (selecoesEixos.reacao && selecoesEixos.impacto) {
+                const chave = `${selecoesEixos.reacao}-${selecoesEixos.impacto}`;
+                const dados = estimativas[chave];
+                document.getElementById('txt-estimativa').innerText = dados.nome;
+                document.getElementById('txt-desc-estimativa').innerText = dados.desc;
+                document.getElementById('eixos-resultado').classList.remove('hidden');
+            }
+        }
+
+        const perguntas = [
+            { id: 1, text: "Gosta da natureza.", temps: ["Melancólico", "Colérico"] },
+            { id: 2, text: "Tende para a melancolia, sentimentalismo (aquela pessoa bem sensível).", temps: ["Melancólico"] },
+            { id: 3, text: "É uma pessoa tímida, indecisa, que às vezes desiste com certa facilidade.", temps: ["Melancólico", "Sanguíneo"] },
+            { id: 4, text: "Possui senso prático desenvolvido (consegue se organizar e agir rapidamente diante de uma situação).", temps: ["Colérico", "Sanguíneo", "Fleumático"] },
+            { id: 5, text: "Tem pouco interesse pelo mundo exterior (prefere ficar em casa, não liga muito para convites em excesso ou fofocas).", temps: ["Colérico", "Sanguíneo"] },
+            { id: 6, text: "É difícil reconciliar-se ou perdoar (guarda a ofensa por dentro e espera que o outro venha pedir desculpas).", temps: ["Melancólico"] },
+            { id: 7, text: "Gosta da eloquência, possui boa oratória (gosta de falar em público e se expor).", temps: ["Colérico"] },
+            { id: 8, text: "Rumina os acontecimentos (as situações do passado ficam voltando e se repetindo na sua cabeça).", temps: ["Melancólico"] },
+            { id: 9, text: "É violento (pode ser de forma física, verbal falando palavrões, ou expressando muita raiva fechando a cara e batendo portas).", temps: ["Colérico"] },
+            { id: 10, text: "Gosta de novidades (fica logo animado quando alguém diz 'menina, você não sabe o que aconteceu!').", temps: ["Colérico", "Sanguíneo"] },
+            { id: 11, text: "É impulsivo (a reação é mais rápida que o pensamento; quando vê, já fez ou já falou).", temps: ["Colérico"] },
+            { id: 12, text: "É otimista (geralmente está de bem com a vida, bem-humorado e acredita que as coisas vão dar certo).", temps: ["Colérico"] },
+            { id: 13, text: "É bem-educadinho, cordial, arrasta os outros com a palavra e gosta de ser exemplar/perfeitinho.", temps: ["Sanguíneo"] },
+            { id: 14, text: "Os outros o consideram autoritário ou mandão (quer que todo mundo faça as coisas do seu jeito).", temps: ["Colérico"] },
+            { id: 15, text: "Aprecia pausas e momentos de solidão (mesmo que goste de interagir, precisa de um tempo sozinho para se reenergizar).", temps: ["Melancólico"] },
+            { id: 16, text: "Possui grande capacidade de trabalho (as pessoas comentam que o seu dia parece ter 48 horas de tanto que você faz).", temps: ["Colérico"] },
+            { id: 17, text: "Sente necessidade intensa de ação em múltiplas direções (envolve-se em vários projetos ao mesmo tempo).", temps: ["Colérico", "Sanguíneo", "Melancólico", "Fleumático"] },
+            { id: 18, text: "É uma pessoa de hábitos (gosta e se sente bem com rotinas — 'todo dia faz tudo sempre igual').", temps: ["Colérico"] },
+            { id: 19, text: "Gosta de uma vida simples, não tem muita ambição (está bom e confortável do jeito que está).", temps: ["Melancólico", "Fleumático"] },
+            { id: 20, text: "É calmo, objetivo e com o humor sempre igual (mantém a estabilidade emocional, sem grandes euforias).", temps: ["Melancólico", "Fleumático"] },
+            { id: 21, text: "Confia mais na prática do que na teoria (não planeja demais, prefere colocar a mão na massa).", temps: ["Fleumático", "Sanguíneo"] },
+            { id: 22, text: "É persistentemente e perseverante (não desiste facilmente do que quer).", temps: ["Sanguíneo"] },
+            { id: 23, text: "Possui senso teórico (consegue explicar conceitos abstratos com facilidade).", temps: ["Fleumático"] },
+            { id: 24, text: "Gosta muito dos prazeres da vida (comer bem, dançar, sair, conversar).", temps: ["Fleumático"] },
+            { id: 25, text: "Gosta de brincar com todo mundo, usar de zombaria, ironia e dar apelidos.", temps: ["Sanguíneo"] },
+            { id: 26, text: "É ciumento e fechado (uma postura mais possessiva).", temps: ["Fleumático"] },
+            { id: 27, text: "Tem reputação de pessoa corajosa (os outros frequentemente comentam o quanto você é corajoso).", temps: ["Melancólico"] },
+            { id: 28, text: "Gosta das teorias e das coisas abstratas (assuntos complexos como psicologia ou física).", temps: ["Fleumático", "Sanguíneo"] },
+            { id: 29, text: "Possui senso de humor (ri e se diverte com facilidade).", temps: ["Fleumático"] },
+            { id: 30, text: "É conhecido como alguém leal e franco (uma pessoa em quem os outros confiam).", temps: ["Sanguíneo"] },
+            { id: 31, text: "Tem reputação de pessoa fina, delicada e cortês.", temps: ["Fleumático"] },
+            { id: 32, text: "É uma pessoa de princípios e gosta de relevá-los.", temps: ["Sanguíneo"] }
+        ];
+
+        const infoTemps = {
+            "Colérico": { emoji: "🔥", color: "text-orange-500", desc: "Movidos pela ação, liderança e foco em resultados. Possuem enorme força realizadora.", forcas: "Determinação, independência, liderança e coragem.", atencao: "Autoritarismo e intolerância a falhas alheias." },
+            "Sanguíneo": { emoji: "💨", color: "text-sky-500", desc: "Comunicativos, otimistas e cheios de energia social. Trazem alegria por onde passam.", forcas: "Eloquência, adaptabilidade e entusiasmo.", atencao: "Falta de foco crônico e impulsividade verbal." },
+            "Melancólico": { emoji: "🍂", color: "text-amber-600", desc: "Profundos, analíticos e detalhistas. Valorizam a ordem, o belo e a precisão das coisas.", forcas: "Lealdade, alta capacidade analítica e sensibilidade.", atencao: "Tendência ao pessimismo e dificuldade em esquecer ofensas." },
+            "Fleumático": { emoji: "❄️", color: "text-teal-500", desc: "Pacíficos, diplomáticos, calmos e incrivelmente estáveis sob pressão.", forcas: "Estabilidade emocional, facilidade de convivência e senso de justiça.", atencao: "Passividade excessiva e evitação de confrontos necessários." }
+        };
+
+        const renderContainer = document.getElementById('questionsContainer');
+        perguntas.forEach(q => {
+            const div = document.createElement('div');
+            div.className = "flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-slate-200/50";
+            div.onclick = (e) => {
+                if(e.target.tagName !== 'INPUT') {
+                    const cb = div.querySelector('input');
+                    cb.checked = !cb.checked;
+                    updateCounter();
+                }
+            };
+            div.innerHTML = `
+                <input type="checkbox" data-id="${q.id}" onchange="updateCounter()" class="mt-1 w-5 h-5 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                <span class="text-slate-700 text-sm md:text-base"><strong class="text-slate-400 mr-1 font-medium">#${q.id}</strong> ${q.text}</span>
+            `;
+            renderContainer.appendChild(div);
+        });
+
+        function updateCounter() {
+            const checkedCount = document.querySelectorAll('#questionsContainer input:checked').length;
+            document.getElementById('counter').innerText = `${checkedCount} selecionadas`;
+        }
+
+        function calcularResultado() {
+            let scores = { "Colérico": 0, "Sanguíneo": 0, "Melancólico": 0, "Fleumático": 0 };
+            const checkboxes = document.querySelectorAll('#questionsContainer input:checked');
+            
+            if(checkboxes.length === 0) {
+                alert("Por favor, marque algumas caixas na lista de 32 perguntas para gerar a análise final.");
+                return;
+            }
+
+            checkboxes.forEach(cb => {
+                const id = parseInt(cb.getAttribute('data-id'));
+                const pObj = perguntas.find(p => p.id === id);
+                if (pObj) pObj.temps.forEach(t => scores[t]++);
+            });
+
+            const total = scores["Colérico"] + scores["Sanguíneo"] + scores["Melancólico"] + scores["Fleumático"];
+            const getPct = (p) => total > 0 ? Math.round((p / total) * 100) : 0;
+
+            document.getElementById('score-colerico').innerText = `${scores["Colérico"]} pts (${getPct(scores["Colérico"])}%)`;
+            document.getElementById('score-sanguineo').innerText = `${scores["Sanguíneo"]} pts (${getPct(scores["Sanguíneo"])}%)`;
+            document.getElementById('score-melancolico').innerText = `${scores["Melancólico"]} pts (${getPct(scores["Melancólico"])}%)`;
+            document.getElementById('score-fleumatico').innerText = `${scores["Fleumático"]} pts (${getPct(scores["Fleumático"])}%)`;
+
+            document.getElementById('bar-colerico').style.width = `${getPct(scores["Colérico"])}%`;
+            document.getElementById('bar-sanguineo').style.width = `${getPct(scores["Sanguíneo"])}%`;
+            document.getElementById('bar-melancolico').style.width = `${getPct(scores["Melancólico"])}%`;
+            document.getElementById('bar-fleumatico').style.width = `${getPct(scores["Fleumático"])}%`;
+
+            let sorted = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+            let dom = sorted[0]; let sub = sorted[1];
+
+            document.getElementById('resumo-dominante').innerText = `${infoTemps[dom].emoji} ${dom}`;
+            document.getElementById('resumo-subdominante').innerText = `${infoTemps[sub].emoji} ${sub}`;
+
+            document.getElementById('detalhes-perfis').innerHTML = `
+                <div class="p-5 rounded-xl bg-slate-50 border border-slate-100">
+                    <h4 class="font-bold ${infoTemps[dom].color} flex items-center gap-2 mb-2">${infoTemps[dom].emoji} Perfil Dominante: ${dom}</h4>
+                    <p class="text-slate-600 text-sm font-light">${infoTemps[dom].desc}</p>
+                </div>
+                <div class="p-5 rounded-xl bg-slate-50 border border-slate-100">
+                    <h4 class="font-bold ${infoTemps[sub].color} flex items-center gap-2 mb-2">${infoTemps[sub].emoji} Perfil Subdominante: ${sub}</h4>
+                    <p class="text-slate-600 text-sm font-light">${infoTemps[sub].desc}</p>
+                </div>
+            `;
+
+            // Reset do feedback do form de email
+            document.getElementById('form-feedback').classList.add('hidden');
+            document.getElementById('emailCaptureForm').reset();
+
+            const section = document.getElementById('resultado-section');
+            section.classList.remove('hidden');
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function enviarEmail(event) {
+            event.preventDefault();
+            const name = document.getElementById('user-name').value;
+            const email = document.getElementById('user-email').value;
+            const dom = document.getElementById('resumo-dominante').innerText;
+            const sub = document.getElementById('resumo-subdominante').innerText;
+
+            // Integração / Mock de Envio
+            console.log(`Enviando relatório para ${name} (${email}) | Perfil: ${dom} + ${sub}`);
+            
+            const feedback = document.getElementById('form-feedback');
+            feedback.innerText = `Obrigado, ${name}! Seu resultado (${dom} + ${sub}) foi processado e enviado com sucesso para ${email}.`;
+            feedback.classList.remove('hidden');
+            
+            document.getElementById('emailCaptureForm').reset();
+        }
+
+        function reiniciarTeste() {
+            document.getElementById('quizForm').reset();
+            updateCounter();
+            selecoesEixos = { reacao: null, impacto: null };
+            document.getElementById('eixos-resultado').classList.add('hidden');
+            document.getElementById('btn-reacao-rapida').className = 'w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-all';
+            document.getElementById('btn-reacao-lenta').className = 'w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-all';
+            document.getElementById('btn-impacto-ficam').className = 'w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-all';
+            document.getElementById('btn-impacto-passam').className = 'w-full text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-all';
+            document.getElementById('resultado-section').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
